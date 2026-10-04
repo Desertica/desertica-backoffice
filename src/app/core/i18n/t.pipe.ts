@@ -18,6 +18,7 @@ export type EnumPrefix =
   | 'status.payment'
   | 'status.document'
   | 'status.waiver'
+  | 'bookings.paymentStatus'
   | 'enum.paymentKind'
   | 'enum.paymentMethod'
   | 'enum.source'

@@ -22,6 +22,10 @@ export interface BookingQuery {
   from?: string;
   to?: string;
   q?: string;
+  paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID';
+  source?: 'WEB' | 'MANUAL';
+  waiverStatus?: 'PENDING' | 'SIGNED';
+  currency?: Currency;
 }
 
 @Injectable({ providedIn: 'root' })

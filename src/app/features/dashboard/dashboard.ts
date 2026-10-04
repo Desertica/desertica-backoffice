@@ -44,7 +44,7 @@ const PENDING_LINKS = [
     key: 'unpaidBookings',
     label: 'dashboard.pending.unpaidBookings',
     link: '/bookings',
-    query: { status: 'PENDING_PAYMENT' },
+    query: { paymentStatus: 'UNPAID' },
     permission: 'bookings:read',
   },
   {
@@ -58,7 +58,7 @@ const PENDING_LINKS = [
     key: 'waiversPending',
     label: 'dashboard.pending.waiversPending',
     link: '/bookings',
-    query: {},
+    query: { waiver: 'PENDING' },
     permission: 'bookings:read',
   },
   {
