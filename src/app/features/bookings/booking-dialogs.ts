@@ -83,7 +83,7 @@ const newKey = () => crypto.randomUUID();
               q.refundPercent
             }}%)
           </p>
-          @if (q.tier?.hoursBefore != null) {
+          @if ((q.tier?.hoursBefore ?? -1) >= 0) {
             <p class="text-xs text-muted-foreground">
               {{ 'bookings.cancel.quote.tier' | t: { hours: q.tier?.hoursBefore ?? 0 } }}
             </p>
