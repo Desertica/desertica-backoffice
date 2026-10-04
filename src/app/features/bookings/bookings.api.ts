@@ -63,6 +63,15 @@ export class BookingsApi {
     );
   }
 
+  /** Read-only preview of what a cancellation would refund; nothing changes on the API. */
+  async cancellationQuote(id: string, refund: 'POLICY' | 'FULL' | 'NONE') {
+    return unwrap(
+      await this.http.GET('/bookings/{id}/cancellation-quote', {
+        params: { path: { id }, query: { refund } },
+      }),
+    );
+  }
+
   async reschedule(id: string, body: { targetDepartureId: string; reason?: string }) {
     return unwrap(
       await this.http.POST('/bookings/{id}/reschedule', { params: { path: { id } }, body }),
