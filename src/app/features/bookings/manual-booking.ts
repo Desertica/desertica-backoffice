@@ -223,20 +223,22 @@ export class ManualBooking {
     ),
   );
 
-  /** List price for the chosen departure and party (uses the public quote endpoint of the contract). */
+  /** Price for the chosen departure and party (`createStaffQuote`); honours the agreed price only for `bookings:override`. */
   protected readonly quote = resource({
     params: () => {
       const v = this.values();
-      return v?.departureId && (v.adults ?? 0) >= 1
-        ? {
-            departureId: v.departureId,
-            adults: v.adults!,
-            children: v.children ?? 0,
-            currency: v.currency!,
-          }
-        : undefined;
+      if (!v?.departureId || (v.adults ?? 0) < 1) return undefined;
+      const override = this.canOverride && v.override?.trim() ? parseToCents(v.override) : null;
+      return {
+        departureId: v.departureId,
+        adults: v.adults!,
+        children: v.children ?? 0,
+        currency: v.currency!,
+        ...(override !== null ? { overrideTotalCents: override } : {}),
+      };
     },
-    loader: async ({ params }) => unwrap(await this.http.POST('/public/quotes', { body: params })),
+    loader: async ({ params, abortSignal }) =>
+      unwrap(await this.http.POST('/bookings/quote', { body: params, signal: abortSignal })),
   });
 
   constructor() {
