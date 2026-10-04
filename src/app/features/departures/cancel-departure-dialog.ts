@@ -12,7 +12,6 @@ import { HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
-import { TourCatalog } from '../../core/api/tour-catalog';
 import type { Departure } from '../../core/api/types';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { LimaDateTimePipe } from '../../shared/format.pipes';
@@ -106,7 +105,6 @@ export class CancelDepartureDialog {
   private readonly api = inject(DeparturesApi);
   private readonly notify = inject(Notify);
   private readonly fb = inject(FormBuilder).nonNullable;
-  protected readonly catalog = inject(TourCatalog);
 
   protected readonly departure = this.dialog.context.departure;
   protected readonly resolutions: readonly Resolution[] = ['REFUND', 'RESCHEDULE', 'CLIENT_CHOICE'];

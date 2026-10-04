@@ -133,10 +133,6 @@ export class BookingsPage {
     void this.router.navigate([], { queryParams: {} });
   }
 
-  protected tourTitle(slug: string): string {
-    return this.catalog.titleBySlug(slug) ?? slug;
-  }
-
   private navigate(queryParams: Record<string, string | number | null>) {
     return this.router.navigate([], { queryParams, queryParamsHandling: 'merge' });
   }
