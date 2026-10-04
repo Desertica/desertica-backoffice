@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, isDevMode, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import createClient from 'openapi-fetch';
 import { unwrap } from '../api/api-error';
 import type { components, paths } from '../api/schema';
@@ -20,7 +20,6 @@ export class AuthService {
     credentials: 'include',
   });
 
-  private readonly devMock = isDevMode() && !!inject(RUNTIME_CONFIG).devLogin;
   private readonly _accessToken = signal<string | null>(null);
   private readonly _user = signal<User | null>(null);
   private inflightRefresh: Promise<boolean> | null = null;
@@ -32,8 +31,6 @@ export class AuthService {
 
   /** UI-only check. The API is the real authority on every call. */
   has(permission: string): boolean {
-    // Prism's example user carries a placeholder permission list; in the dev mock everything is visible.
-    if (this.devMock) return true;
     return this.permissions().has(permission);
   }
 
