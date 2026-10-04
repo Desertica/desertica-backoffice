@@ -1,0 +1,142 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  resource,
+  signal,
+} from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { HlmInputImports } from '@spartan-ng/helm/input';
+import { HlmLabelImports } from '@spartan-ng/helm/label';
+import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
+import { HlmTableImports } from '@spartan-ng/helm/table';
+import type { CompanyInput, DocumentType } from '../../core/api/types';
+import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
+import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
+import { Notify } from '../../shared/notify';
+import { AdminApi } from './admin.api';
+
+/** Series prefixes: B (boleta), F (factura) or E, then 3 letters or digits. */
+export const SERIES_PREFIX = /^[BFE][A-Z0-9]{3}$/;
+
+export function buildCompany(v: {
+  ruc: string;
+  legalName: string;
+  tradeName: string;
+  fiscalAddress: string;
+  ubigeo: string;
+  igvRate: string;
+  environment: 'BETA' | 'PRODUCTION';
+}): CompanyInput {
+  return {
+    ruc: v.ruc.trim(),
+    legalName: v.legalName.trim(),
+    fiscalAddress: v.fiscalAddress.trim(),
+    environment: v.environment,
+    ...(v.tradeName.trim() ? { tradeName: v.tradeName.trim() } : {}),
+    ...(v.ubigeo.trim() ? { ubigeo: v.ubigeo.trim() } : {}),
+    ...(v.igvRate.trim() ? { igvRate: v.igvRate.trim() } : {}),
+  };
+}
+
+@Component({
+  selector: 'app-company-page',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    ReactiveFormsModule,
+    TPipe,
+    EnumLabelPipe,
+    HasPermissionDirective,
+    HlmButtonImports,
+    HlmInputImports,
+    HlmLabelImports,
+    HlmSkeletonImports,
+    HlmTableImports,
+  ],
+  templateUrl: './company-page.html',
+})
+export class CompanyPage {
+  private readonly api = inject(AdminApi);
+  private readonly notify = inject(Notify);
+  private readonly fb = inject(FormBuilder).nonNullable;
+  protected readonly saving = signal(false);
+  protected readonly creating = signal(false);
+  protected readonly docTypes: readonly DocumentType[] = [
+    'BOLETA',
+    'FACTURA',
+    'NOTA_CREDITO',
+    'NOTA_DEBITO',
+  ];
+
+  protected readonly company = resource({ loader: () => this.api.getCompany() });
+  protected readonly series = resource({ loader: () => this.api.listSeries() });
+
+  protected readonly form = this.fb.group({
+    ruc: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+    legalName: ['', Validators.required],
+    tradeName: [''],
+    fiscalAddress: ['', Validators.required],
+    ubigeo: ['', Validators.pattern(/^(\d{6})?$/)],
+    igvRate: [''],
+    environment: ['BETA' as 'BETA' | 'PRODUCTION'],
+  });
+  protected readonly seriesForm = this.fb.group({
+    docType: ['BOLETA' as DocumentType],
+    prefix: ['', [Validators.required, Validators.pattern(SERIES_PREFIX)]],
+    nextNumber: [1, [Validators.required, Validators.min(1)]],
+  });
+
+  constructor() {
+    effect(() => {
+      const c = this.company.value();
+      if (c)
+        this.form.reset({
+          ruc: c.ruc,
+          legalName: c.legalName,
+          tradeName: c.tradeName ?? '',
+          fiscalAddress: c.fiscalAddress,
+          ubigeo: c.ubigeo ?? '',
+          igvRate: c.igvRate ?? '',
+          environment: c.environment ?? 'BETA',
+        });
+    });
+  }
+
+  protected async save() {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
+    this.saving.set(true);
+    try {
+      await this.api.saveCompany(buildCompany(this.form.getRawValue()));
+      this.notify.success('company.saved');
+      this.company.reload();
+    } catch (e) {
+      this.notify.error(e);
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  protected async createSeries() {
+    this.seriesForm.markAllAsTouched();
+    if (this.seriesForm.invalid) return;
+    const v = this.seriesForm.getRawValue();
+    this.creating.set(true);
+    try {
+      await this.api.createSeries({
+        docType: v.docType,
+        prefix: v.prefix.trim().toUpperCase(),
+        nextNumber: v.nextNumber,
+      });
+      this.notify.success('series.created');
+      this.seriesForm.reset({ docType: 'BOLETA', prefix: '', nextNumber: 1 });
+      this.series.reload();
+    } catch (e) {
+      this.notify.error(e);
+    } finally {
+      this.creating.set(false);
+    }
+  }
+}
