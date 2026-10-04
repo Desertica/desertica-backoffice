@@ -32,6 +32,10 @@ export const BOOKING_STATUSES: readonly BookingStatus[] = [
   'NO_SHOW',
 ];
 const PAGE_SIZE = 25;
+const PAYMENT_STATUSES = ['UNPAID', 'PARTIAL', 'PAID'] as const;
+const SOURCES = ['WEB', 'MANUAL'] as const;
+const WAIVER_STATUSES = ['PENDING', 'SIGNED'] as const;
+const CURRENCIES = ['USD', 'PEN'] as const;
 
 /** Query-string filters (Lima days) to the API query (UTC instants; `to` is exclusive of the next day). */
 export function toBookingQuery(f: {
@@ -40,12 +44,24 @@ export function toBookingQuery(f: {
   tour?: string;
   from?: string;
   to?: string;
+  paymentStatus?: string;
+  source?: string;
+  waiver?: string;
+  currency?: string;
   page?: string | number;
 }): BookingQuery {
   const q: BookingQuery = { page: Number(f.page) > 0 ? Number(f.page) : 1, pageSize: PAGE_SIZE };
   if (f.status && (BOOKING_STATUSES as readonly string[]).includes(f.status))
     q.status = f.status as BookingStatus;
   if (f.q?.trim()) q.q = f.q.trim();
+  if (f.paymentStatus && PAYMENT_STATUSES.includes(f.paymentStatus as never))
+    q.paymentStatus = f.paymentStatus as BookingQuery['paymentStatus'];
+  if (f.source && SOURCES.includes(f.source as never))
+    q.source = f.source as BookingQuery['source'];
+  if (f.waiver && WAIVER_STATUSES.includes(f.waiver as never))
+    q.waiverStatus = f.waiver as BookingQuery['waiverStatus'];
+  if (f.currency && CURRENCIES.includes(f.currency as never))
+    q.currency = f.currency as BookingQuery['currency'];
   if (f.tour) q.tourRefId = f.tour;
   if (f.from) q.from = limaToUtcIso(f.from);
   if (f.to) q.to = limaToUtcIso(addDays(f.to, 1));
@@ -79,12 +95,20 @@ export class BookingsPage {
   readonly tour = input<string>();
   readonly from = input<string>();
   readonly to = input<string>();
+  readonly paymentStatus = input<string>();
+  readonly source = input<string>();
+  readonly waiver = input<string>();
+  readonly currency = input<string>();
   readonly page = input<string>();
 
   private readonly api = inject(BookingsApi);
   private readonly router = inject(Router);
   protected readonly catalog = inject(TourCatalog);
   protected readonly statuses = BOOKING_STATUSES;
+  protected readonly paymentStatuses = PAYMENT_STATUSES;
+  protected readonly sources = SOURCES;
+  protected readonly waiverStatuses = WAIVER_STATUSES;
+  protected readonly currencies = CURRENCIES;
   protected readonly search = signal('');
   private debounce: ReturnType<typeof setTimeout> | undefined;
 
@@ -95,6 +119,10 @@ export class BookingsPage {
       tour: this.tour(),
       from: this.from(),
       to: this.to(),
+      paymentStatus: this.paymentStatus(),
+      source: this.source(),
+      waiver: this.waiver(),
+      currency: this.currency(),
       page: this.page(),
     }),
   );
@@ -103,7 +131,18 @@ export class BookingsPage {
     loader: ({ params }) => this.api.list(params),
   });
   protected readonly hasFilters = computed(
-    () => !!(this.status() || this.q() || this.tour() || this.from() || this.to()),
+    () =>
+      !!(
+        this.status() ||
+        this.q() ||
+        this.tour() ||
+        this.from() ||
+        this.to() ||
+        this.paymentStatus() ||
+        this.source() ||
+        this.waiver() ||
+        this.currency()
+      ),
   );
 
   constructor() {
@@ -111,7 +150,10 @@ export class BookingsPage {
     effect(() => this.search.set(this.q() ?? ''));
   }
 
-  protected setFilter(key: 'status' | 'tour' | 'from' | 'to', value: string) {
+  protected setFilter(
+    key: 'status' | 'tour' | 'from' | 'to' | 'paymentStatus' | 'source' | 'waiver' | 'currency',
+    value: string,
+  ) {
     void this.navigate({ [key]: value || null, page: null });
   }
 
