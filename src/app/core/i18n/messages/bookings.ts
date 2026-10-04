@@ -75,6 +75,11 @@ export const bookings = defineMessages({
     'bookings.cancel.refund.NONE': 'Sin reembolso (excepción)',
     'bookings.cancel.policyHint':
       'El API calcula el monto con la política que el cliente aceptó. Las excepciones requieren permiso especial.',
+    'bookings.cancel.reason.NONE_REQUESTED': 'Se eligió cancelar sin reembolso.',
+    'bookings.cancel.reason.NOTHING_TO_REFUND': 'No hay nada que reembolsar.',
+    'bookings.cancel.reason.NO_PAYMENTS': 'La reserva no tiene pagos.',
+    'bookings.cancel.reason.NO_POLICY': 'La reserva no tiene política de cancelación.',
+    'bookings.cancel.reason.OUTSIDE_POLICY_WINDOW': 'Fuera del plazo de reembolso de la política.',
     'bookings.cancel.quote.paid': 'Cobrado hasta ahora',
     'bookings.cancel.quote.refund': 'Se reembolsará',
     'bookings.cancel.quote.tier':
@@ -242,9 +247,15 @@ export const bookings = defineMessages({
     'bookings.cancel.refund.NONE': 'No refund (exception)',
     'bookings.cancel.policyHint':
       'The API computes the amount with the policy the customer accepted. Exceptions need a special permission.',
+    'bookings.cancel.reason.NONE_REQUESTED': 'Cancelling without a refund was chosen.',
+    'bookings.cancel.reason.NOTHING_TO_REFUND': 'Nothing to refund.',
+    'bookings.cancel.reason.NO_PAYMENTS': 'The booking has no payments.',
+    'bookings.cancel.reason.NO_POLICY': 'The booking has no cancellation policy.',
+    'bookings.cancel.reason.OUTSIDE_POLICY_WINDOW': 'Outside the policy refund window.',
     'bookings.cancel.quote.paid': 'Collected so far',
     'bookings.cancel.quote.refund': 'Will be refunded',
-    'bookings.cancel.quote.tier': 'Policy tier: cancelled {hours} h or more in advance',
+    'bookings.cancel.quote.tier':
+      'Policy tier: {percent}% if cancelled {hours} h or more in advance',
     'bookings.cancel.quote.error':
       'The refund could not be calculated; the API will compute it on confirm.',
     'bookings.cancel.confirm': 'Cancel booking',

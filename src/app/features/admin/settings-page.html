@@ -48,7 +48,14 @@
 
   <section *appHasPermission="'fraud:read'" aria-labelledby="fr-h" class="space-y-3">
     <h2 id="fr-h" class="text-lg font-medium">{{ 'settings.section.fraud' | t }}</h2>
-    @if (blocked.value(); as list) {
+    @if (blocked.error()) {
+      <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+        {{ 'common.loadError' | t }}
+        <button hlmBtn size="sm" variant="outline" (click)="blocked.reload()">
+          {{ 'common.retry' | t }}
+        </button>
+      </div>
+    } @else if (blocked.value(); as list) {
       @if (list.length === 0) {
         <p class="text-sm text-muted-foreground">{{ 'blocked.empty' | t }}</p>
       } @else {

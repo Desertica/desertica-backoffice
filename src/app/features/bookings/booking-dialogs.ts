@@ -43,7 +43,7 @@ const newKey = () => crypto.randomUUID();
 @Component({
   selector: 'app-cancel-booking-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [...COMMON, MoneyPipe],
+  imports: [...COMMON, MoneyPipe, EnumLabelPipe],
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-4" novalidate>
       <hlm-dialog-header>
@@ -83,13 +83,18 @@ const newKey = () => crypto.randomUUID();
               q.refundPercent
             }}%)
           </p>
-          @if ((q.tier?.hoursBefore ?? -1) >= 0) {
+          @if (q.tier && (q.tier.refundPercent ?? 0) > 0) {
             <p class="text-xs text-muted-foreground">
-              {{ 'bookings.cancel.quote.tier' | t: { hours: q.tier?.hoursBefore ?? 0 } }}
+              {{
+                'bookings.cancel.quote.tier'
+                  | t: { hours: q.tier.hoursBefore ?? 0, percent: q.tier.refundPercent ?? 0 }
+              }}
             </p>
           }
           @if (q.reason) {
-            <p class="text-xs text-muted-foreground">{{ q.reason }}</p>
+            <p class="text-xs text-muted-foreground">
+              {{ q.reason | enumLabel: 'bookings.cancel.reason' }}
+            </p>
           }
         } @else {
           <p class="text-muted-foreground">{{ 'common.loading' | t }}</p>
