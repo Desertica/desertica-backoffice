@@ -1,4 +1,9 @@
 import type { MessageKey } from './messages.es';
+import { bookings } from './messages/bookings';
+import { customers } from './messages/customers';
+import { dashboard } from './messages/dashboard';
+import { departures } from './messages/departures';
+import { shared } from './messages/shared';
 
 export const en: Record<MessageKey, string> = {
   'app.name': 'Desértica Backoffice',
@@ -51,4 +56,9 @@ export const en: Record<MessageKey, string> = {
   'notFound.back': 'Back to dashboard',
 
   'placeholder.soon': 'This screen arrives in the next milestone.',
+  ...shared.en,
+  ...dashboard.en,
+  ...departures.en,
+  ...bookings.en,
+  ...customers.en,
 };

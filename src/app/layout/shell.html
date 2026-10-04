@@ -9,7 +9,7 @@
     ></button>
   }
   <aside
-    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform lg:static lg:translate-x-0"
+    class="print:hidden fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform lg:static lg:translate-x-0"
     [class.-translate-x-full]="!menuOpen()"
     id="sidebar"
   >
@@ -53,7 +53,7 @@
   </aside>
 
   <div class="flex min-w-0 flex-1 flex-col">
-    <header class="flex h-14 items-center gap-2 border-b border-border px-4">
+    <header class="print:hidden flex h-14 items-center gap-2 border-b border-border px-4">
       <button
         hlmBtn
         variant="ghost"

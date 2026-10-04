@@ -1,4 +1,10 @@
 /** Spanish is the primary language and defines the keys; `messages.en.ts` must match them exactly. */
+import { bookings } from './messages/bookings';
+import { customers } from './messages/customers';
+import { dashboard } from './messages/dashboard';
+import { departures } from './messages/departures';
+import { shared } from './messages/shared';
+
 export const es = {
   'app.name': 'Desértica Backoffice',
   'common.loading': 'Cargando…',
@@ -50,6 +56,11 @@ export const es = {
   'notFound.back': 'Volver al panel',
 
   'placeholder.soon': 'Esta pantalla llega en el siguiente hito.',
+  ...shared.es,
+  ...dashboard.es,
+  ...departures.es,
+  ...bookings.es,
+  ...customers.es,
 } as const;
 
 export type MessageKey = keyof typeof es;
