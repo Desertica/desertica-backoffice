@@ -70,7 +70,7 @@ export class DeparturesPage {
   ];
 
   constructor() {
-    // Titles are best-effort: operators may lack catalog:read, in which case the slug-less fallback shows.
+    // The catalog only feeds the tour filter; operators without catalog:read just don't get it.
     void this.catalog.load().catch(() => undefined);
   }
 
@@ -104,7 +104,7 @@ export class DeparturesPage {
   );
 
   protected tourTitle(d: Departure): string {
-    return this.catalog.titleById(d.tourRefId) ?? '…';
+    return d.tourTitle;
   }
 
   protected prev() {

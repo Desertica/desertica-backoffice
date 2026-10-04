@@ -111,7 +111,7 @@
                   }
                 </td>
                 <td hlmTd>{{ b.customerName }}</td>
-                <td hlmTd>{{ tourTitle(b.tourSlug) }}</td>
+                <td hlmTd>{{ b.tourTitle }}</td>
                 <td hlmTd>{{ b.startsAt | limaDateTime }}</td>
                 <td hlmTd>{{ (b.adults ?? 0) + (b.children ?? 0) }}</td>
                 <td hlmTd><app-status-badge kind="booking" [value]="b.status" /></td>
