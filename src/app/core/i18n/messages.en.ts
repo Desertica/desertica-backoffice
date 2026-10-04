@@ -1,5 +1,9 @@
 import type { MessageKey } from './messages.es';
+import { admin } from './messages/admin';
 import { bookings } from './messages/bookings';
+import { complaints } from './messages/complaints';
+import { documents } from './messages/documents';
+import { payments } from './messages/payments';
 import { customers } from './messages/customers';
 import { dashboard } from './messages/dashboard';
 import { departures } from './messages/departures';
@@ -55,10 +59,13 @@ export const en: Record<MessageKey, string> = {
   'notFound.body': 'This address does not exist.',
   'notFound.back': 'Back to dashboard',
 
-  'placeholder.soon': 'This screen arrives in the next milestone.',
   ...shared.en,
   ...dashboard.en,
   ...departures.en,
   ...bookings.en,
   ...customers.en,
+  ...payments.en,
+  ...documents.en,
+  ...complaints.en,
+  ...admin.en,
 };

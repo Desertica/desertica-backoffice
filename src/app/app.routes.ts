@@ -1,8 +1,6 @@
 import type { Route, Routes } from '@angular/router';
 import { authGuard, guestGuard, permissionGuard } from './core/auth/auth.guard';
 
-const placeholder = () => import('./shared/placeholder').then((m) => m.Placeholder);
-
 /** A staff route: hidden (redirect to /forbidden) unless the role holds `permission`. */
 const guarded = (
   path: string,
@@ -58,15 +56,36 @@ export const routes: Routes = [
         import('./features/customers/customer-detail').then((m) => m.CustomerDetail),
       ),
 
-      // Milestone 3 screens: placeholders until their features land.
-      guarded('complaints', 'complaints:read', placeholder),
-      guarded('payments', 'payments:read', placeholder),
-      guarded('disputes', 'payments:read', placeholder),
-      guarded('documents', 'documents:read', placeholder),
-      guarded('users', 'users:read', placeholder),
-      guarded('company', 'company:read', placeholder),
-      guarded('audit', 'audit:read', placeholder),
-      guarded('settings', 'settings:read', placeholder),
+      guarded('complaints', 'complaints:read', () =>
+        import('./features/complaints/complaints-page').then((m) => m.ComplaintsPage),
+      ),
+      guarded('complaints/:id', 'complaints:read', () =>
+        import('./features/complaints/complaint-detail').then((m) => m.ComplaintDetail),
+      ),
+      guarded('payments', 'payments:read', () =>
+        import('./features/payments/payments-page').then((m) => m.PaymentsPage),
+      ),
+      guarded('disputes', 'payments:read', () =>
+        import('./features/payments/disputes-page').then((m) => m.DisputesPage),
+      ),
+      guarded('disputes/:id', 'payments:read', () =>
+        import('./features/payments/dispute-detail').then((m) => m.DisputeDetail),
+      ),
+      guarded('documents', 'documents:read', () =>
+        import('./features/documents/documents-page').then((m) => m.DocumentsPage),
+      ),
+      guarded('users', 'users:read', () =>
+        import('./features/admin/users-page').then((m) => m.UsersPage),
+      ),
+      guarded('company', 'company:read', () =>
+        import('./features/admin/company-page').then((m) => m.CompanyPage),
+      ),
+      guarded('audit', 'audit:read', () =>
+        import('./features/admin/audit-page').then((m) => m.AuditPage),
+      ),
+      guarded('settings', 'settings:read', () =>
+        import('./features/admin/settings-page').then((m) => m.SettingsPage),
+      ),
 
       {
         path: 'forbidden',

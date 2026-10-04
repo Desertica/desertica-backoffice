@@ -34,3 +34,22 @@ export interface Page<T> {
   data: T[];
   meta: Meta;
 }
+
+export type Refund = S['Refund'];
+export type Dispute = S['Dispute'];
+export type DisputeStatus = S['DisputeStatus'];
+export type Complaint = S['Complaint'];
+export type ComplaintStatus = S['ComplaintStatus'];
+export type User = S['User'];
+export type Role = S['Role'];
+export type Company = S['Company'];
+export type CompanyInput = S['CompanyInput'];
+export type Series = S['Series'];
+export type BlockedIdentity = S['BlockedIdentity'];
+export type AuditLog = S['AuditLog'];
+export type LegalDocument = S['LegalDocument'];
+export type LegalDocumentKind = S['LegalDocumentKind'];
+export type PaymentStatus = S['PaymentStatus'];
+export type PaymentProvider = S['PaymentProvider'];
+export type DocumentStatus = S['DocumentStatus'];
+export type DocumentType = S['DocumentType'];
