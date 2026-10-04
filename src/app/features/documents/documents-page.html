@@ -71,6 +71,8 @@
           <thead hlmTHead>
             <tr hlmTr>
               <th hlmTh>{{ 'documents.col.number' | t }}</th>
+              <th hlmTh>{{ 'documents.col.booking' | t }}</th>
+              <th hlmTh>{{ 'documents.col.customer' | t }}</th>
               <th hlmTh>{{ 'documents.col.type' | t }}</th>
               <th hlmTh>{{ 'documents.col.status' | t }}</th>
               <th hlmTh>{{ 'documents.col.issued' | t }}</th>
@@ -89,6 +91,12 @@
                     >{{ number(d) }}</a
                   >
                 </td>
+                <td hlmTd>
+                  <a [routerLink]="['/bookings', d.bookingId]" class="hover:underline">{{
+                    d.bookingReference
+                  }}</a>
+                </td>
+                <td hlmTd>{{ d.customerName }}</td>
                 <td hlmTd>{{ d.docType | enumLabel: 'enum.docType' }}</td>
                 <td hlmTd>
                   <app-status-badge kind="document" [value]="d.status" />
