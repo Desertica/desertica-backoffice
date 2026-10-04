@@ -61,6 +61,11 @@ import { PaymentsApi } from './payments.api';
               {{ d.provider | enumLabel: 'enum.provider' }} · {{ d.providerRef }} ·
               {{ d.reason || '—' }}
             </p>
+            <a
+              [routerLink]="['/bookings', d.bookingId]"
+              class="text-sm font-medium hover:underline"
+              >{{ 'disputes.detail.booking' | t: { reference: d.bookingReference } }}</a
+            >
           </div>
           <div class="text-right text-sm">
             <p class="text-muted-foreground">{{ 'disputes.col.due' | t }}</p>
