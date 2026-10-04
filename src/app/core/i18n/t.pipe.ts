@@ -25,7 +25,16 @@ export type EnumPrefix =
   | 'enum.idDocType'
   | 'enum.docType'
   | 'weekday'
-  | 'departures.cancel.resolution';
+  | 'departures.cancel.resolution'
+  | 'enum.provider'
+  | 'refund.status'
+  | 'dispute.status'
+  | 'complaints.status'
+  | 'complaints.kind'
+  | 'complaints.good'
+  | 'company.env'
+  | 'blocked.kind'
+  | 'legal.kind';
 
 /** `{{ d.format | enumLabel: 'enum.format' }}`: translates an API enum value; unknown values show as-is. */
 @Pipe({ name: 'enumLabel', pure: false })

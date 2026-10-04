@@ -1,5 +1,9 @@
 /** Spanish is the primary language and defines the keys; `messages.en.ts` must match them exactly. */
+import { admin } from './messages/admin';
 import { bookings } from './messages/bookings';
+import { complaints } from './messages/complaints';
+import { documents } from './messages/documents';
+import { payments } from './messages/payments';
 import { customers } from './messages/customers';
 import { dashboard } from './messages/dashboard';
 import { departures } from './messages/departures';
@@ -55,12 +59,15 @@ export const es = {
   'notFound.body': 'La dirección no existe.',
   'notFound.back': 'Volver al panel',
 
-  'placeholder.soon': 'Esta pantalla llega en el siguiente hito.',
   ...shared.es,
   ...dashboard.es,
   ...departures.es,
   ...bookings.es,
   ...customers.es,
+  ...payments.es,
+  ...documents.es,
+  ...complaints.es,
+  ...admin.es,
 } as const;
 
 export type MessageKey = keyof typeof es;

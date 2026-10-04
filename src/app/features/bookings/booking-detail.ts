@@ -16,7 +16,7 @@ import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { HlmTableImports } from '@spartan-ng/helm/table';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
 import { ApiError } from '../../core/api/api-error';
-import type { Booking, Document } from '../../core/api/types';
+import type { Booking } from '../../core/api/types';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
 import { I18n } from '../../core/i18n/i18n.service';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
@@ -24,6 +24,7 @@ import { useDialogs } from '../../shared/dialog';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
 import { StatusBadge } from '../../shared/status-badge';
+import { documentNumber } from '../documents/document-dialogs';
 import { DeparturesApi } from '../departures/departures.api';
 import { BookingsApi } from './bookings.api';
 import {
@@ -34,11 +35,6 @@ import {
   PaymentLinkDialog,
   RescheduleBookingDialog,
 } from './booking-dialogs';
-
-/** `B001-00000012`: series and number padded to 8 digits, as printed on the comprobante. */
-export function documentNumber(d: Pick<Document, 'series' | 'number'>): string {
-  return `${d.series}-${String(d.number).padStart(8, '0')}`;
-}
 
 /** What is still owed. Never negative, and never mixes currencies: it is the booking's own. */
 export function pendingCents(b: Pick<Booking, 'totalCents' | 'paidCents'>): number {
@@ -56,6 +52,8 @@ export function allowedActions(status: Booking['status']) {
     issue: status !== 'CANCELLED' && status !== 'PENDING_PAYMENT',
   };
 }
+
+export { documentNumber };
 
 @Component({
   selector: 'app-booking-detail',
