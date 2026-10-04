@@ -1,0 +1,294 @@
+<div class="space-y-6">
+  <a hlmBtn variant="ghost" size="sm" routerLink="/departures" class="print:hidden"
+    >← {{ 'departures.title' | t }}</a
+  >
+
+  @if (notFound()) {
+    <p class="text-muted-foreground">{{ 'departures.detail.notFound' | t }}</p>
+  } @else if (departure.error()) {
+    <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+      {{ 'common.error.generic' | t }}
+      <button hlmBtn size="sm" variant="outline" (click)="departure.reload()">
+        {{ 'common.retry' | t }}
+      </button>
+    </div>
+  } @else if (departure.value(); as d) {
+    <header class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold">{{ title() }}</h1>
+        <p class="text-muted-foreground">
+          {{ d.startsAt | limaDateTime }} · {{ 'common.timezoneHint' | t }}
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 print:hidden">
+        <app-status-badge kind="departure" [value]="d.status" />
+        @if (editable()) {
+          <button
+            *appHasPermission="'departures:write'"
+            hlmBtn
+            variant="outline"
+            size="sm"
+            [disabled]="saving()"
+            (click)="toggleSales()"
+          >
+            {{
+              d.status === 'OPEN'
+                ? ('departures.detail.close' | t)
+                : ('departures.detail.reopen' | t)
+            }}
+          </button>
+          <button
+            *appHasPermission="'departures:write'"
+            hlmBtn
+            variant="outline"
+            size="sm"
+            (click)="editing.set(!editing())"
+          >
+            {{ 'departures.detail.edit' | t }}
+          </button>
+          <button
+            *appHasPermission="'departures:cancel'"
+            hlmBtn
+            variant="destructive"
+            size="sm"
+            (click)="cancelDeparture()"
+          >
+            {{ 'departures.cancel.action' | t }}
+          </button>
+        }
+      </div>
+    </header>
+
+    <section hlmCard class="print:hidden">
+      <div hlmCardHeader>
+        <h2 hlmCardTitle>{{ 'departures.detail.summary' | t }}</h2>
+      </div>
+      <dl hlmCardContent class="grid gap-4 text-sm sm:grid-cols-3">
+        <div>
+          <dt class="text-muted-foreground">{{ 'departures.col.seats' | t }}</dt>
+          <dd class="font-medium">
+            {{ 'departures.seats' | t: { sold: d.seatsSold, capacity: d.capacity } }}
+            @if (d.seatsHeld) {
+              · {{ 'departures.seatsHeld' | t: { held: d.seatsHeld } }}
+            }
+          </dd>
+        </div>
+        <div>
+          <dt class="text-muted-foreground">{{ 'departures.col.format' | t }}</dt>
+          <dd class="font-medium">
+            {{ d.format | enumLabel: 'enum.format' }} · {{ d.language | uppercase }}
+          </dd>
+        </div>
+        <div>
+          <dt class="text-muted-foreground">{{ 'departures.form.meetingPoint' | t }}</dt>
+          <dd class="font-medium">{{ d.meetingPoint || '—' }}</dd>
+        </div>
+        <div>
+          <dt class="text-muted-foreground">{{ 'departures.form.guide' | t }}</dt>
+          <dd class="font-medium">{{ d.guideName || '—' }}</dd>
+        </div>
+        <div>
+          <dt class="text-muted-foreground">{{ 'departures.form.vehicle' | t }}</dt>
+          <dd class="font-medium">{{ d.vehicleNote || '—' }}</dd>
+        </div>
+        <div>
+          <dt class="text-muted-foreground">{{ 'departures.form.notes' | t }}</dt>
+          <dd class="font-medium">{{ d.notes || '—' }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    @if (editing() && editable()) {
+      <form
+        [formGroup]="form"
+        (ngSubmit)="save()"
+        class="grid gap-4 rounded-lg border border-border p-4 sm:grid-cols-2 print:hidden"
+        novalidate
+      >
+        <label class="grid gap-1.5"
+          ><span hlmLabel>{{ 'departures.form.date' | t }}</span
+          ><input hlmInput type="date" formControlName="date"
+        /></label>
+        <label class="grid gap-1.5"
+          ><span hlmLabel>{{ 'departures.form.time' | t }}</span
+          ><input hlmInput type="time" formControlName="time"
+        /></label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'departures.form.capacity' | t }}</span>
+          <input hlmInput type="number" [min]="d.seatsSold || 1" formControlName="capacity" />
+          <span class="text-xs text-muted-foreground">{{
+            'departures.detail.capacityConflict' | t
+          }}</span>
+        </label>
+        <label class="grid gap-1.5"
+          ><span hlmLabel>{{ 'departures.form.cutoff' | t }}</span
+          ><input hlmInput type="number" min="0" formControlName="cutoffMinutes"
+        /></label>
+        <label class="grid gap-1.5 sm:col-span-2"
+          ><span hlmLabel>{{ 'departures.form.meetingPoint' | t }}</span
+          ><input hlmInput formControlName="meetingPoint"
+        /></label>
+        <label class="grid gap-1.5"
+          ><span hlmLabel>{{ 'departures.form.guide' | t }}</span
+          ><input hlmInput formControlName="guideName"
+        /></label>
+        <label class="grid gap-1.5"
+          ><span hlmLabel>{{ 'departures.form.vehicle' | t }}</span
+          ><input hlmInput formControlName="vehicleNote"
+        /></label>
+        <label class="grid gap-1.5 sm:col-span-2"
+          ><span hlmLabel>{{ 'departures.form.notes' | t }}</span
+          ><textarea hlmTextarea rows="2" formControlName="notes"></textarea>
+        </label>
+        <div class="flex justify-end gap-2 sm:col-span-2">
+          <button hlmBtn type="button" variant="outline" (click)="editing.set(false)">
+            {{ 'common.cancel' | t }}
+          </button>
+          <button hlmBtn type="submit" [disabled]="saving() || form.invalid">
+            {{ 'common.save' | t }}
+          </button>
+        </div>
+      </form>
+    }
+
+    <div class="flex gap-1 border-b border-border print:hidden" role="tablist">
+      <button
+        role="tab"
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        [attr.aria-selected]="tab() === 'bookings'"
+        [class.font-semibold]="tab() === 'bookings'"
+        (click)="tab.set('bookings')"
+      >
+        {{ 'departures.detail.tab.bookings' | t }}
+      </button>
+      <button
+        role="tab"
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        [attr.aria-selected]="tab() === 'manifest'"
+        [class.font-semibold]="tab() === 'manifest'"
+        (click)="tab.set('manifest')"
+      >
+        {{ 'departures.detail.tab.manifest' | t }}
+      </button>
+    </div>
+
+    @if (tab() === 'bookings') {
+      @let rows = bookings.value() ?? [];
+      @if (bookings.isLoading() && !bookings.hasValue()) {
+        <hlm-skeleton class="h-24" />
+      } @else if (rows.length === 0) {
+        <p class="text-muted-foreground">{{ 'departures.detail.noBookings' | t }}</p>
+      } @else {
+        <div hlmTableContainer>
+          <table hlmTable>
+            <thead hlmTHead>
+              <tr hlmTr>
+                <th hlmTh>{{ 'bookings.col.reference' | t }}</th>
+                <th hlmTh>{{ 'bookings.col.customer' | t }}</th>
+                <th hlmTh>{{ 'bookings.col.people' | t }}</th>
+                <th hlmTh>{{ 'bookings.col.status' | t }}</th>
+                <th hlmTh class="text-right">{{ 'bookings.col.paid' | t }}</th>
+              </tr>
+            </thead>
+            <tbody hlmTBody>
+              @for (b of rows; track b.id) {
+                <tr hlmTr>
+                  <td hlmTd>
+                    <a [routerLink]="['/bookings', b.id]" class="font-medium hover:underline">{{
+                      b.reference
+                    }}</a>
+                  </td>
+                  <td hlmTd>{{ b.customerName }}</td>
+                  <td hlmTd>{{ b.adults ?? 0 }} + {{ b.children ?? 0 }}</td>
+                  <td hlmTd><app-status-badge kind="booking" [value]="b.status" /></td>
+                  <td hlmTd class="text-right">
+                    {{ b.paidCents | money: b.currency }} / {{ b.totalCents | money: b.currency }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    } @else {
+      <section aria-labelledby="mf-h" class="space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="mf-h" class="text-lg font-medium">{{ 'departures.manifest.title' | t }}</h2>
+          <div class="flex gap-2 print:hidden">
+            <button
+              hlmBtn
+              variant="outline"
+              size="sm"
+              [disabled]="!manifest.hasValue()"
+              (click)="exportCsv()"
+            >
+              {{ 'common.exportCsv' | t }}
+            </button>
+            <button hlmBtn variant="outline" size="sm" (click)="print()">
+              {{ 'common.print' | t }}
+            </button>
+          </div>
+        </div>
+        @if (manifest.isLoading() && !manifest.hasValue()) {
+          <hlm-skeleton class="h-24" />
+        } @else if (manifest.error()) {
+          <button hlmBtn size="sm" variant="outline" (click)="manifest.reload()">
+            {{ 'common.retry' | t }}
+          </button>
+        } @else if (manifest.value(); as m) {
+          @if (m.passengers.length === 0) {
+            <p class="text-muted-foreground">{{ 'departures.manifest.empty' | t }}</p>
+          } @else {
+            <div hlmTableContainer>
+              <table hlmTable>
+                <thead hlmTHead>
+                  <tr hlmTr>
+                    <th hlmTh>{{ 'departures.manifest.passenger' | t }}</th>
+                    <th hlmTh>{{ 'departures.manifest.booking' | t }}</th>
+                    <th hlmTh>{{ 'departures.manifest.document' | t }}</th>
+                    <th hlmTh>{{ 'departures.manifest.phone' | t }}</th>
+                    <th hlmTh>{{ 'departures.manifest.emergency' | t }}</th>
+                    <th hlmTh>{{ 'departures.manifest.medical' | t }}</th>
+                    <th hlmTh>{{ 'departures.manifest.waiver' | t }}</th>
+                    <th hlmTh class="text-right">{{ 'departures.manifest.balance' | t }}</th>
+                  </tr>
+                </thead>
+                <tbody hlmTBody>
+                  @for (p of m.passengers; track $index) {
+                    <tr hlmTr>
+                      <td hlmTd class="font-medium">{{ p.name }}</td>
+                      <td hlmTd>{{ p.bookingReference }}</td>
+                      <td hlmTd>
+                        {{ p.idDocType ? (p.idDocType | enumLabel: 'enum.idDocType') : '' }}
+                        {{ p.idDocNumber }}
+                      </td>
+                      <td hlmTd>{{ p.phone || '—' }}</td>
+                      <td hlmTd>
+                        {{ p.emergencyContactName || '—' }} {{ p.emergencyContactPhone }}
+                      </td>
+                      <td hlmTd>{{ p.medicalNotes || '—' }}</td>
+                      <td hlmTd><app-status-badge kind="waiver" [value]="p.waiverStatus" /></td>
+                      <td hlmTd class="text-right">
+                        @if (p.balanceDueCents && p.currency) {
+                          {{ p.balanceDueCents | money: p.currency }}
+                        } @else {
+                          —
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
+      </section>
+    }
+  } @else {
+    <hlm-skeleton class="h-40" />
+  }
+</div>
