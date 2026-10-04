@@ -223,9 +223,9 @@ export class ManualBooking {
     ),
   );
 
-  /** Price for the chosen departure and party (`createStaffQuote`); honours the agreed price only for `bookings:override`. */
-  protected readonly quote = resource({
-    params: () => {
+  /** Compared by value so typing in unrelated fields does not re-quote. */
+  private readonly quoteParams = computed(
+    () => {
       const v = this.values();
       if (!v?.departureId || (v.adults ?? 0) < 1) return undefined;
       const override = this.canOverride && v.override?.trim() ? parseToCents(v.override) : null;
@@ -237,6 +237,11 @@ export class ManualBooking {
         ...(override !== null ? { overrideTotalCents: override } : {}),
       };
     },
+    { equal: (a, b) => JSON.stringify(a) === JSON.stringify(b) },
+  );
+  /** Price for the chosen departure and party (`createStaffQuote`); honours the agreed price only for `bookings:override`. */
+  protected readonly quote = resource({
+    params: () => this.quoteParams(),
     loader: async ({ params, abortSignal }) =>
       unwrap(await this.http.POST('/bookings/quote', { body: params, signal: abortSignal })),
   });

@@ -63,7 +63,14 @@
 
   <section aria-labelledby="se-h" class="space-y-3">
     <h2 id="se-h" class="text-lg font-medium">{{ 'company.section.series' | t }}</h2>
-    @if (series.value(); as list) {
+    @if (series.error()) {
+      <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+        {{ 'common.loadError' | t }}
+        <button hlmBtn size="sm" variant="outline" (click)="series.reload()">
+          {{ 'common.retry' | t }}
+        </button>
+      </div>
+    } @else if (series.value(); as list) {
       @if (list.length === 0) {
         <p class="text-sm text-muted-foreground">{{ 'series.empty' | t }}</p>
       } @else {
