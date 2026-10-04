@@ -75,6 +75,12 @@ export const bookings = defineMessages({
     'bookings.cancel.refund.NONE': 'Sin reembolso (excepción)',
     'bookings.cancel.policyHint':
       'El API calcula el monto con la política que el cliente aceptó. Las excepciones requieren permiso especial.',
+    'bookings.cancel.quote.paid': 'Cobrado hasta ahora',
+    'bookings.cancel.quote.refund': 'Se reembolsará',
+    'bookings.cancel.quote.tier':
+      'Tramo de la política: cancelación con {hours} h o más de anticipación',
+    'bookings.cancel.quote.error':
+      'No se pudo calcular el reembolso; el API lo calculará al confirmar.',
     'bookings.cancel.confirm': 'Cancelar reserva',
     'bookings.cancel.done': 'Reserva cancelada',
 
@@ -235,6 +241,11 @@ export const bookings = defineMessages({
     'bookings.cancel.refund.NONE': 'No refund (exception)',
     'bookings.cancel.policyHint':
       'The API computes the amount with the policy the customer accepted. Exceptions need a special permission.',
+    'bookings.cancel.quote.paid': 'Collected so far',
+    'bookings.cancel.quote.refund': 'Will be refunded',
+    'bookings.cancel.quote.tier': 'Policy tier: cancelled {hours} h or more in advance',
+    'bookings.cancel.quote.error':
+      'The refund could not be calculated; the API will compute it on confirm.',
     'bookings.cancel.confirm': 'Cancel booking',
     'bookings.cancel.done': 'Booking cancelled',
 
