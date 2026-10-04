@@ -23,13 +23,9 @@
               inputmode="decimal"
               [ngModel]="form()[f.key]"
               (ngModelChange)="setField(f.key, $event)"
-              [attr.aria-invalid]="fieldError()?.key === f.key"
-              [attr.aria-describedby]="'hint-' + f.key"
               [disabled]="!auth.has('settings:write')"
             />
-            <span [id]="'hint-' + f.key" class="text-xs text-muted-foreground">{{
-              f.hint | t
-            }}</span>
+            <span class="text-xs text-muted-foreground">{{ f.hint | t }}</span>
             @if (fieldError(); as e) {
               @if (e.key === f.key) {
                 <span class="text-xs text-destructive" role="alert">{{ e.message | t }}</span>

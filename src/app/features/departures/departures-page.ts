@@ -53,7 +53,12 @@ export class DeparturesPage {
   protected readonly catalog = inject(TourCatalog);
   protected readonly i18n = inject(I18n);
 
-  protected readonly view = signal<'calendar' | 'list'>('calendar');
+  /** A 7-column month grid does not fit a phone: start on the list there. */
+  protected readonly view = signal<'calendar' | 'list'>(
+    typeof matchMedia === 'function' && matchMedia('(max-width: 639px)').matches
+      ? 'list'
+      : 'calendar',
+  );
   protected readonly month = signal(monthOf(limaToday()));
   protected readonly tourId = signal('');
   protected readonly status = signal<DepartureStatus | ''>('');
