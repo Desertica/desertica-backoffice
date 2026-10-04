@@ -1,0 +1,45 @@
+<main class="flex min-h-screen items-center justify-center bg-background p-4">
+  <section hlmCard class="w-full max-w-sm">
+    <div hlmCardHeader>
+      <h1 hlmCardTitle class="text-xl">{{ 'login.title' | t }}</h1>
+      <p hlmCardDescription>{{ 'login.subtitle' | t }}</p>
+    </div>
+    <div hlmCardContent class="space-y-4">
+      @if (!configured) {
+        <div hlmAlert variant="destructive">
+          <p hlmAlertDescription>{{ 'login.notConfigured' | t }}</p>
+        </div>
+      } @else {
+        <div #googleButton class="flex min-h-11 justify-center" [class.opacity-50]="busy()"></div>
+      }
+      @if (devLogin) {
+        <button hlmBtn variant="outline" class="w-full" (click)="signInWithMock()">
+          Mock (dev)
+        </button>
+      }
+      @if (busy()) {
+        <p class="text-center text-sm text-muted-foreground" role="status">
+          {{ 'login.signingIn' | t }}
+        </p>
+      }
+      @if (error(); as key) {
+        <div hlmAlert variant="destructive" role="alert">
+          <p hlmAlertDescription>{{ key | t }}</p>
+        </div>
+      }
+    </div>
+    <div hlmCardFooter class="justify-center gap-2">
+      @for (l of langs; track l) {
+        <button
+          hlmBtn
+          size="xs"
+          [variant]="i18n.lang() === l ? 'secondary' : 'ghost'"
+          [attr.aria-pressed]="i18n.lang() === l"
+          (click)="i18n.set(l)"
+        >
+          {{ l === 'es' ? 'Español' : 'English' }}
+        </button>
+      }
+    </div>
+  </section>
+</main>
