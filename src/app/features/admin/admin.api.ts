@@ -1,3 +1,4 @@
+import type { components } from '../../core/api/schema';
 import { Injectable, inject } from '@angular/core';
 import { ApiClient } from '../../core/api/api-client';
 import { unwrap } from '../../core/api/api-error';
@@ -14,8 +15,6 @@ import type {
   Series,
   User,
 } from '../../core/api/types';
-
-export type SettingsMap = Record<string, unknown>;
 
 @Injectable({ providedIn: 'root' })
 export class AdminApi {
@@ -63,11 +62,12 @@ export class AdminApi {
     return unwrap(await this.http.GET('/audit-logs', { params: { query } }));
   }
 
-  async getSettings(): Promise<SettingsMap> {
-    return unwrap(await this.http.GET('/settings')) as SettingsMap;
+  async getSettings() {
+    return unwrap(await this.http.GET('/settings'));
   }
-  async saveSettings(body: SettingsMap): Promise<SettingsMap> {
-    return unwrap(await this.http.PUT('/settings', { body })) as SettingsMap;
+  /** Only the keys sent are changed. */
+  async saveSettings(body: components['schemas']['SettingsInput']) {
+    return unwrap(await this.http.PUT('/settings', { body }));
   }
 
   async listBlocked(): Promise<BlockedIdentity[]> {

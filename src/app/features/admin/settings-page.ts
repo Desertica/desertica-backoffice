@@ -13,13 +13,20 @@ import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { HlmTableImports } from '@spartan-ng/helm/table';
 import type { LegalDocumentKind } from '../../core/api/types';
+import { AuthService } from '../../core/auth/auth.service';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
 import type { MessageKey } from '../../core/i18n/messages.es';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { LimaDateTimePipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
 import { AdminApi } from './admin.api';
-import { type SettingRow, type SettingType, fromRows, toRows } from './settings-model';
+import {
+  SETTING_FIELDS,
+  type SettingKey,
+  type SettingsForm,
+  toForm,
+  toInput,
+} from './settings-model';
 
 const LEGAL_KINDS: readonly LegalDocumentKind[] = [
   'TERMS',
@@ -48,22 +55,19 @@ const LEGAL_KINDS: readonly LegalDocumentKind[] = [
   templateUrl: './settings-page.html',
 })
 export class SettingsPage {
+  protected readonly auth = inject(AuthService);
   private readonly api = inject(AdminApi);
   private readonly notify = inject(Notify);
   private readonly fb = inject(FormBuilder).nonNullable;
 
-  protected readonly types: readonly { value: SettingType; label: MessageKey }[] = [
-    { value: 'string', label: 'settings.type.string' },
-    { value: 'number', label: 'settings.type.number' },
-    { value: 'boolean', label: 'settings.type.boolean' },
-    { value: 'json', label: 'settings.type.json' },
-  ];
+  protected readonly fields = SETTING_FIELDS;
   protected readonly legalKinds = LEGAL_KINDS;
 
   protected readonly settings = resource({ loader: () => this.api.getSettings() });
   protected readonly blocked = resource({ loader: () => this.api.listBlocked() });
-  protected readonly rows = signal<SettingRow[]>([]);
-  protected readonly rowError = signal<{ key: MessageKey; index: number } | null>(null);
+  protected readonly form = signal<SettingsForm>(toForm({}));
+  private loaded = toForm({});
+  protected readonly fieldError = signal<{ key: SettingKey; message: MessageKey } | null>(null);
   protected readonly saving = signal(false);
 
   protected readonly blockForm = this.fb.group({
@@ -80,35 +84,27 @@ export class SettingsPage {
   constructor() {
     effect(() => {
       const s = this.settings.value();
-      if (s) this.rows.set(toRows(s));
+      if (!s) return;
+      this.loaded = toForm(s);
+      this.form.set(this.loaded);
+      this.fieldError.set(null);
     });
   }
 
-  protected update(index: number, patch: Partial<SettingRow>) {
-    this.rows.update((rows) => rows.map((r, i) => (i === index ? { ...r, ...patch } : r)));
-    this.rowError.set(null);
-  }
-
-  protected add() {
-    this.rows.update((rows) => [...rows, { key: '', type: 'string', text: '' }]);
-  }
-
-  protected remove(index: number) {
-    this.rows.update((rows) => rows.filter((_, i) => i !== index));
+  protected setField(key: SettingKey, text: string) {
+    this.form.update((f) => ({ ...f, [key]: text }));
+    this.fieldError.set(null);
   }
 
   protected async save() {
-    const result = fromRows(this.rows());
+    const result = toInput(this.form(), this.loaded);
     if ('error' in result) {
-      const key: Record<typeof result.error, MessageKey> = {
-        invalidNumber: 'settings.invalidNumber',
-        invalidJson: 'settings.invalidJson',
-        duplicateKey: 'settings.duplicateKey',
-        emptyKey: 'common.required',
-      };
-      this.rowError.set({ key: key[result.error], index: result.index });
+      const message: MessageKey =
+        result.error === 'invalidNumber' ? 'settings.invalidNumber' : 'settings.outOfRange';
+      this.fieldError.set({ key: result.key, message });
       return;
     }
+    if (Object.keys(result.value).length === 0) return;
     this.saving.set(true);
     try {
       await this.api.saveSettings(result.value);
