@@ -39,6 +39,10 @@ export class I18n {
     return text;
   }
 
+  has(key: string): boolean {
+    return key in DICTIONARIES[this.lang()];
+  }
+
   set(lang: Lang): void {
     this.lang.set(lang);
   }
