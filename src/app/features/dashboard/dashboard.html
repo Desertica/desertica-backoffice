@@ -1,0 +1,123 @@
+<div class="space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-semibold">{{ 'nav.dashboard' | t }}</h1>
+    <div class="flex flex-wrap gap-1" role="group" [attr.aria-label]="'common.date' | t">
+      @for (p of presets; track p.value) {
+        <button
+          hlmBtn
+          size="sm"
+          [variant]="preset() === p.value ? 'default' : 'outline'"
+          [attr.aria-pressed]="preset() === p.value"
+          (click)="preset.set(p.value)"
+        >
+          {{ p.label | t }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (summary.error()) {
+    <div
+      class="flex items-center gap-3 rounded-lg border border-destructive/40 p-4 text-sm text-destructive"
+      role="alert"
+    >
+      {{ 'common.error.generic' | t }}
+      <button hlmBtn size="sm" variant="outline" (click)="summary.reload()">
+        {{ 'common.retry' | t }}
+      </button>
+    </div>
+  } @else if (summary.isLoading() && !summary.hasValue()) {
+    <div class="grid gap-4 md:grid-cols-3">
+      <hlm-skeleton class="h-32" />
+      <hlm-skeleton class="h-32" />
+      <hlm-skeleton class="h-32" />
+    </div>
+  } @else {
+    <section aria-labelledby="sales-h" class="space-y-3">
+      <h2 id="sales-h" class="text-lg font-medium">{{ 'dashboard.sales' | t }}</h2>
+      @if (sales().length === 0) {
+        <p class="text-muted-foreground">{{ 'dashboard.sales.empty' | t }}</p>
+      } @else {
+        <div class="grid gap-4 md:grid-cols-2">
+          @for (s of sales(); track s.currency) {
+            <div hlmCard>
+              <div hlmCardHeader>
+                <h3 hlmCardTitle>{{ s.currency }}</h3>
+                <p hlmCardDescription>
+                  {{ 'dashboard.sales.bookings' | t: { count: s.bookings } }}
+                </p>
+              </div>
+              <dl hlmCardContent class="grid grid-cols-3 gap-2">
+                <div>
+                  <dt class="text-xs text-muted-foreground">{{ 'dashboard.sales.gross' | t }}</dt>
+                  <dd class="text-lg font-semibold">{{ s.grossCents | money: s.currency }}</dd>
+                </div>
+                <div>
+                  <dt class="text-xs text-muted-foreground">
+                    {{ 'dashboard.sales.refunded' | t }}
+                  </dt>
+                  <dd class="text-lg font-semibold">{{ s.refundedCents | money: s.currency }}</dd>
+                </div>
+                <div>
+                  <dt class="text-xs text-muted-foreground">{{ 'dashboard.sales.net' | t }}</dt>
+                  <dd class="text-lg font-semibold">{{ s.netCents | money: s.currency }}</dd>
+                </div>
+              </dl>
+            </div>
+          }
+        </div>
+        @if (sales().length > 1) {
+          <p class="text-xs text-muted-foreground">{{ 'dashboard.sales.currencyNote' | t }}</p>
+        }
+      }
+    </section>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <section aria-labelledby="occ-h" hlmCard>
+        <div hlmCardHeader>
+          <h2 id="occ-h" hlmCardTitle>{{ 'dashboard.occupancy' | t }}</h2>
+          <p hlmCardDescription>
+            {{
+              'dashboard.occupancy.seats'
+                | t: { sold: occupancy().sold, capacity: occupancy().capacity }
+            }}
+          </p>
+        </div>
+        <div hlmCardContent class="space-y-2">
+          <p class="text-3xl font-semibold">{{ occupancy().percent }}%</p>
+          <div
+            class="h-2 w-full overflow-hidden rounded-full bg-muted"
+            role="progressbar"
+            [attr.aria-valuenow]="occupancy().percent"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            <div class="h-full bg-primary" [style.width.%]="occupancy().percent"></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="pend-h" hlmCard>
+        <div hlmCardHeader>
+          <h2 id="pend-h" hlmCardTitle>{{ 'dashboard.pending' | t }}</h2>
+        </div>
+        <ul hlmCardContent class="divide-y divide-border">
+          @for (p of pending(); track p.key) {
+            <li>
+              <a
+                [routerLink]="p.link"
+                [queryParams]="p.query"
+                class="flex items-center justify-between py-2 text-sm hover:underline"
+              >
+                <span>{{ p.label | t }}</span>
+                <span class="font-semibold" [class.text-destructive]="p.count > 0">{{
+                  p.count
+                }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+    </div>
+  }
+</div>
