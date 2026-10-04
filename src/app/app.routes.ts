@@ -1,7 +1,19 @@
-import type { Routes } from '@angular/router';
+import type { Route, Routes } from '@angular/router';
 import { authGuard, guestGuard, permissionGuard } from './core/auth/auth.guard';
 
 const placeholder = () => import('./shared/placeholder').then((m) => m.Placeholder);
+
+/** A staff route: hidden (redirect to /forbidden) unless the role holds `permission`. */
+const guarded = (
+  path: string,
+  permission: string,
+  loadComponent: Route['loadComponent'],
+): Route => ({
+  path,
+  canActivate: [permissionGuard],
+  data: { permission },
+  loadComponent,
+});
 
 export const routes: Routes = [
   {
@@ -15,78 +27,47 @@ export const routes: Routes = [
     loadComponent: () => import('./layout/shell').then((m) => m.Shell),
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
-      {
-        path: 'dashboard',
-        canActivate: [permissionGuard],
-        data: { permission: 'reports:read' },
-        loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
-      },
-      {
-        path: 'departures',
-        canActivate: [permissionGuard],
-        data: { permission: 'departures:read' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'bookings',
-        canActivate: [permissionGuard],
-        data: { permission: 'bookings:read' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'customers',
-        canActivate: [permissionGuard],
-        data: { permission: 'customers:read' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'complaints',
-        canActivate: [permissionGuard],
-        data: { permission: 'complaints:read' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'payments',
-        canActivate: [permissionGuard],
-        data: { permission: 'payments:read' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'disputes',
-        canActivate: [permissionGuard],
-        data: { permission: 'payments:read' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'documents',
-        canActivate: [permissionGuard],
-        data: { permission: 'documents:read' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'users',
-        canActivate: [permissionGuard],
-        data: { permission: 'users:read' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'company',
-        canActivate: [permissionGuard],
-        data: { permission: 'company:read' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'audit',
-        canActivate: [permissionGuard],
-        data: { permission: 'audit:read' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'settings',
-        canActivate: [permissionGuard],
-        data: { permission: 'settings:read' },
-        loadComponent: placeholder,
-      },
+      guarded('dashboard', 'reports:read', () =>
+        import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+      ),
+
+      guarded('departures', 'departures:read', () =>
+        import('./features/departures/departures-page').then((m) => m.DeparturesPage),
+      ),
+      guarded('departures/new', 'departures:write', () =>
+        import('./features/departures/departure-form').then((m) => m.DepartureForm),
+      ),
+      guarded('departures/:id', 'departures:read', () =>
+        import('./features/departures/departure-detail').then((m) => m.DepartureDetail),
+      ),
+
+      guarded('bookings', 'bookings:read', () =>
+        import('./features/bookings/bookings-page').then((m) => m.BookingsPage),
+      ),
+      guarded('bookings/new', 'bookings:write', () =>
+        import('./features/bookings/manual-booking').then((m) => m.ManualBooking),
+      ),
+      guarded('bookings/:id', 'bookings:read', () =>
+        import('./features/bookings/booking-detail').then((m) => m.BookingDetail),
+      ),
+
+      guarded('customers', 'customers:read', () =>
+        import('./features/customers/customers-page').then((m) => m.CustomersPage),
+      ),
+      guarded('customers/:id', 'customers:read', () =>
+        import('./features/customers/customer-detail').then((m) => m.CustomerDetail),
+      ),
+
+      // Milestone 3 screens: placeholders until their features land.
+      guarded('complaints', 'complaints:read', placeholder),
+      guarded('payments', 'payments:read', placeholder),
+      guarded('disputes', 'payments:read', placeholder),
+      guarded('documents', 'documents:read', placeholder),
+      guarded('users', 'users:read', placeholder),
+      guarded('company', 'company:read', placeholder),
+      guarded('audit', 'audit:read', placeholder),
+      guarded('settings', 'settings:read', placeholder),
+
       {
         path: 'forbidden',
         loadComponent: () => import('./features/not-found/forbidden').then((m) => m.Forbidden),
