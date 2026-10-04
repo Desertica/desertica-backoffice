@@ -1,0 +1,327 @@
+<div class="space-y-6">
+  <a hlmBtn variant="ghost" size="sm" routerLink="/bookings">← {{ 'bookings.title' | t }}</a>
+
+  @if (notFound()) {
+    <p class="text-muted-foreground">{{ 'bookings.detail.notFound' | t }}</p>
+  } @else if (booking.error()) {
+    <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+      {{ 'common.error.generic' | t }}
+      <button hlmBtn size="sm" variant="outline" (click)="booking.reload()">
+        {{ 'common.retry' | t }}
+      </button>
+    </div>
+  } @else if (booking.value(); as b) {
+    <header class="flex flex-wrap items-start justify-between gap-3">
+      <div class="space-y-1">
+        <h1 class="text-2xl font-semibold">{{ b.reference }}</h1>
+        <div class="flex items-center gap-2 text-sm text-muted-foreground">
+          <app-status-badge kind="booking" [value]="b.status" />
+          @if (b.source) {
+            <span>{{ b.source | enumLabel: 'enum.source' }}</span>
+          }
+          <span>{{ b.createdAt | limaDateTime }}</span>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        @if (actions().collect) {
+          <button
+            *appHasPermission="'payments:write'"
+            hlmBtn
+            variant="outline"
+            size="sm"
+            (click)="manualPayment()"
+          >
+            {{ 'bookings.action.manualPayment' | t }}
+          </button>
+          <button
+            *appHasPermission="'payments:write'"
+            hlmBtn
+            variant="outline"
+            size="sm"
+            (click)="paymentLink()"
+          >
+            {{ 'bookings.action.paymentLink' | t }}
+          </button>
+        }
+        @if (actions().issue) {
+          <button
+            *appHasPermission="'documents:issue'"
+            hlmBtn
+            variant="outline"
+            size="sm"
+            (click)="issueDocument()"
+          >
+            {{ 'bookings.action.issueDocument' | t }}
+          </button>
+        }
+        @if (actions().reschedule) {
+          <button
+            *appHasPermission="'bookings:write'"
+            hlmBtn
+            variant="outline"
+            size="sm"
+            (click)="reschedule()"
+          >
+            {{ 'bookings.action.reschedule' | t }}
+          </button>
+        }
+        @if (actions().markStatus) {
+          <button
+            *appHasPermission="'bookings:write'"
+            hlmBtn
+            variant="outline"
+            size="sm"
+            (click)="mark('COMPLETED')"
+          >
+            {{ 'bookings.action.complete' | t }}
+          </button>
+          <button
+            *appHasPermission="'bookings:write'"
+            hlmBtn
+            variant="outline"
+            size="sm"
+            (click)="mark('NO_SHOW')"
+          >
+            {{ 'bookings.action.noShow' | t }}
+          </button>
+        }
+        @if (actions().cancel) {
+          <button
+            *appHasPermission="'bookings:cancel'"
+            hlmBtn
+            variant="destructive"
+            size="sm"
+            (click)="cancel()"
+          >
+            {{ 'bookings.action.cancel' | t }}
+          </button>
+        }
+      </div>
+    </header>
+
+    @if (b.status === 'CANCELLED') {
+      <p class="rounded-lg border border-border bg-muted p-3 text-sm">
+        {{
+          'bookings.detail.cancelInfo'
+            | t: { date: (b.cancelledAt | limaDateTime), reason: b.cancelReason || '—' }
+        }}
+      </p>
+    }
+
+    <div class="grid gap-4 lg:grid-cols-3">
+      <section hlmCard>
+        <div hlmCardHeader>
+          <h2 hlmCardTitle>{{ 'bookings.detail.customer' | t }}</h2>
+        </div>
+        <div hlmCardContent class="space-y-1 text-sm">
+          @if (b.customer; as c) {
+            <p class="font-medium">
+              <a [routerLink]="['/customers', c.id]" class="hover:underline"
+                >{{ c.firstName }} {{ c.lastName }}</a
+              >
+            </p>
+            <p>{{ c.email }}</p>
+            <p>{{ c.phone || '—' }} {{ c.country ? '· ' + c.country : '' }}</p>
+            @if (c.idDocNumber) {
+              <p>
+                {{ c.idDocType ? (c.idDocType | enumLabel: 'enum.idDocType') : '' }}
+                {{ c.idDocNumber }}
+              </p>
+            }
+          } @else {
+            <p>{{ b.customerName }}</p>
+          }
+        </div>
+      </section>
+
+      <section hlmCard>
+        <div hlmCardHeader>
+          <h2 hlmCardTitle>{{ 'bookings.detail.departure' | t }}</h2>
+        </div>
+        <div hlmCardContent class="space-y-1 text-sm">
+          <p class="font-medium">{{ b.startsAt | limaDateTime }}</p>
+          <p>{{ b.tourSlug }}</p>
+          <p>
+            {{ 'bookings.detail.people' | t: { adults: b.adults ?? 0, children: b.children ?? 0 } }}
+          </p>
+          <a [routerLink]="['/departures', b.departureId]" class="text-primary hover:underline">{{
+            'bookings.detail.openDeparture' | t
+          }}</a>
+        </div>
+      </section>
+
+      <section hlmCard>
+        <div hlmCardHeader>
+          <h2 hlmCardTitle>{{ 'bookings.detail.money' | t }} ({{ b.currency }})</h2>
+        </div>
+        <dl hlmCardContent class="grid grid-cols-2 gap-y-1 text-sm">
+          <dt class="text-muted-foreground">{{ 'bookings.detail.total' | t }}</dt>
+          <dd class="text-right font-medium">{{ b.totalCents | money: b.currency }}</dd>
+          @if (b.depositCents !== null && b.depositCents !== undefined) {
+            <dt class="text-muted-foreground">{{ 'bookings.detail.deposit' | t }}</dt>
+            <dd class="text-right">{{ b.depositCents | money: b.currency }}</dd>
+          }
+          <dt class="text-muted-foreground">{{ 'bookings.detail.paid' | t }}</dt>
+          <dd class="text-right">{{ b.paidCents | money: b.currency }}</dd>
+          @if (b.refundedCents) {
+            <dt class="text-muted-foreground">{{ 'bookings.detail.refunded' | t }}</dt>
+            <dd class="text-right">{{ b.refundedCents | money: b.currency }}</dd>
+          }
+          <dt class="text-muted-foreground">{{ 'bookings.detail.pending' | t }}</dt>
+          <dd class="text-right font-semibold">{{ pending() | money: b.currency }}</dd>
+        </dl>
+      </section>
+    </div>
+
+    <section aria-labelledby="pay-h" class="space-y-2">
+      <h2 id="pay-h" class="text-lg font-medium">{{ 'bookings.detail.payments' | t }}</h2>
+      @if (!b.payments?.length) {
+        <p class="text-sm text-muted-foreground">{{ 'bookings.detail.noPayments' | t }}</p>
+      } @else {
+        <div hlmTableContainer>
+          <table hlmTable>
+            <thead hlmTHead>
+              <tr hlmTr>
+                <th hlmTh>{{ 'bookings.pay.col.date' | t }}</th>
+                <th hlmTh>{{ 'bookings.pay.col.method' | t }}</th>
+                <th hlmTh>{{ 'bookings.pay.col.kind' | t }}</th>
+                <th hlmTh>{{ 'bookings.pay.col.status' | t }}</th>
+                <th hlmTh class="text-right">{{ 'bookings.pay.col.amount' | t }}</th>
+              </tr>
+            </thead>
+            <tbody hlmTBody>
+              @for (p of b.payments; track p.id) {
+                <tr hlmTr>
+                  <td hlmTd>{{ p.paidAt ?? p.createdAt | limaDateTime }}</td>
+                  <td hlmTd>
+                    {{ p.method | enumLabel: 'enum.paymentMethod' }}
+                    <span class="text-xs text-muted-foreground">{{ p.provider }}</span>
+                  </td>
+                  <td hlmTd>{{ p.kind | enumLabel: 'enum.paymentKind' }}</td>
+                  <td hlmTd><app-status-badge kind="payment" [value]="p.status" /></td>
+                  <td hlmTd class="text-right">
+                    {{ p.amountCents | money: p.currency }}
+                    @if (p.refundedCents) {
+                      <span class="block text-xs text-muted-foreground"
+                        >−{{ p.refundedCents | money: p.currency }}</span
+                      >
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <section aria-labelledby="doc-h" class="space-y-2">
+      <h2 id="doc-h" class="text-lg font-medium">{{ 'bookings.detail.documents' | t }}</h2>
+      @if (!b.documents?.length) {
+        <p class="text-sm text-muted-foreground">{{ 'bookings.detail.noDocuments' | t }}</p>
+      } @else {
+        <div hlmTableContainer>
+          <table hlmTable>
+            <thead hlmTHead>
+              <tr hlmTr>
+                <th hlmTh>{{ 'bookings.doc.col.number' | t }}</th>
+                <th hlmTh>{{ 'bookings.doc.col.type' | t }}</th>
+                <th hlmTh>{{ 'bookings.doc.col.status' | t }}</th>
+                <th hlmTh>{{ 'bookings.doc.col.issued' | t }}</th>
+                <th hlmTh class="text-right">{{ 'bookings.doc.col.total' | t }}</th>
+              </tr>
+            </thead>
+            <tbody hlmTBody>
+              @for (d of b.documents; track d.id) {
+                <tr hlmTr>
+                  <td hlmTd class="font-medium">{{ docNumber(d) }}</td>
+                  <td hlmTd>{{ d.docType | enumLabel: 'enum.docType' }}</td>
+                  <td hlmTd>
+                    <app-status-badge kind="document" [value]="d.status" />
+                    @if (d.sunatMessage && (d.status === 'REJECTED' || d.status === 'ERROR')) {
+                      <span class="block text-xs text-destructive">{{ d.sunatMessage }}</span>
+                    }
+                  </td>
+                  <td hlmTd>{{ d.issuedAt | limaDateTime }}</td>
+                  <td hlmTd class="text-right">{{ d.totalCents | money: d.currency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <section aria-labelledby="pax-h" class="space-y-2">
+        <h2 id="pax-h" class="text-lg font-medium">{{ 'bookings.detail.passengers' | t }}</h2>
+        <ul class="divide-y divide-border rounded-lg border border-border text-sm">
+          @for (p of b.passengers ?? []; track p.id) {
+            <li class="p-3">
+              <p class="font-medium">{{ p.firstName }} {{ p.lastName }}</p>
+              <p class="text-muted-foreground">
+                {{ p.idDocType ? (p.idDocType | enumLabel: 'enum.idDocType') : '' }}
+                {{ p.idDocNumber }} {{ p.nationality ? '· ' + p.nationality : '' }}
+              </p>
+              @if (p.emergencyContactName) {
+                <p class="text-muted-foreground">
+                  {{ p.emergencyContactName }} {{ p.emergencyContactPhone }}
+                </p>
+              }
+            </li>
+          } @empty {
+            <li class="p-3 text-muted-foreground">{{ 'common.notAvailable' | t }}</li>
+          }
+        </ul>
+
+        <h2 class="pt-2 text-lg font-medium">{{ 'bookings.detail.waivers' | t }}</h2>
+        <ul class="divide-y divide-border rounded-lg border border-border text-sm">
+          @for (w of b.waivers ?? []; track w.id) {
+            <li class="flex items-center justify-between p-3">
+              <span>{{
+                w.signerName
+                  ? ('bookings.waiver.signedBy' | t: { name: w.signerName })
+                  : 'v' + w.version
+              }}</span>
+              <app-status-badge kind="waiver" [value]="w.status" />
+            </li>
+          } @empty {
+            <li class="p-3 text-muted-foreground">{{ 'bookings.detail.noWaivers' | t }}</li>
+          }
+        </ul>
+      </section>
+
+      <section aria-labelledby="notes-h" class="space-y-2">
+        <h2 id="notes-h" class="text-lg font-medium">{{ 'bookings.detail.notes' | t }}</h2>
+        <textarea
+          hlmTextarea
+          rows="5"
+          [formControl]="notes"
+          [attr.aria-label]="'bookings.detail.notes' | t"
+        ></textarea>
+        <div *appHasPermission="'bookings:write'" class="flex justify-end">
+          <button
+            hlmBtn
+            size="sm"
+            [disabled]="savingNotes() || notes.pristine"
+            (click)="saveNotes()"
+          >
+            {{ 'common.save' | t }}
+          </button>
+        </div>
+
+        @if (b.billing; as bill) {
+          <h2 class="pt-2 text-lg font-medium">{{ 'bookings.detail.billing' | t }}</h2>
+          <p class="text-sm">
+            {{ bill.docType | enumLabel: 'enum.docType' }} · {{ bill.name }}<br />{{
+              bill.idDocType | enumLabel: 'enum.idDocType'
+            }}
+            {{ bill.idDocNumber }}<br />{{ bill.address }}
+          </p>
+        }
+      </section>
+    </div>
+  } @else {
+    <hlm-skeleton class="h-48" />
+  }
+</div>
