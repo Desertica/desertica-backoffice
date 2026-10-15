@@ -1,0 +1,142 @@
+<div class="flex min-h-screen bg-background text-foreground">
+  <!-- Sidebar: fixed on lg+, slide-over drawer below -->
+  @if (menuOpen()) {
+    <button
+      type="button"
+      class="fixed inset-0 z-30 bg-black/50 lg:hidden"
+      [attr.aria-label]="'common.close' | t"
+      (click)="menuOpen.set(false)"
+    ></button>
+  }
+  <aside
+    class="print:hidden fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform lg:static lg:translate-x-0"
+    [class.-translate-x-full]="!menuOpen()"
+    id="sidebar"
+  >
+    <div class="flex h-14 items-center justify-between px-4">
+      <a routerLink="/" class="text-base font-semibold tracking-tight">{{ 'app.name' | t }}</a>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="icon-sm"
+        class="lg:hidden"
+        [attr.aria-label]="'common.close' | t"
+        (click)="menuOpen.set(false)"
+      >
+        <ng-icon name="lucideX" />
+      </button>
+    </div>
+    <nav class="flex-1 space-y-5 overflow-y-auto px-2 py-3" [attr.aria-label]="'app.name' | t">
+      @for (group of groups(); track group.label) {
+        <div>
+          <p class="px-2 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {{ group.label | t }}
+          </p>
+          <ul class="space-y-0.5">
+            @for (item of group.items; track item.path) {
+              <li>
+                <a
+                  [routerLink]="item.path"
+                  routerLinkActive="bg-sidebar-accent text-sidebar-accent-foreground"
+                  class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent"
+                  (click)="menuOpen.set(false)"
+                >
+                  <ng-icon [name]="item.icon" class="text-base" />
+                  {{ item.label | t }}
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </nav>
+  </aside>
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="print:hidden flex h-14 items-center gap-2 border-b border-border px-4">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="icon-sm"
+        class="lg:hidden"
+        [attr.aria-label]="'nav.open' | t"
+        aria-controls="sidebar"
+        [attr.aria-expanded]="menuOpen()"
+        (click)="menuOpen.set(true)"
+      >
+        <ng-icon name="lucideMenu" />
+      </button>
+      <div class="flex-1"></div>
+
+      <!-- Language -->
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        [hlmDropdownMenuTrigger]="langMenu"
+        [attr.aria-label]="'header.language' | t"
+      >
+        <ng-icon name="lucideLanguages" />
+        <span class="uppercase">{{ i18n.lang() }}</span>
+      </button>
+      <ng-template #langMenu>
+        <div hlmDropdownMenu class="w-36">
+          @for (l of langs; track l) {
+            <button hlmDropdownMenuItem (click)="setLang(l)">
+              {{ l === 'es' ? 'Español' : 'English' }}
+              @if (i18n.lang() === l) {
+                <ng-icon name="lucideCheck" class="ml-auto" />
+              }
+            </button>
+          }
+        </div>
+      </ng-template>
+
+      <!-- Theme -->
+      <button
+        hlmBtn
+        variant="ghost"
+        size="icon-sm"
+        [hlmDropdownMenuTrigger]="themeMenu"
+        [attr.aria-label]="'header.theme' | t"
+      >
+        <ng-icon [name]="themeIcon()" />
+      </button>
+      <ng-template #themeMenu>
+        <div hlmDropdownMenu class="w-36">
+          @for (c of themes; track c.value) {
+            <button hlmDropdownMenuItem (click)="setTheme(c.value)">
+              {{ c.label | t }}
+              @if (theme.choice() === c.value) {
+                <ng-icon name="lucideCheck" class="ml-auto" />
+              }
+            </button>
+          }
+        </div>
+      </ng-template>
+
+      <!-- User -->
+      <button hlmBtn variant="outline" size="sm" [hlmDropdownMenuTrigger]="userMenu">
+        {{ auth.user()?.name }}
+      </button>
+      <ng-template #userMenu>
+        <div hlmDropdownMenu class="w-56">
+          <div class="px-2 py-1.5 text-sm">
+            <p class="font-medium">{{ auth.user()?.name }}</p>
+            <p class="text-xs text-muted-foreground">
+              {{ auth.user()?.email }} · {{ auth.user()?.role?.name }}
+            </p>
+          </div>
+          <button hlmDropdownMenuItem (click)="signOut()">
+            <ng-icon name="lucideLogOut" />
+            {{ 'header.signOut' | t }}
+          </button>
+        </div>
+      </ng-template>
+    </header>
+
+    <main class="flex-1 p-4 md:p-6">
+      <router-outlet />
+    </main>
+  </div>
+</div>

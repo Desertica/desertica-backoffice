@@ -1,0 +1,125 @@
+<div class="mx-auto max-w-4xl space-y-8">
+  <h1 class="text-2xl font-semibold">{{ 'company.title' | t }}</h1>
+
+  <section aria-labelledby="co-h" class="space-y-3">
+    <h2 id="co-h" class="text-lg font-medium">{{ 'company.section.company' | t }}</h2>
+    @if (company.error()) {
+      <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+        {{ 'company.loadError' | t }}
+        <button hlmBtn size="sm" variant="outline" (click)="company.reload()">
+          {{ 'common.retry' | t }}
+        </button>
+      </div>
+    } @else if (!company.hasValue()) {
+      <hlm-skeleton class="h-48" />
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="save()" class="grid gap-4 sm:grid-cols-2" novalidate>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'company.field.ruc' | t }}</span>
+          <input hlmInput inputmode="numeric" maxlength="11" formControlName="ruc" />
+          @if (form.controls.ruc.touched && form.controls.ruc.invalid) {
+            <span class="text-xs text-destructive">{{ 'company.rucInvalid' | t }}</span>
+          }
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'company.field.environment' | t }}</span>
+          <select hlmInput formControlName="environment">
+            <option value="BETA">{{ 'BETA' | enumLabel: 'company.env' }}</option>
+            <option value="PRODUCTION">{{ 'PRODUCTION' | enumLabel: 'company.env' }}</option>
+          </select>
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'company.field.legalName' | t }}</span>
+          <input hlmInput formControlName="legalName" />
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'company.field.tradeName' | t }}</span>
+          <input hlmInput formControlName="tradeName" />
+        </label>
+        <label class="grid gap-1.5 sm:col-span-2">
+          <span hlmLabel>{{ 'company.field.fiscalAddress' | t }}</span>
+          <input hlmInput formControlName="fiscalAddress" />
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'company.field.ubigeo' | t }}</span>
+          <input hlmInput inputmode="numeric" maxlength="6" formControlName="ubigeo" />
+          @if (form.controls.ubigeo.invalid) {
+            <span class="text-xs text-destructive">{{ 'company.ubigeoInvalid' | t }}</span>
+          }
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'company.field.igvRate' | t }}</span>
+          <input hlmInput formControlName="igvRate" placeholder="0.1800" />
+        </label>
+        <p class="text-xs text-muted-foreground sm:col-span-2">{{ 'company.certNote' | t }}</p>
+        <div *appHasPermission="'company:write'" class="flex justify-end sm:col-span-2">
+          <button hlmBtn type="submit" [disabled]="saving() || form.pristine">
+            {{ 'common.save' | t }}
+          </button>
+        </div>
+      </form>
+    }
+  </section>
+
+  <section aria-labelledby="se-h" class="space-y-3">
+    <h2 id="se-h" class="text-lg font-medium">{{ 'company.section.series' | t }}</h2>
+    @if (series.value(); as list) {
+      @if (list.length === 0) {
+        <p class="text-sm text-muted-foreground">{{ 'series.empty' | t }}</p>
+      } @else {
+        <div hlmTableContainer>
+          <table hlmTable>
+            <thead hlmTHead>
+              <tr hlmTr>
+                <th hlmTh>{{ 'series.col.prefix' | t }}</th>
+                <th hlmTh>{{ 'series.col.type' | t }}</th>
+                <th hlmTh>{{ 'series.col.next' | t }}</th>
+                <th hlmTh>{{ 'series.col.active' | t }}</th>
+              </tr>
+            </thead>
+            <tbody hlmTBody>
+              @for (s of list; track s.id) {
+                <tr hlmTr>
+                  <td hlmTd class="font-medium">{{ s.prefix }}</td>
+                  <td hlmTd>{{ s.docType | enumLabel: 'enum.docType' }}</td>
+                  <td hlmTd>{{ s.nextNumber }}</td>
+                  <td hlmTd>{{ s.active ? '✓' : '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+    <form
+      *appHasPermission="'company:write'"
+      [formGroup]="seriesForm"
+      (ngSubmit)="createSeries()"
+      class="flex flex-wrap items-end gap-3"
+      novalidate
+    >
+      <label class="grid gap-1.5 text-sm">
+        <span hlmLabel>{{ 'series.col.type' | t }}</span>
+        <select hlmInput formControlName="docType" class="w-44">
+          @for (t of docTypes; track t) {
+            <option [value]="t">{{ t | enumLabel: 'enum.docType' }}</option>
+          }
+        </select>
+      </label>
+      <label class="grid gap-1.5 text-sm">
+        <span hlmLabel>{{ 'series.field.prefix' | t }}</span>
+        <input hlmInput class="w-32 uppercase" maxlength="4" formControlName="prefix" />
+        @if (seriesForm.controls.prefix.touched && seriesForm.controls.prefix.invalid) {
+          <span class="text-xs text-destructive">{{ 'series.prefixInvalid' | t }}</span>
+        }
+      </label>
+      <label class="grid gap-1.5 text-sm">
+        <span hlmLabel>{{ 'series.field.next' | t }}</span>
+        <input hlmInput type="number" min="1" class="w-32" formControlName="nextNumber" />
+      </label>
+      <button hlmBtn type="submit" variant="outline" [disabled]="creating()">
+        {{ 'series.new' | t }}
+      </button>
+    </form>
+  </section>
+</div>

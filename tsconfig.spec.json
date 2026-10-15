@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec",
+    "types": ["vitest/globals", "google.accounts"]
+  },
+  "include": ["src/**/*.d.ts", "src/**/*.spec.ts", "libs/ui/**/src/**/*.ts"]
+}

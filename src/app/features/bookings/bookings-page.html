@@ -1,0 +1,134 @@
+<div class="space-y-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-semibold">{{ 'bookings.title' | t }}</h1>
+    <a *appHasPermission="'bookings:write'" hlmBtn routerLink="/bookings/new">{{
+      'bookings.new' | t
+    }}</a>
+  </div>
+
+  <div class="flex flex-wrap items-end gap-3">
+    <label class="grid min-w-64 flex-1 gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'common.search' | t }}</span>
+      <input
+        hlmInput
+        type="search"
+        [placeholder]="'bookings.search' | t"
+        [ngModel]="search()"
+        (ngModelChange)="onSearch($event)"
+      />
+    </label>
+    <label class="grid gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'bookings.filter.status' | t }}</span>
+      <select
+        hlmInput
+        class="w-44"
+        [ngModel]="status() ?? ''"
+        (ngModelChange)="setFilter('status', $event)"
+      >
+        <option value="">{{ 'common.all' | t }}</option>
+        @for (s of statuses; track s) {
+          <option [value]="s">{{ s | enumLabel: 'status.booking' }}</option>
+        }
+      </select>
+    </label>
+    <label class="grid gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'bookings.filter.tour' | t }}</span>
+      <select
+        hlmInput
+        class="w-48"
+        [ngModel]="tour() ?? ''"
+        (ngModelChange)="setFilter('tour', $event)"
+      >
+        <option value="">{{ 'common.all' | t }}</option>
+        @for (t of catalog.tours(); track t.id) {
+          <option [value]="t.id">{{ t.title }}</option>
+        }
+      </select>
+    </label>
+    <label class="grid gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'common.from' | t }}</span>
+      <input
+        hlmInput
+        type="date"
+        [ngModel]="from() ?? ''"
+        (ngModelChange)="setFilter('from', $event)"
+      />
+    </label>
+    <label class="grid gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'common.to' | t }}</span>
+      <input
+        hlmInput
+        type="date"
+        [ngModel]="to() ?? ''"
+        (ngModelChange)="setFilter('to', $event)"
+      />
+    </label>
+    @if (hasFilters()) {
+      <button hlmBtn variant="ghost" size="sm" (click)="clear()">{{ 'common.clear' | t }}</button>
+    }
+  </div>
+
+  @if (bookings.error()) {
+    <div
+      class="flex items-center gap-3 rounded-lg border border-destructive/40 p-4 text-sm text-destructive"
+      role="alert"
+    >
+      {{ 'bookings.loadError' | t }}
+      <button hlmBtn size="sm" variant="outline" (click)="bookings.reload()">
+        {{ 'common.retry' | t }}
+      </button>
+    </div>
+  } @else if (bookings.isLoading() && !bookings.hasValue()) {
+    <hlm-skeleton class="h-72" />
+  } @else if (bookings.value(); as res) {
+    @if (res.data.length === 0) {
+      <p class="text-muted-foreground">{{ 'common.empty' | t }}</p>
+    } @else {
+      <div hlmTableContainer>
+        <table hlmTable>
+          <thead hlmTHead>
+            <tr hlmTr>
+              <th hlmTh>{{ 'bookings.col.reference' | t }}</th>
+              <th hlmTh>{{ 'bookings.col.customer' | t }}</th>
+              <th hlmTh>{{ 'bookings.col.tour' | t }}</th>
+              <th hlmTh>{{ 'bookings.col.departure' | t }}</th>
+              <th hlmTh>{{ 'bookings.col.people' | t }}</th>
+              <th hlmTh>{{ 'bookings.col.status' | t }}</th>
+              <th hlmTh class="text-right">{{ 'bookings.col.paid' | t }}</th>
+            </tr>
+          </thead>
+          <tbody hlmTBody>
+            @for (b of res.data; track b.id) {
+              <tr hlmTr>
+                <td hlmTd>
+                  <a [routerLink]="['/bookings', b.id]" class="font-medium hover:underline">{{
+                    b.reference
+                  }}</a>
+                  @if (b.source === 'MANUAL') {
+                    <span class="ml-1 text-xs text-muted-foreground">{{
+                      b.source | enumLabel: 'enum.source'
+                    }}</span>
+                  }
+                </td>
+                <td hlmTd>{{ b.customerName }}</td>
+                <td hlmTd>{{ tourTitle(b.tourSlug) }}</td>
+                <td hlmTd>{{ b.startsAt | limaDateTime }}</td>
+                <td hlmTd>{{ (b.adults ?? 0) + (b.children ?? 0) }}</td>
+                <td hlmTd><app-status-badge kind="booking" [value]="b.status" /></td>
+                <td hlmTd class="text-right">
+                  {{ b.paidCents | money: b.currency }} / {{ b.totalCents | money: b.currency }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pager
+        [page]="res.meta.page"
+        [pageSize]="res.meta.pageSize"
+        [total]="res.meta.total"
+        (pageChange)="goTo($event)"
+      />
+    }
+  }
+</div>

@@ -1,0 +1,247 @@
+<div class="mx-auto max-w-3xl space-y-6">
+  <div class="flex items-start justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-semibold">{{ 'bookings.new.title' | t }}</h1>
+      <p class="text-sm text-muted-foreground">{{ 'bookings.new.subtitle' | t }}</p>
+    </div>
+    <a hlmBtn variant="ghost" routerLink="/bookings">{{ 'common.back' | t }}</a>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-8" novalidate>
+    <fieldset class="grid gap-4 sm:grid-cols-2">
+      <legend class="mb-2 text-lg font-medium">{{ 'bookings.new.section.trip' | t }}</legend>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{ 'bookings.new.tour' | t }}</span>
+        <select hlmInput formControlName="tourRefId">
+          <option value="">{{ 'departures.form.tourPlaceholder' | t }}</option>
+          @for (tour of activeTours(); track tour.id) {
+            <option [value]="tour.id">{{ tour.title }}</option>
+          }
+        </select>
+      </label>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{ 'bookings.new.departure' | t }}</span>
+        <select hlmInput formControlName="departureId">
+          <option value="">{{ 'bookings.new.departurePlaceholder' | t }}</option>
+          @for (d of available(); track d.id) {
+            <option [value]="d.id">
+              {{ d.startsAt | limaDateTime }} ·
+              {{
+                'bookings.new.seatsLeft'
+                  | t: { count: d.capacity - d.seatsSold - (d.seatsHeld ?? 0) }
+              }}
+            </option>
+          }
+        </select>
+        @if (tourId() && !departures.isLoading() && available().length === 0) {
+          <span class="text-xs text-destructive">{{ 'bookings.new.noDepartures' | t }}</span>
+        }
+      </label>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{ 'bookings.new.adults' | t }}</span>
+        <input hlmInput type="number" min="1" formControlName="adults" />
+      </label>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{ 'bookings.new.children' | t }}</span>
+        <input hlmInput type="number" min="0" formControlName="children" />
+      </label>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{ 'bookings.new.currency' | t }}</span>
+        <select hlmInput formControlName="currency">
+          @for (c of currencies; track c) {
+            <option [value]="c">{{ c }}</option>
+          }
+        </select>
+      </label>
+      <div class="self-end text-sm" aria-live="polite">
+        @if (quote.value(); as q) {
+          <p class="text-muted-foreground">{{ 'bookings.new.quote' | t }}</p>
+          <p class="text-lg font-semibold">{{ q.totalCents | money: q.currency }}</p>
+        } @else if (quote.error()) {
+          <p class="text-destructive">{{ 'bookings.new.quoteError' | t }}</p>
+        }
+      </div>
+    </fieldset>
+
+    <fieldset formGroupName="customer" class="grid gap-4 sm:grid-cols-2">
+      <legend class="mb-2 text-lg font-medium">{{ 'bookings.new.section.customer' | t }}</legend>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{ 'bookings.new.firstName' | t }}</span>
+        <input hlmInput formControlName="firstName" autocomplete="off" />
+        @if (
+          form.controls.customer.controls.firstName.touched &&
+          form.controls.customer.controls.firstName.invalid
+        ) {
+          <span class="text-xs text-destructive">{{ 'common.required' | t }}</span>
+        }
+      </label>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{ 'bookings.new.lastName' | t }}</span>
+        <input hlmInput formControlName="lastName" autocomplete="off" />
+        @if (
+          form.controls.customer.controls.lastName.touched &&
+          form.controls.customer.controls.lastName.invalid
+        ) {
+          <span class="text-xs text-destructive">{{ 'common.required' | t }}</span>
+        }
+      </label>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{ 'bookings.new.email' | t }}</span>
+        <input hlmInput type="email" formControlName="email" autocomplete="off" />
+        @if (
+          form.controls.customer.controls.email.touched &&
+          form.controls.customer.controls.email.invalid
+        ) {
+          <span class="text-xs text-destructive">{{ 'common.invalidEmail' | t }}</span>
+        }
+      </label>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{ 'bookings.new.phone' | t }}</span>
+        <input hlmInput type="tel" formControlName="phone" autocomplete="off" />
+      </label>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{ 'bookings.new.country' | t }}</span>
+        <input hlmInput maxlength="2" class="uppercase" formControlName="country" />
+      </label>
+      <div class="grid grid-cols-2 gap-2">
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'bookings.new.idDocType' | t }}</span>
+          <select hlmInput formControlName="idDocType">
+            @for (t of idDocTypes; track t) {
+              <option [value]="t">{{ t | enumLabel: 'enum.idDocType' }}</option>
+            }
+          </select>
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'bookings.new.idDocNumber' | t }}</span>
+          <input hlmInput formControlName="idDocNumber" autocomplete="off" />
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="grid gap-4 sm:grid-cols-2">
+      <legend class="mb-2 text-lg font-medium">{{ 'bookings.new.section.billing' | t }}</legend>
+      <label class="grid gap-1.5" formGroupName="billing">
+        <span hlmLabel>{{ 'bookings.doc.docType' | t }}</span>
+        <select hlmInput formControlName="docType">
+          <option value="BOLETA">{{ 'BOLETA' | enumLabel: 'enum.docType' }}</option>
+          <option value="FACTURA">{{ 'FACTURA' | enumLabel: 'enum.docType' }}</option>
+        </select>
+      </label>
+      <label class="flex items-center gap-2 self-end text-sm">
+        <input type="checkbox" formControlName="billingSame" /> {{ 'bookings.new.billingSame' | t }}
+      </label>
+      @if (!billingSame()) {
+        <ng-container formGroupName="billing">
+          <label class="grid gap-1.5 sm:col-span-2">
+            <span hlmLabel>{{ 'bookings.new.billingName' | t }}</span>
+            <input hlmInput formControlName="name" />
+          </label>
+          <label class="grid gap-1.5">
+            <span hlmLabel>{{ 'bookings.new.idDocType' | t }}</span>
+            <select hlmInput formControlName="idDocType">
+              @for (t of idDocTypes; track t) {
+                <option [value]="t">{{ t | enumLabel: 'enum.idDocType' }}</option>
+              }
+            </select>
+          </label>
+          <label class="grid gap-1.5">
+            <span hlmLabel>{{ 'bookings.new.idDocNumber' | t }}</span>
+            <input hlmInput formControlName="idDocNumber" />
+          </label>
+          <label class="grid gap-1.5 sm:col-span-2">
+            <span hlmLabel>{{ 'bookings.new.billingAddress' | t }}</span>
+            <input hlmInput formControlName="address" />
+          </label>
+        </ng-container>
+      }
+    </fieldset>
+
+    <fieldset class="space-y-3">
+      <legend class="mb-2 text-lg font-medium">{{ 'bookings.new.section.passengers' | t }}</legend>
+      <div formArrayName="passengers" class="space-y-3">
+        @for (p of passengers.controls; track p; let i = $index) {
+          <div
+            [formGroupName]="i"
+            class="grid gap-2 rounded-lg border border-border p-3 sm:grid-cols-5"
+          >
+            <input
+              hlmInput
+              [placeholder]="'bookings.new.firstName' | t"
+              [attr.aria-label]="'bookings.new.firstName' | t"
+              formControlName="firstName"
+            />
+            <input
+              hlmInput
+              [placeholder]="'bookings.new.lastName' | t"
+              [attr.aria-label]="'bookings.new.lastName' | t"
+              formControlName="lastName"
+            />
+            <select
+              hlmInput
+              [attr.aria-label]="'bookings.new.idDocType' | t"
+              formControlName="idDocType"
+            >
+              @for (t of idDocTypes; track t) {
+                <option [value]="t">{{ t | enumLabel: 'enum.idDocType' }}</option>
+              }
+            </select>
+            <input
+              hlmInput
+              [placeholder]="'bookings.new.idDocNumber' | t"
+              [attr.aria-label]="'bookings.new.idDocNumber' | t"
+              formControlName="idDocNumber"
+            />
+            <button hlmBtn type="button" variant="ghost" size="sm" (click)="removePassenger(i)">
+              {{ 'bookings.new.removePassenger' | t }}
+            </button>
+          </div>
+        }
+      </div>
+      <button hlmBtn type="button" variant="outline" size="sm" (click)="addPassenger()">
+        {{ 'bookings.new.addPassenger' | t }}
+      </button>
+    </fieldset>
+
+    <fieldset class="grid gap-4 sm:grid-cols-2">
+      <legend class="mb-2 text-lg font-medium">{{ 'bookings.new.section.payment' | t }}</legend>
+      <label class="grid gap-1.5">
+        <span hlmLabel>{{
+          'bookings.new.deposit' | t: { currency: form.controls.currency.value }
+        }}</span>
+        <input hlmInput inputmode="decimal" formControlName="deposit" />
+      </label>
+      @if (canOverride) {
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{
+            'bookings.new.override' | t: { currency: form.controls.currency.value }
+          }}</span>
+          <input hlmInput inputmode="decimal" formControlName="override" />
+        </label>
+      }
+      <label class="grid gap-1.5 sm:col-span-2">
+        <span hlmLabel>{{ 'bookings.new.notes' | t }}</span>
+        <textarea hlmTextarea rows="2" formControlName="notes"></textarea>
+      </label>
+      <label class="flex items-center gap-2 text-sm sm:col-span-2">
+        <input type="checkbox" formControlName="sendConfirmation" />
+        {{ 'bookings.new.sendConfirmation' | t }}
+      </label>
+    </fieldset>
+
+    @if (errors().length) {
+      <ul
+        class="list-disc rounded-lg border border-destructive/40 p-3 pl-7 text-sm text-destructive"
+        role="alert"
+      >
+        @for (e of errors(); track e) {
+          <li>{{ e | t }}</li>
+        }
+      </ul>
+    }
+    <div class="flex justify-end gap-2">
+      <a hlmBtn variant="outline" routerLink="/bookings">{{ 'common.cancel' | t }}</a>
+      <button hlmBtn type="submit" [disabled]="saving()">{{ 'bookings.new.submit' | t }}</button>
+    </div>
+  </form>
+</div>
