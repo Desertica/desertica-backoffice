@@ -19,7 +19,6 @@ import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { HlmTableImports } from '@spartan-ng/helm/table';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
 import { ApiError } from '../../core/api/api-error';
-import { TourCatalog } from '../../core/api/tour-catalog';
 import type { Departure, UpdateDeparture } from '../../core/api/types';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
 import { limaDay, limaTime24, limaToUtcIso } from '../../core/format/datetime';
@@ -93,7 +92,6 @@ export class DepartureDetail {
   private readonly notify = inject(Notify);
   private readonly dialogs = useDialogs();
   private readonly fb = inject(FormBuilder).nonNullable;
-  protected readonly catalog = inject(TourCatalog);
 
   protected readonly tab = signal<'bookings' | 'manifest'>('bookings');
   protected readonly saving = signal(false);
@@ -123,7 +121,7 @@ export class DepartureDetail {
   );
   protected readonly title = computed(() => {
     const d = this.departure.value();
-    return d ? (this.catalog.titleById(d.tourRefId) ?? '…') : '';
+    return d?.tourTitle ?? '';
   });
 
   protected readonly form = this.fb.group({
@@ -138,7 +136,6 @@ export class DepartureDetail {
   });
 
   constructor() {
-    void this.catalog.load().catch(() => undefined);
     effect(() => {
       const d = this.departure.value();
       if (!d) return;

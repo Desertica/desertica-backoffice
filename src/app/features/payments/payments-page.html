@@ -113,7 +113,7 @@
                     <a
                       [routerLink]="['/bookings', p.bookingId]"
                       class="font-medium hover:underline"
-                      >{{ p.bookingReference ?? '—' }}</a
+                      >{{ p.bookingReference }}</a
                     >
                   </td>
                   <td hlmTd>
@@ -172,6 +172,7 @@
             <thead hlmTHead>
               <tr hlmTr>
                 <th hlmTh>{{ 'payments.refunds.col.date' | t }}</th>
+                <th hlmTh>{{ 'payments.refunds.col.booking' | t }}</th>
                 <th hlmTh>{{ 'payments.refunds.col.reason' | t }}</th>
                 <th hlmTh>{{ 'payments.refunds.col.by' | t }}</th>
                 <th hlmTh>{{ 'payments.refunds.col.status' | t }}</th>
@@ -182,11 +183,19 @@
               @for (r of res.data; track r.id) {
                 <tr hlmTr>
                   <td hlmTd>{{ r.createdAt | limaDateTime }}</td>
+                  <td hlmTd>
+                    <a
+                      [routerLink]="['/bookings', r.bookingId]"
+                      class="font-medium hover:underline"
+                      >{{ r.bookingReference }}</a
+                    >
+                  </td>
                   <td hlmTd>{{ r.reason }}</td>
                   <td hlmTd>{{ r.requestedBy || '—' }}</td>
                   <td hlmTd>{{ r.status | enumLabel: 'refund.status' }}</td>
-                  <!-- The refund carries no currency in the contract (see contract change requests): shown as units without a symbol. -->
-                  <td hlmTd class="text-right tabular-nums">{{ r.amountCents / 100 }}</td>
+                  <td hlmTd class="text-right tabular-nums">
+                    {{ r.amountCents | money: r.currency }}
+                  </td>
                 </tr>
               }
             </tbody>

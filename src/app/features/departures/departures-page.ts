@@ -53,7 +53,12 @@ export class DeparturesPage {
   protected readonly catalog = inject(TourCatalog);
   protected readonly i18n = inject(I18n);
 
-  protected readonly view = signal<'calendar' | 'list'>('calendar');
+  /** A 7-column month grid does not fit a phone: start on the list there. */
+  protected readonly view = signal<'calendar' | 'list'>(
+    typeof matchMedia === 'function' && matchMedia('(max-width: 639px)').matches
+      ? 'list'
+      : 'calendar',
+  );
   protected readonly month = signal(monthOf(limaToday()));
   protected readonly tourId = signal('');
   protected readonly status = signal<DepartureStatus | ''>('');
@@ -70,7 +75,7 @@ export class DeparturesPage {
   ];
 
   constructor() {
-    // Titles are best-effort: operators may lack catalog:read, in which case the slug-less fallback shows.
+    // The catalog only feeds the tour filter; operators without catalog:read just don't get it.
     void this.catalog.load().catch(() => undefined);
   }
 
@@ -104,7 +109,7 @@ export class DeparturesPage {
   );
 
   protected tourTitle(d: Departure): string {
-    return this.catalog.titleById(d.tourRefId) ?? '…';
+    return d.tourTitle;
   }
 
   protected prev() {

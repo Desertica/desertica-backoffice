@@ -1,26 +1,25 @@
-import { Injectable, computed, inject, isDevMode, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import createClient from 'openapi-fetch';
 import { unwrap } from '../api/api-error';
 import type { components, paths } from '../api/schema';
 import { RUNTIME_CONFIG } from '../config/runtime-config';
-import { readStorage, writeStorage } from '../storage/safe-storage';
 
 export type User = components['schemas']['User'];
 type Session = components['schemas']['Session'];
 
-/**
- * Refresh token storage (see PR description for the trade-off):
- * the access token lives only in memory; the refresh token lives in `sessionStorage`
- * so a reload keeps the session but closing the tab ends it.
- */
-export const REFRESH_TOKEN_KEY = 'desertica.refresh';
-
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Auth endpoints use a client without the refresh middleware to avoid loops.
-  private readonly raw = createClient<paths>({ baseUrl: inject(RUNTIME_CONFIG).apiBaseUrl });
+  /**
+   * Auth endpoints use a client without the refresh middleware to avoid loops.
+   * The refresh token is an httpOnly cookie set by the API: the SPA never reads it, it only asks
+   * the browser to send it (`credentials: 'include'`; requires same-site with the API, see CLAUDE.md).
+   * The access token lives only in memory.
+   */
+  private readonly raw = createClient<paths>({
+    baseUrl: inject(RUNTIME_CONFIG).apiBaseUrl,
+    credentials: 'include',
+  });
 
-  private readonly devMock = isDevMode() && !!inject(RUNTIME_CONFIG).devLogin;
   private readonly _accessToken = signal<string | null>(null);
   private readonly _user = signal<User | null>(null);
   private inflightRefresh: Promise<boolean> | null = null;
@@ -32,14 +31,12 @@ export class AuthService {
 
   /** UI-only check. The API is the real authority on every call. */
   has(permission: string): boolean {
-    // Prism's example user carries a placeholder permission list; in the dev mock everything is visible.
-    if (this.devMock) return true;
     return this.permissions().has(permission);
   }
 
-  /** Called once at startup: restores the session from the stored refresh token. */
+  /** Called once at startup: tries to recover the session from the refresh cookie. */
   async init(): Promise<void> {
-    if (readStorage('session', REFRESH_TOKEN_KEY)) await this.refresh();
+    await this.refresh();
   }
 
   async loginWithGoogle(idToken: string): Promise<void> {
@@ -54,38 +51,32 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
-    const refreshToken = readStorage('session', REFRESH_TOKEN_KEY);
     this.clear();
-    if (refreshToken) {
-      try {
-        await this.raw.POST('/auth/logout', { body: { refreshToken } });
-      } catch {
-        /* the local session is already gone */
-      }
+    try {
+      await this.raw.POST('/auth/logout');
+    } catch {
+      /* the local session is already gone */
     }
   }
 
   private async doRefresh(): Promise<boolean> {
-    const refreshToken = readStorage('session', REFRESH_TOKEN_KEY);
-    if (!refreshToken) return false;
     try {
-      const { data, response } = await this.raw.POST('/auth/refresh', { body: { refreshToken } });
+      const { data, response } = await this.raw.POST('/auth/refresh');
       if (!data) {
-        // Only a rejected token ends the session; a 5xx may be transient.
+        // Only a rejected cookie ends the session; a 5xx may be transient.
         if (response.status === 401 || response.status === 403) this.clear();
         return false;
       }
       await this.adopt(data);
       return true;
     } catch {
-      // Network failure: keep the stored token so a later attempt can succeed.
+      // Network failure: the cookie is still there, so a later attempt can succeed.
       return false;
     }
   }
 
   private async adopt(session: Session): Promise<void> {
     this._accessToken.set(session.accessToken);
-    writeStorage('session', REFRESH_TOKEN_KEY, session.refreshToken);
     this._user.set(session.user);
     // `GET /auth/me` is the source of truth for permissions.
     const me = await this.raw.GET('/auth/me', {
@@ -97,6 +88,5 @@ export class AuthService {
   private clear(): void {
     this._accessToken.set(null);
     this._user.set(null);
-    writeStorage('session', REFRESH_TOKEN_KEY, null);
   }
 }

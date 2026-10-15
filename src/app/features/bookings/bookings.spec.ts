@@ -27,6 +27,26 @@ const form: ManualBookingForm = {
   sendConfirmation: true,
 };
 
+describe('booking filters', () => {
+  it('passes the new filters through and drops unknown values', () => {
+    expect(
+      toBookingQuery({
+        paymentStatus: 'UNPAID',
+        source: 'MANUAL',
+        waiver: 'PENDING',
+        currency: 'PEN',
+      }),
+    ).toMatchObject({
+      paymentStatus: 'UNPAID',
+      source: 'MANUAL',
+      waiverStatus: 'PENDING',
+      currency: 'PEN',
+    });
+    const q = toBookingQuery({ paymentStatus: 'x', source: 'y', waiver: 'z', currency: 'EUR' });
+    expect(q.paymentStatus ?? q.source ?? q.waiverStatus ?? q.currency).toBeUndefined();
+  });
+});
+
 describe('manual booking', () => {
   it('builds the body: trims, uppercases country, converts money to cents, drops empty passengers', () => {
     const body = buildManualBooking(form);

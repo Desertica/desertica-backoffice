@@ -54,11 +54,14 @@
         </select>
       </label>
       <div class="self-end text-sm" aria-live="polite">
-        @if (quote.value(); as q) {
+        @if (quote.error()) {
+          <p class="text-destructive">{{ 'bookings.new.quoteError' | t }}</p>
+        } @else if (quote.value(); as q) {
           <p class="text-muted-foreground">{{ 'bookings.new.quote' | t }}</p>
           <p class="text-lg font-semibold">{{ q.totalCents | money: q.currency }}</p>
-        } @else if (quote.error()) {
-          <p class="text-destructive">{{ 'bookings.new.quoteError' | t }}</p>
+          <p class="text-xs text-muted-foreground">
+            {{ 'bookings.new.quoteDeposit' | t: { amount: (q.depositCents | money: q.currency) } }}
+          </p>
         }
       </div>
     </fieldset>

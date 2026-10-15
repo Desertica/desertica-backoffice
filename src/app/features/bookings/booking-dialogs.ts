@@ -6,6 +6,7 @@ import {
   resource,
   signal,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialogImports } from '@spartan-ng/helm/dialog';
@@ -42,7 +43,7 @@ const newKey = () => crypto.randomUUID();
 @Component({
   selector: 'app-cancel-booking-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: COMMON,
+  imports: [...COMMON, MoneyPipe, EnumLabelPipe],
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-4" novalidate>
       <hlm-dialog-header>
@@ -66,6 +67,39 @@ const newKey = () => crypto.randomUUID();
           }
         </select>
       </label>
+      <section
+        class="grid gap-1 rounded-lg border border-border p-3 text-sm"
+        aria-live="polite"
+        [attr.aria-busy]="quote.isLoading()"
+      >
+        @if (quote.error()) {
+          <p class="text-muted-foreground">{{ 'bookings.cancel.quote.error' | t }}</p>
+        } @else if (quote.value(); as q) {
+          <p class="text-muted-foreground">
+            {{ 'bookings.cancel.quote.paid' | t }}: {{ q.paidCents | money: q.currency }}
+          </p>
+          <p class="text-base font-semibold">
+            {{ 'bookings.cancel.quote.refund' | t }}: {{ q.refundCents | money: q.currency }} ({{
+              q.refundPercent
+            }}%)
+          </p>
+          @if (q.tier && (q.tier.refundPercent ?? 0) > 0) {
+            <p class="text-xs text-muted-foreground">
+              {{
+                'bookings.cancel.quote.tier'
+                  | t: { hours: q.tier.hoursBefore ?? 0, percent: q.tier.refundPercent ?? 0 }
+              }}
+            </p>
+          }
+          @if (q.reason) {
+            <p class="text-xs text-muted-foreground">
+              {{ q.reason | enumLabel: 'bookings.cancel.reason' }}
+            </p>
+          }
+        } @else {
+          <p class="text-muted-foreground">{{ 'common.loading' | t }}</p>
+        }
+      </section>
       <hlm-dialog-footer>
         <button hlmBtn type="button" variant="outline" (click)="dialog.close()">
           {{ 'common.cancel' | t }}
@@ -89,6 +123,14 @@ export class CancelBookingDialog {
   protected readonly form = this.fb.group({
     reason: ['', Validators.required],
     refund: ['POLICY' as 'POLICY' | 'FULL' | 'NONE'],
+  });
+  private readonly refund = toSignal(this.form.controls.refund.valueChanges, {
+    initialValue: this.form.controls.refund.value,
+  });
+  /** What the cancellation would refund with the selected option, before confirming. */
+  protected readonly quote = resource({
+    params: () => this.refund(),
+    loader: ({ params }) => this.api.cancellationQuote(this.booking.id, params),
   });
 
   protected async submit() {
