@@ -17,6 +17,7 @@ Hoy el repo tiene una sola rama protegible: `main`. Si creas otras ramas de larg
    - `Secretos`
    - `Reglas del repo`
    - `Node`
+   - `Lint`
 6. Marca **Do not allow bypassing the above settings** (o "Include administrators") y deja desmarcado permitir force pushes y borrar la rama.
 7. **Create** / **Save changes**.
 
@@ -25,3 +26,9 @@ Hoy el repo tiene una sola rama protegible: `main`. Si creas otras ramas de larg
 - `Node` pasa en verde sin codigo (dice "Sin package.json") y empieza a validar solo cuando llega `package.json`.
 - `npm audit` es informativo (no bloquea). Cuando este en verde, quita `continue-on-error: true` de ese paso en el workflow.
 - Dependabot (`.github/dependabot.yml`) abre PRs semanales agrupados de npm y github-actions.
+
+## Lint, triggers y Lighthouse
+
+- El CI corre en cada PR y en cada push a cualquier rama; un push nuevo cancela la corrida anterior de la misma rama. Una rama con PR abierto corre dos veces (push y PR), es normal.
+- `Lint` pasa en verde sin codigo. El esqueleto de la app debe incluir `angular-eslint` y un script `npm run lint`; sin script, `Lint` pasa sin revisar nada. `Node` ya no corre lint.
+- Lighthouse (`docs/pipelines/lighthouse.yml`, copiar a `.github/workflows/lighthouse.yml`) es solo informativo: NO lo agregues como check requerido. Corre cada lunes o a mano (Actions -> Lighthouse -> Run workflow) sobre la variable de repo `PROD_URL` (Settings -> Secrets and variables -> Actions -> Variables). Si esta vacia, termina en verde. Como el backoffice esta detras de login, probablemente solo mida la pagina de login.

@@ -3,7 +3,10 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: ['**']
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -61,10 +64,32 @@ jobs:
         continue-on-error: true
         run: npm audit --omit=dev --audit-level=high
       - if: steps.d.outputs.has == 'true'
-        run: npm run --if-present lint
-      - if: steps.d.outputs.has == 'true'
         run: npm run --if-present format:check
       - if: steps.d.outputs.has == 'true'
         run: npm run --if-present test
       - if: steps.d.outputs.has == 'true'
         run: npm run build
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: d
+        run: |
+          if [ -f package.json ]; then echo "has=true" >> "$GITHUB_OUTPUT"; else echo "has=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Sin package.json
+        if: steps.d.outputs.has == 'false'
+        run: |
+          echo "Sin package.json todavia, nada que construir. OK."
+          exit 0
+      - if: steps.d.outputs.has == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.d.outputs.has == 'true'
+        run: npm ci
+      # Sin script lint pasa; el esqueleto debe incluir angular-eslint.
+      - if: steps.d.outputs.has == 'true'
+        run: npm run --if-present lint
