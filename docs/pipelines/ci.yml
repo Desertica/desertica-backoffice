@@ -1,0 +1,95 @@
+# Copiar a .github/workflows/ci.yml. Los jobs existen siempre; sin package.json terminan en verde.
+name: CI
+on:
+  pull_request:
+  push:
+    branches: ['**']
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  secretos:
+    name: Secretos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      # En repos de organizacion exige el secret GITLEAKS_LICENSE (ver docs/PROTECCION-RAMAS.md).
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  reglas:
+    name: Reglas del repo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No commitear .env, .cursor/ ni .vscode/
+        run: |
+          bad=$(git ls-files | grep -E '(^|/)(\.env($|\.)|\.cursor/|\.vscode/)' | grep -vE '(^|/)\.env\.example$' || true)
+          if [ -n "$bad" ]; then echo "Archivos prohibidos:"; echo "$bad"; exit 1; fi
+      - name: Sin analitica ni scripts de terceros
+        run: |
+          paths=$(ls -d src index.html 2>/dev/null || true)
+          [ -z "$paths" ] && { echo "Sin src/ ni index.html: nada que revisar."; exit 0; }
+          if grep -rniE 'googletagmanager|fbevents|hotjar|clarity' $paths; then
+            echo "Analitica/marketing de terceros no permitida"; exit 1
+          fi
+
+  node:
+    name: Node
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: d
+        run: |
+          if [ -f package.json ]; then echo "has=true" >> "$GITHUB_OUTPUT"; else echo "has=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Sin package.json
+        if: steps.d.outputs.has == 'false'
+        run: |
+          echo "Sin package.json todavia, nada que construir. OK."
+          exit 0
+      - if: steps.d.outputs.has == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.d.outputs.has == 'true'
+        run: npm ci
+      # Informativo hasta que este en verde: quitar continue-on-error entonces.
+      - if: steps.d.outputs.has == 'true'
+        continue-on-error: true
+        run: npm audit --omit=dev --audit-level=high
+      - if: steps.d.outputs.has == 'true'
+        run: npm run --if-present format:check
+      - if: steps.d.outputs.has == 'true'
+        run: npm run --if-present test
+      - if: steps.d.outputs.has == 'true'
+        run: npm run build
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: d
+        run: |
+          if [ -f package.json ]; then echo "has=true" >> "$GITHUB_OUTPUT"; else echo "has=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Sin package.json
+        if: steps.d.outputs.has == 'false'
+        run: |
+          echo "Sin package.json todavia, nada que construir. OK."
+          exit 0
+      - if: steps.d.outputs.has == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.d.outputs.has == 'true'
+        run: npm ci
+      # Sin script lint pasa; el esqueleto debe incluir angular-eslint.
+      - if: steps.d.outputs.has == 'true'
+        run: npm run --if-present lint
