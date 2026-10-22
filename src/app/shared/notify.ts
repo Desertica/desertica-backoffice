@@ -12,6 +12,10 @@ export class Notify {
     toast.success(this.i18n.t(key, params));
   }
 
+  info(key: MessageKey) {
+    toast.info(this.i18n.t(key));
+  }
+
   /** Shows the API's own message when there is one (it is already user-facing), else a generic text. */
   error(e: unknown) {
     toast.error(errorMessage(e, this.i18n));

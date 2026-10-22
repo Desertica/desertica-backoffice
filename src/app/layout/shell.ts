@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
@@ -32,6 +39,7 @@ import type { MessageKey } from '../core/i18n/messages.es';
 import { TPipe } from '../core/i18n/t.pipe';
 import { NAV_GROUPS } from '../core/nav/nav-items';
 import { ThemeService, type ThemeChoice } from '../core/theme/theme.service';
+import { Notify } from '../shared/notify';
 
 @Component({
   selector: 'app-shell',
@@ -77,6 +85,8 @@ export class Shell {
   protected readonly theme = inject(ThemeService);
   private readonly router = inject(Router);
   private readonly google = inject(GoogleIdentity);
+  private readonly notify = inject(Notify);
+  private signingOut = false;
 
   protected readonly langs = LANGS;
   protected readonly themes: readonly { value: ThemeChoice; label: MessageKey }[] = [
@@ -110,7 +120,21 @@ export class Shell {
     this.theme.set(choice);
   }
 
+  constructor() {
+    // The session can end on its own (refresh cookie rejected): go to login instead of leaving a dead screen.
+    let wasAuthenticated = this.auth.isAuthenticated();
+    effect(() => {
+      const authenticated = this.auth.isAuthenticated();
+      if (wasAuthenticated && !authenticated && !this.signingOut) {
+        void this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+        this.notify.info('auth.sessionExpired');
+      }
+      wasAuthenticated = authenticated;
+    });
+  }
+
   protected async signOut() {
+    this.signingOut = true;
     await this.auth.logout();
     this.google.disableAutoSelect();
     await this.router.navigateByUrl('/login');
