@@ -15,11 +15,21 @@ import { HlmTableImports } from '@spartan-ng/helm/table';
 import type { CompanyInput, DocumentType } from '../../core/api/types';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
+import { useDialogs } from '../../shared/dialog';
+import { I18n } from '../../core/i18n/i18n.service';
 import { Notify } from '../../shared/notify';
+import { TypedConfirmDialog } from '../../shared/typed-confirm-dialog';
 import { AdminApi } from './admin.api';
 
 /** Series prefixes: B (boleta), F (factura) or E, then 3 letters or digits. */
 export const SERIES_PREFIX = /^[BFE][A-Z0-9]{3}$/;
+
+/** Boletas start with B, facturas with F, notes follow the document they correct (B or F); E is accepted for any. */
+export function seriesPrefixError(docType: DocumentType, prefix: string): boolean {
+  const p = prefix.trim().toUpperCase();
+  const allowed = docType === 'BOLETA' ? 'BE' : docType === 'FACTURA' ? 'FE' : 'BFE';
+  return !SERIES_PREFIX.test(p) || !allowed.includes(p[0]);
+}
 
 export function buildCompany(v: {
   ruc: string;
@@ -60,6 +70,8 @@ export function buildCompany(v: {
 export class CompanyPage {
   private readonly api = inject(AdminApi);
   private readonly notify = inject(Notify);
+  private readonly i18n = inject(I18n);
+  private readonly dialogs = useDialogs();
   private readonly fb = inject(FormBuilder).nonNullable;
   protected readonly saving = signal(false);
   protected readonly creating = signal(false);
@@ -82,11 +94,20 @@ export class CompanyPage {
     igvRate: [''],
     environment: ['BETA' as 'BETA' | 'PRODUCTION'],
   });
-  protected readonly seriesForm = this.fb.group({
-    docType: ['BOLETA' as DocumentType],
-    prefix: ['', [Validators.required, Validators.pattern(SERIES_PREFIX)]],
-    nextNumber: [1, [Validators.required, Validators.min(1)]],
-  });
+  protected readonly seriesForm = this.fb.group(
+    {
+      docType: ['BOLETA' as DocumentType],
+      prefix: ['', Validators.required],
+      nextNumber: [1, [Validators.required, Validators.min(1)]],
+    },
+    {
+      // Upper-cased before checking, so typing `b001` is fine.
+      validators: (g) =>
+        seriesPrefixError(g.get('docType')!.value, g.get('prefix')!.value)
+          ? { prefix: true }
+          : null,
+    },
+  );
 
   constructor() {
     effect(() => {
@@ -107,9 +128,18 @@ export class CompanyPage {
   protected async save() {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
+    const input = buildCompany(this.form.getRawValue());
+    if (input.environment === 'PRODUCTION' && this.company.value()?.environment !== 'PRODUCTION') {
+      const ok = await this.dialogs.open<boolean>(TypedConfirmDialog, {
+        title: this.i18n.t('company.productionTitle'),
+        description: this.i18n.t('company.productionWarning'),
+        accepted: [input.ruc, 'PRODUCCION'],
+      });
+      if (!ok) return;
+    }
     this.saving.set(true);
     try {
-      await this.api.saveCompany(buildCompany(this.form.getRawValue()));
+      await this.api.saveCompany(input);
       this.notify.success('company.saved');
       this.company.reload();
     } catch (e) {
