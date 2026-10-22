@@ -9,10 +9,13 @@ import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
 import { startWith } from 'rxjs';
 import { TourCatalog } from '../../core/api/tour-catalog';
 import type { CreateDeparture, TourFormat } from '../../core/api/types';
-import { limaToUtcIso, limaToday } from '../../core/format/datetime';
+import { isDay, limaToUtcIso, limaToday } from '../../core/format/datetime';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { Notify } from '../../shared/notify';
 import { DeparturesApi } from './departures.api';
+
+/** The `date` from the URL when it is a real day, otherwise today. */
+export const initialDate = (param: string | null) => (param && isDay(param) ? param : limaToday());
 
 export const WEEKDAYS = [1, 2, 3, 4, 5, 6, 0] as const;
 
@@ -76,7 +79,7 @@ export class DepartureForm {
   protected readonly form = this.fb.group({
     tourRefId: ['', Validators.required],
     date: [
-      inject(ActivatedRoute).snapshot.queryParamMap.get('date') ?? limaToday(),
+      initialDate(inject(ActivatedRoute).snapshot.queryParamMap.get('date')),
       Validators.required,
     ],
     time: ['08:00', Validators.required],

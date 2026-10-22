@@ -17,7 +17,7 @@ import { HlmTableImports } from '@spartan-ng/helm/table';
 import { TourCatalog } from '../../core/api/tour-catalog';
 import type { BookingStatus } from '../../core/api/types';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
-import { addDays, limaToUtcIso } from '../../core/format/datetime';
+import { addDays, isDay, limaToUtcIso } from '../../core/format/datetime';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { Pager } from '../../shared/pager';
@@ -63,8 +63,8 @@ export function toBookingQuery(f: {
   if (f.currency && CURRENCIES.includes(f.currency as never))
     q.currency = f.currency as BookingQuery['currency'];
   if (f.tour) q.tourRefId = f.tour;
-  if (f.from) q.from = limaToUtcIso(f.from);
-  if (f.to) q.to = limaToUtcIso(addDays(f.to, 1));
+  if (f.from && isDay(f.from)) q.from = limaToUtcIso(f.from);
+  if (f.to && isDay(f.to)) q.to = limaToUtcIso(addDays(f.to, 1));
   return q;
 }
 
