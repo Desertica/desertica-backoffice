@@ -1,10 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  Injector,
+  afterNextRender,
   computed,
   effect,
   inject,
   signal,
+  viewChild,
+  type ElementRef,
 } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -78,6 +82,7 @@ import { Notify } from '../shared/notify';
     }),
   ],
   templateUrl: './shell.html',
+  host: { '(document:keydown.escape)': 'closeMenu()' },
 })
 export class Shell {
   protected readonly auth = inject(AuthService);
@@ -86,6 +91,9 @@ export class Shell {
   private readonly router = inject(Router);
   private readonly google = inject(GoogleIdentity);
   private readonly notify = inject(Notify);
+  private readonly injector = inject(Injector);
+  private readonly sidebar = viewChild.required<ElementRef<HTMLElement>>('sidebar');
+  private readonly menuButton = viewChild.required<ElementRef<HTMLElement>>('menuButton');
   private signingOut = false;
 
   protected readonly langs = LANGS;
@@ -111,6 +119,17 @@ export class Shell {
         ? 'lucideMoon'
         : 'lucideSun',
   );
+
+  protected openMenu() {
+    this.menuOpen.set(true);
+    afterNextRender(() => this.sidebar().nativeElement.focus(), { injector: this.injector });
+  }
+
+  protected closeMenu() {
+    if (!this.menuOpen()) return;
+    this.menuOpen.set(false);
+    this.menuButton().nativeElement.focus();
+  }
 
   protected setLang(lang: Lang) {
     this.i18n.set(lang);

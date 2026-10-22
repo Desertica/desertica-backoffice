@@ -157,24 +157,22 @@
       </form>
     }
 
-    <div class="flex gap-1 border-b border-border print:hidden" role="tablist">
+    <div class="flex gap-1 border-b border-border print:hidden" role="group">
       <button
-        role="tab"
         hlmBtn
         variant="ghost"
         size="sm"
-        [attr.aria-selected]="tab() === 'bookings'"
+        [attr.aria-pressed]="tab() === 'bookings'"
         [class.font-semibold]="tab() === 'bookings'"
         (click)="tab.set('bookings')"
       >
         {{ 'departures.detail.tab.bookings' | t }}
       </button>
       <button
-        role="tab"
         hlmBtn
         variant="ghost"
         size="sm"
-        [attr.aria-selected]="tab() === 'manifest'"
+        [attr.aria-pressed]="tab() === 'manifest'"
         [class.font-semibold]="tab() === 'manifest'"
         (click)="tab.set('manifest')"
       >

@@ -56,4 +56,20 @@ describe('Shell session expiry', () => {
     expect(navigate).not.toHaveBeenCalled();
     expect(info).not.toHaveBeenCalled();
   });
+
+  it('hides the closed drawer from keyboard and screen readers, and Escape closes it returning focus', () => {
+    const fixture = TestBed.createComponent(Shell);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const aside = el.querySelector('#sidebar')!;
+    const toggle = el.querySelector<HTMLElement>('[aria-controls="sidebar"]')!;
+    expect(aside.classList).toContain('invisible');
+    toggle.click();
+    fixture.detectChanges();
+    expect(aside.classList).not.toContain('invisible');
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+    expect(aside.classList).toContain('invisible');
+    expect(document.activeElement).toBe(toggle);
+  });
 });
