@@ -157,7 +157,8 @@
       </div>
     </div>
   } @else {
-    @let rows = departures.value() ?? [];
+    @let rows = departures.value()?.items ?? [];
+    <app-truncated-notice [show]="departures.value()?.truncated" />
     @if (rows.length === 0) {
       <p class="text-muted-foreground">{{ 'common.empty' | t }}</p>
     } @else {

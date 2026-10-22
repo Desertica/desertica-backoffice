@@ -1,4 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Injector,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+  type ElementRef,
+} from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
@@ -32,6 +43,7 @@ import type { MessageKey } from '../core/i18n/messages.es';
 import { TPipe } from '../core/i18n/t.pipe';
 import { NAV_GROUPS } from '../core/nav/nav-items';
 import { ThemeService, type ThemeChoice } from '../core/theme/theme.service';
+import { Notify } from '../shared/notify';
 
 @Component({
   selector: 'app-shell',
@@ -70,6 +82,7 @@ import { ThemeService, type ThemeChoice } from '../core/theme/theme.service';
     }),
   ],
   templateUrl: './shell.html',
+  host: { '(document:keydown.escape)': 'closeMenu()' },
 })
 export class Shell {
   protected readonly auth = inject(AuthService);
@@ -77,6 +90,11 @@ export class Shell {
   protected readonly theme = inject(ThemeService);
   private readonly router = inject(Router);
   private readonly google = inject(GoogleIdentity);
+  private readonly notify = inject(Notify);
+  private readonly injector = inject(Injector);
+  private readonly sidebar = viewChild.required<ElementRef<HTMLElement>>('sidebar');
+  private readonly menuButton = viewChild.required<ElementRef<HTMLElement>>('menuButton');
+  private signingOut = false;
 
   protected readonly langs = LANGS;
   protected readonly themes: readonly { value: ThemeChoice; label: MessageKey }[] = [
@@ -102,6 +120,17 @@ export class Shell {
         : 'lucideSun',
   );
 
+  protected openMenu() {
+    this.menuOpen.set(true);
+    afterNextRender(() => this.sidebar().nativeElement.focus(), { injector: this.injector });
+  }
+
+  protected closeMenu() {
+    if (!this.menuOpen()) return;
+    this.menuOpen.set(false);
+    this.menuButton().nativeElement.focus();
+  }
+
   protected setLang(lang: Lang) {
     this.i18n.set(lang);
   }
@@ -110,7 +139,21 @@ export class Shell {
     this.theme.set(choice);
   }
 
+  constructor() {
+    // The session can end on its own (refresh cookie rejected): go to login instead of leaving a dead screen.
+    let wasAuthenticated = this.auth.isAuthenticated();
+    effect(() => {
+      const authenticated = this.auth.isAuthenticated();
+      if (wasAuthenticated && !authenticated && !this.signingOut) {
+        void this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+        this.notify.info('auth.sessionExpired');
+      }
+      wasAuthenticated = authenticated;
+    });
+  }
+
   protected async signOut() {
+    this.signingOut = true;
     await this.auth.logout();
     this.google.disableAutoSelect();
     await this.router.navigateByUrl('/login');

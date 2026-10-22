@@ -20,9 +20,11 @@ import { centsToInput, parseToCents } from '../../core/format/money';
 import { I18n } from '../../core/i18n/i18n.service';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { injectDialog } from '../../shared/dialog';
+import { IdempotencyKeys } from '../../shared/idempotency';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
-import { DeparturesApi } from '../departures/departures.api';
+import { TruncatedNotice } from '../../shared/truncated-notice';
+import { DeparturesApi, upcomingRange } from '../departures/departures.api';
 import { BookingsApi } from './bookings.api';
 
 const COMMON = [
@@ -34,9 +36,6 @@ const COMMON = [
   HlmLabelImports,
   HlmTextareaImports,
 ];
-
-/** A fresh key per dialog open: retries of the same submit reuse it, so a double click cannot pay twice. */
-const newKey = () => crypto.randomUUID();
 
 // ---------------------------------------------------------------- cancel
 
@@ -172,7 +171,7 @@ export function rescheduleTargets(
 @Component({
   selector: 'app-reschedule-booking-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [...COMMON, LimaDateTimePipe],
+  imports: [...COMMON, LimaDateTimePipe, TruncatedNotice],
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-4" novalidate>
       <hlm-dialog-header>
@@ -196,6 +195,7 @@ export function rescheduleTargets(
               </option>
             }
           </select>
+          <app-truncated-notice [show]="candidates.value()?.truncated" />
         </label>
         <label class="grid gap-1.5">
           <span hlmLabel>{{ 'bookings.reschedule.reason' | t }}</span>
@@ -230,11 +230,11 @@ export class RescheduleBookingDialog {
       this.departures.listAll({
         tourRefId: this.dialog.context.tourRefId,
         status: 'OPEN',
-        from: new Date().toISOString(),
+        ...upcomingRange(),
       }),
   });
   protected readonly targets = computed(() =>
-    rescheduleTargets(this.candidates.value() ?? [], this.booking.departureId, this.people),
+    rescheduleTargets(this.candidates.value()?.items ?? [], this.booking.departureId, this.people),
   );
 
   protected async submit() {
@@ -293,6 +293,13 @@ export function buildManualPayment(
   };
 }
 
+/** `datetime-local` is Lima wall-clock time; a payment cannot have happened in the future. */
+export function paidAtInFuture(paidAt: string, now = Date.now()): boolean {
+  return (
+    !!paidAt && new Date(limaToUtcIso(paidAt.slice(0, 10), paidAt.slice(11, 16))).getTime() > now
+  );
+}
+
 @Component({
   selector: 'app-manual-payment-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -324,11 +331,18 @@ export function buildManualPayment(
           <input hlmInput inputmode="decimal" formControlName="amount" />
           @if (form.controls.amount.touched && !valid()) {
             <span class="text-xs text-destructive">{{ 'bookings.payment.invalidAmount' | t }}</span>
+          } @else if (overpays()) {
+            <span class="text-xs text-amber-600" role="status">{{
+              'bookings.payment.overpay' | t
+            }}</span>
           }
         </label>
         <label class="grid gap-1.5">
           <span hlmLabel>{{ 'bookings.payment.paidAt' | t }} ({{ 'common.optional' | t }})</span>
           <input hlmInput type="datetime-local" formControlName="paidAt" />
+          @if (paidAtFuture()) {
+            <span class="text-xs text-destructive">{{ 'bookings.payment.paidAtFuture' | t }}</span>
+          }
         </label>
         <label class="grid gap-1.5 sm:col-span-2">
           <span hlmLabel>{{ 'bookings.payment.reference' | t }} ({{ 'common.optional' | t }})</span>
@@ -351,7 +365,7 @@ export class ManualPaymentDialog {
   private readonly api = inject(BookingsApi);
   private readonly notify = inject(Notify);
   private readonly fb = inject(FormBuilder).nonNullable;
-  private readonly idempotencyKey = newKey();
+  private readonly keys = new IdempotencyKeys();
   protected readonly booking = this.dialog.context.booking;
   protected readonly methods = ['CASH', 'TRANSFER', 'YAPE', 'OTHER'] as const;
   protected readonly kinds: readonly PaymentKind[] = ['FULL', 'DEPOSIT', 'BALANCE'];
@@ -368,16 +382,28 @@ export class ManualPaymentDialog {
     return buildManualPayment(this.form.getRawValue(), this.booking.currency) !== null;
   }
 
+  /** A warning, not a block: staff may be recording a tip or a correction. */
+  protected overpays() {
+    const body = buildManualPayment(this.form.getRawValue(), this.booking.currency);
+    return (
+      !!body && body.amountCents > Math.max(0, this.booking.totalCents - this.booking.paidCents)
+    );
+  }
+
+  protected paidAtFuture() {
+    return paidAtInFuture(this.form.controls.paidAt.value);
+  }
+
   protected async submit() {
     this.form.markAllAsTouched();
     const body = buildManualPayment(this.form.getRawValue(), this.booking.currency);
-    if (!body) return;
+    if (!body || this.paidAtFuture()) return;
     this.busy.set(true);
     try {
       const payment = await this.api.recordManualPayment(
         this.booking.id,
         body,
-        this.idempotencyKey,
+        this.keys.keyFor(body),
       );
       this.notify.success('bookings.payment.done');
       this.dialog.close(payment);
@@ -553,7 +579,7 @@ export class IssueDocumentDialog {
   private readonly api = inject(BookingsApi);
   private readonly notify = inject(Notify);
   private readonly fb = inject(FormBuilder).nonNullable;
-  private readonly idempotencyKey = newKey();
+  private readonly keys = new IdempotencyKeys();
   protected readonly booking = this.dialog.context.booking;
   protected readonly payments = (this.booking.payments ?? []).filter(
     (p) => p.status === 'SUCCEEDED',
@@ -565,14 +591,11 @@ export class IssueDocumentDialog {
     const v = this.form.getRawValue();
     this.busy.set(true);
     try {
-      await this.api.issueDocument(
-        this.booking.id,
-        {
-          ...(v.docType ? { docType: v.docType as 'BOLETA' | 'FACTURA' } : {}),
-          ...(v.paymentId ? { paymentId: v.paymentId } : {}),
-        },
-        this.idempotencyKey,
-      );
+      const body = {
+        ...(v.docType ? { docType: v.docType as 'BOLETA' | 'FACTURA' } : {}),
+        ...(v.paymentId ? { paymentId: v.paymentId } : {}),
+      };
+      await this.api.issueDocument(this.booking.id, body, this.keys.keyFor(body));
       this.notify.success('bookings.doc.queued');
       this.dialog.close(true);
     } catch (e) {

@@ -12,14 +12,28 @@ import { HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
-import type { Departure } from '../../core/api/types';
+import type { BookingSummary, Currency, Departure } from '../../core/api/types';
+import { sumByCurrency } from '../../core/format/money';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
-import { LimaDateTimePipe } from '../../shared/format.pipes';
+import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { injectDialog } from '../../shared/dialog';
 import { Notify } from '../../shared/notify';
-import { DeparturesApi } from './departures.api';
+import { TruncatedNotice } from '../../shared/truncated-notice';
+import { BookingsApi } from '../bookings/bookings.api';
+import { DeparturesApi, upcomingRange } from './departures.api';
 
 type Resolution = 'REFUND' | 'RESCHEDULE' | 'CLIENT_CHOICE';
+
+/** What a REFUND cancellation will touch: live bookings and, per currency, what they have paid. */
+export function refundSummary(
+  rows: readonly Pick<BookingSummary, 'status' | 'currency' | 'paidCents'>[],
+) {
+  const live = rows.filter((b) => b.status === 'PENDING_PAYMENT' || b.status === 'CONFIRMED');
+  const totals = sumByCurrency(
+    live.map((b) => ({ amountCents: b.paidCents, currency: b.currency as Currency })),
+  );
+  return { count: live.length, totals: Object.entries(totals) as [Currency, number][] };
+}
 
 /** Seats a target departure must have free to absorb the cancelled one. */
 export function canAbsorb(target: Departure, source: Departure): boolean {
@@ -38,6 +52,8 @@ export function canAbsorb(target: Departure, source: Departure): boolean {
     TPipe,
     EnumLabelPipe,
     LimaDateTimePipe,
+    MoneyPipe,
+    TruncatedNotice,
     HlmButtonImports,
     HlmDialogImports,
     HlmInputImports,
@@ -68,6 +84,16 @@ export function canAbsorb(target: Departure, source: Departure): boolean {
         </select>
       </label>
 
+      @if (resolution() === 'REFUND' && refunds.value(); as r) {
+        <div class="rounded-lg border border-destructive/40 p-3 text-sm" role="status">
+          {{ 'departures.cancel.refundCount' | t: { count: r.summary.count } }}
+          @for (t of r.summary.totals; track t[0]) {
+            <strong class="ml-1">{{ t[1] | money: t[0] }}</strong>
+          }
+          <app-truncated-notice [show]="r.truncated" />
+        </div>
+      }
+
       @if (resolution() === 'RESCHEDULE') {
         @if (targets().length === 0 && !candidates.isLoading()) {
           <p class="text-sm text-destructive">{{ 'departures.cancel.noTargets' | t }}</p>
@@ -83,6 +109,7 @@ export function canAbsorb(target: Departure, source: Departure): boolean {
               }
             </select>
           </label>
+          <app-truncated-notice [show]="candidates.value()?.truncated" />
         }
       }
 
@@ -103,6 +130,7 @@ export class CancelDepartureDialog {
     { affectedBookings: number }
   >();
   private readonly api = inject(DeparturesApi);
+  private readonly bookingsApi = inject(BookingsApi);
   private readonly notify = inject(Notify);
   private readonly fb = inject(FormBuilder).nonNullable;
 
@@ -117,13 +145,21 @@ export class CancelDepartureDialog {
   });
   protected readonly resolution = signal<Resolution>('REFUND');
 
+  protected readonly refunds = resource({
+    params: () => (this.resolution() === 'REFUND' ? this.departure.id : undefined),
+    loader: async ({ params }) => {
+      const page = await this.bookingsApi.list({ departureId: params, pageSize: 100 });
+      return { summary: refundSummary(page.data), truncated: page.meta.total > page.data.length };
+    },
+  });
+
   protected readonly candidates = resource({
     params: () => (this.resolution() === 'RESCHEDULE' ? this.departure.tourRefId : undefined),
     loader: ({ params }) =>
-      this.api.listAll({ tourRefId: params, status: 'OPEN', from: new Date().toISOString() }),
+      this.api.listAll({ tourRefId: params, status: 'OPEN', ...upcomingRange() }),
   });
   protected readonly targets = computed(() =>
-    (this.candidates.value() ?? []).filter((t) => canAbsorb(t, this.departure)),
+    (this.candidates.value()?.items ?? []).filter((t) => canAbsorb(t, this.departure)),
   );
 
   constructor() {

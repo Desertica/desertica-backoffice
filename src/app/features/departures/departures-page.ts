@@ -22,6 +22,7 @@ import { I18n } from '../../core/i18n/i18n.service';
 import type { MessageKey } from '../../core/i18n/messages.es';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { LimaDateTimePipe } from '../../shared/format.pipes';
+import { TruncatedNotice } from '../../shared/truncated-notice';
 import { StatusBadge } from '../../shared/status-badge';
 import { monthGrid, monthOf, shiftMonth } from './calendar';
 import { DeparturesApi } from './departures.api';
@@ -39,6 +40,7 @@ const STATUSES: readonly DepartureStatus[] = ['OPEN', 'CLOSED', 'CANCELLED', 'CO
     EnumLabelPipe,
     LimaDateTimePipe,
     StatusBadge,
+    TruncatedNotice,
     HasPermissionDirective,
     HlmButtonImports,
     HlmInputImports,
@@ -94,7 +96,7 @@ export class DeparturesPage {
   protected readonly weeks = computed(() => monthGrid(this.month()));
   protected readonly byDay = computed(() => {
     const map = new Map<string, Departure[]>();
-    for (const d of this.departures.value() ?? []) {
+    for (const d of this.departures.value()?.items ?? []) {
       const day = limaDay(d.startsAt);
       map.set(day, [...(map.get(day) ?? []), d]);
     }

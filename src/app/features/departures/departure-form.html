@@ -29,7 +29,7 @@
 
     <label class="grid gap-1.5">
       <span hlmLabel>{{ 'departures.form.capacity' | t }}</span>
-      <input hlmInput type="number" min="1" formControlName="capacity" />
+      <input hlmInput type="number" min="1" step="1" formControlName="capacity" />
       @if (form.controls.capacity.invalid) {
         <span class="text-xs text-destructive">{{ 'common.required' | t }}</span>
       }

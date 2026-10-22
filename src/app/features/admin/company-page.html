@@ -116,7 +116,7 @@
       <label class="grid gap-1.5 text-sm">
         <span hlmLabel>{{ 'series.field.prefix' | t }}</span>
         <input hlmInput class="w-32 uppercase" maxlength="4" formControlName="prefix" />
-        @if (seriesForm.controls.prefix.touched && seriesForm.controls.prefix.invalid) {
+        @if (seriesForm.controls.prefix.touched && seriesForm.hasError('prefix')) {
           <span class="text-xs text-destructive">{{ 'series.prefixInvalid' | t }}</span>
         }
       </label>

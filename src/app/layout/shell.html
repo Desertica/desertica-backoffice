@@ -5,13 +5,16 @@
       type="button"
       class="fixed inset-0 z-30 bg-black/50 lg:hidden"
       [attr.aria-label]="'common.close' | t"
-      (click)="menuOpen.set(false)"
+      (click)="closeMenu()"
     ></button>
   }
   <aside
-    class="print:hidden fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform lg:static lg:translate-x-0"
+    class="print:hidden fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform lg:visible lg:static lg:translate-x-0"
     [class.-translate-x-full]="!menuOpen()"
+    [class.invisible]="!menuOpen()"
     id="sidebar"
+    #sidebar
+    tabindex="-1"
   >
     <div class="flex h-14 items-center justify-between px-4">
       <a routerLink="/" class="text-base font-semibold tracking-tight">{{ 'app.name' | t }}</a>
@@ -21,7 +24,7 @@
         size="icon-sm"
         class="lg:hidden"
         [attr.aria-label]="'common.close' | t"
-        (click)="menuOpen.set(false)"
+        (click)="closeMenu()"
       >
         <ng-icon name="lucideX" />
       </button>
@@ -62,7 +65,8 @@
         [attr.aria-label]="'nav.open' | t"
         aria-controls="sidebar"
         [attr.aria-expanded]="menuOpen()"
-        (click)="menuOpen.set(true)"
+        #menuButton
+        (click)="openMenu()"
       >
         <ng-icon name="lucideMenu" />
       </button>

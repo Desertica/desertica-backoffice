@@ -3,7 +3,6 @@ import { Injectable, effect, inject, signal } from '@angular/core';
 import { readStorage, writeStorage } from '../storage/safe-storage';
 
 export type ThemeChoice = 'light' | 'dark' | 'system';
-export const THEMES: readonly ThemeChoice[] = ['light', 'dark', 'system'];
 const STORAGE_KEY = 'desertica.theme';
 
 @Injectable({ providedIn: 'root' })
