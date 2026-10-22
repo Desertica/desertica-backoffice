@@ -1,5 +1,6 @@
 import {
   addDays,
+  isDay,
   formatDateTime,
   limaDay,
   limaToUtcIso,
@@ -33,5 +34,18 @@ describe('date arithmetic', () => {
 
   it('uses the Lima day, not the UTC day', () => {
     expect(limaToday(new Date('2026-03-10T03:30:00Z'))).toBe('2026-03-09');
+  });
+});
+
+describe('day validation', () => {
+  it('accepts only real YYYY-MM-DD days', () => {
+    expect(isDay('2026-02-28')).toBe(true);
+    for (const bad of ['', 'abc', '2026-2-3', '2026-02-30', '2026-13-01', '2026-01-01T00:00'])
+      expect(isDay(bad)).toBe(false);
+  });
+
+  it('refuses to convert invalid days instead of throwing a RangeError later', () => {
+    expect(() => limaToUtcIso('2026-02-30')).toThrow('Invalid day');
+    expect(() => addDays('nope', 1)).toThrow('Invalid day');
   });
 });

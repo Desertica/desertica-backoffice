@@ -138,24 +138,22 @@ export class UserDialog {
         </button>
       </div>
 
-      <div class="flex gap-1 border-b border-border" role="tablist">
+      <div class="flex gap-1 border-b border-border" role="group">
         <button
-          role="tab"
           hlmBtn
           variant="ghost"
           size="sm"
-          [attr.aria-selected]="tab() === 'users'"
+          [attr.aria-pressed]="tab() === 'users'"
           [class.font-semibold]="tab() === 'users'"
           (click)="tab.set('users')"
         >
           {{ 'users.tab.users' | t }}
         </button>
         <button
-          role="tab"
           hlmBtn
           variant="ghost"
           size="sm"
-          [attr.aria-selected]="tab() === 'roles'"
+          [attr.aria-pressed]="tab() === 'roles'"
           [class.font-semibold]="tab() === 'roles'"
           (click)="tab.set('roles')"
         >

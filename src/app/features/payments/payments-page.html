@@ -1,24 +1,22 @@
 <div class="space-y-4">
   <h1 class="text-2xl font-semibold">{{ 'payments.title' | t }}</h1>
 
-  <div class="flex gap-1 border-b border-border" role="tablist">
+  <div class="flex gap-1 border-b border-border" role="group">
     <button
-      role="tab"
       hlmBtn
       variant="ghost"
       size="sm"
-      [attr.aria-selected]="tab() === 'payments'"
+      [attr.aria-pressed]="tab() === 'payments'"
       [class.font-semibold]="tab() === 'payments'"
       (click)="setTab('payments')"
     >
       {{ 'payments.tab.payments' | t }}
     </button>
     <button
-      role="tab"
       hlmBtn
       variant="ghost"
       size="sm"
-      [attr.aria-selected]="tab() === 'refunds'"
+      [attr.aria-pressed]="tab() === 'refunds'"
       [class.font-semibold]="tab() === 'refunds'"
       (click)="setTab('refunds')"
     >

@@ -39,7 +39,8 @@ export function occupancyPercent(sold?: number, capacity?: number): number {
   return capacity ? Math.round(((sold ?? 0) / capacity) * 100) : 0;
 }
 
-const PENDING_LINKS = [
+/** Each counter opens its list with the filter that reproduces the number. */
+export const PENDING_LINKS = [
   {
     key: 'unpaidBookings',
     label: 'dashboard.pending.unpaidBookings',
@@ -51,7 +52,7 @@ const PENDING_LINKS = [
     key: 'documentsInError',
     label: 'dashboard.pending.documentsInError',
     link: '/documents',
-    query: {},
+    query: { status: 'ERROR' },
     permission: 'documents:read',
   },
   {
@@ -65,14 +66,14 @@ const PENDING_LINKS = [
     key: 'openDisputes',
     label: 'dashboard.pending.openDisputes',
     link: '/disputes',
-    query: {},
+    query: { status: 'OPEN' },
     permission: 'payments:read',
   },
   {
     key: 'complaintsDueSoon',
     label: 'dashboard.pending.complaintsDueSoon',
     link: '/complaints',
-    query: {},
+    query: { due: 'soon' },
     permission: 'complaints:read',
   },
 ] as const satisfies readonly {

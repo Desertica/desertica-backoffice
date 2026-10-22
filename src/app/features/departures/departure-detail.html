@@ -115,7 +115,13 @@
         /></label>
         <label class="grid gap-1.5">
           <span hlmLabel>{{ 'departures.form.capacity' | t }}</span>
-          <input hlmInput type="number" [min]="d.seatsSold || 1" formControlName="capacity" />
+          <input
+            hlmInput
+            type="number"
+            step="1"
+            [min]="d.seatsSold || 1"
+            formControlName="capacity"
+          />
           <span class="text-xs text-muted-foreground">{{
             'departures.detail.capacityConflict' | t
           }}</span>
@@ -151,24 +157,22 @@
       </form>
     }
 
-    <div class="flex gap-1 border-b border-border print:hidden" role="tablist">
+    <div class="flex gap-1 border-b border-border print:hidden" role="group">
       <button
-        role="tab"
         hlmBtn
         variant="ghost"
         size="sm"
-        [attr.aria-selected]="tab() === 'bookings'"
+        [attr.aria-pressed]="tab() === 'bookings'"
         [class.font-semibold]="tab() === 'bookings'"
         (click)="tab.set('bookings')"
       >
         {{ 'departures.detail.tab.bookings' | t }}
       </button>
       <button
-        role="tab"
         hlmBtn
         variant="ghost"
         size="sm"
-        [attr.aria-selected]="tab() === 'manifest'"
+        [attr.aria-pressed]="tab() === 'manifest'"
         [class.font-semibold]="tab() === 'manifest'"
         (click)="tab.set('manifest')"
       >
@@ -177,7 +181,8 @@
     </div>
 
     @if (tab() === 'bookings') {
-      @let rows = bookings.value() ?? [];
+      @let rows = bookings.value()?.items ?? [];
+      <app-truncated-notice [show]="bookings.value()?.truncated" />
       @if (bookings.isLoading() && !bookings.hasValue()) {
         <hlm-skeleton class="h-24" />
       } @else if (rows.length === 0) {

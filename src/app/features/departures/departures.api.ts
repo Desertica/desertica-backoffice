@@ -18,13 +18,22 @@ export interface DepartureQuery {
 
 const MAX_PAGES = 10;
 
+/** Departures from now to a year ahead: the window every picker offers (and a bound for the fetch). */
+export function upcomingRange(now = new Date()): { from: string; to: string } {
+  return {
+    from: now.toISOString(),
+    to: new Date(now.getTime() + 365 * 86_400_000).toISOString(),
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class DeparturesApi {
   private readonly http = inject(ApiClient).http;
 
-  /** Fetches every page (100 per page) so calendars and pickers see the whole range. */
-  async listAll(query: DepartureQuery): Promise<Departure[]> {
+  /** Fetches up to `MAX_PAGES` pages of 100; `truncated` tells the UI the range holds more than it got. */
+  async listAll(query: DepartureQuery): Promise<{ items: Departure[]; truncated: boolean }> {
     const out: Departure[] = [];
+    let total = 0;
     for (let page = 1; page <= MAX_PAGES; page++) {
       const res = unwrap(
         await this.http.GET('/departures', {
@@ -32,9 +41,13 @@ export class DeparturesApi {
         }),
       );
       out.push(...res.data);
-      if (out.length >= res.meta.total || res.data.length === 0) break;
+      total = res.meta.total;
+      if (out.length >= total || res.data.length === 0) break;
     }
-    return out.sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+    return {
+      items: out.sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
+      truncated: out.length < total,
+    };
   }
 
   async get(id: string): Promise<Departure> {

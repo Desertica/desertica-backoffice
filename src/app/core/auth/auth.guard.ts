@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { type CanActivateFn, type Route, Router } from '@angular/router';
+import { type CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
 /** Sends anonymous visitors to the login page, remembering where they wanted to go. */
@@ -21,5 +21,3 @@ export const permissionGuard: CanActivateFn = (route) => {
   const list = Array.isArray(required) ? required : [required];
   return list.some((p) => auth.has(p)) || inject(Router).createUrlTree(['/forbidden']);
 };
-
-export type GuardedRoute = Route & { data?: { permission?: string | string[] } };

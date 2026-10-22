@@ -1,4 +1,4 @@
-import { occupancyPercent, rangeFor } from './dashboard';
+import { PENDING_LINKS, occupancyPercent, rangeFor } from './dashboard';
 
 describe('dashboard helpers', () => {
   it('computes inclusive Lima ranges from presets', () => {
@@ -12,5 +12,14 @@ describe('dashboard helpers', () => {
     expect(occupancyPercent(7, 9)).toBe(78);
     expect(occupancyPercent(0, 0)).toBe(0);
     expect(occupancyPercent(undefined, undefined)).toBe(0);
+  });
+});
+
+describe('pending counters', () => {
+  it('open their list with the matching filter', () => {
+    const q = Object.fromEntries(PENDING_LINKS.map((l) => [l.key, l.query]));
+    expect(q['documentsInError']).toEqual({ status: 'ERROR' });
+    expect(q['openDisputes']).toEqual({ status: 'OPEN' });
+    expect(q['complaintsDueSoon']).toEqual({ due: 'soon' });
   });
 });
