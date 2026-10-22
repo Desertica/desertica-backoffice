@@ -28,6 +28,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { parseToCents } from '../../core/format/money';
 import type { MessageKey } from '../../core/i18n/messages.es';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
+import { IdempotencyKeys } from '../../shared/idempotency';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
 import { DeparturesApi } from '../departures/departures.api';
@@ -161,8 +162,7 @@ export class ManualBooking {
   protected readonly currencies: readonly Currency[] = ['USD', 'PEN'];
   protected readonly saving = signal(false);
   protected readonly errors = signal<MessageKey[]>([]);
-  /** Reused on retries so a double click cannot create two bookings; renewed when the data changes. */
-  private idempotencyKey = crypto.randomUUID();
+  private readonly keys = new IdempotencyKeys();
 
   protected readonly form = this.fb.group({
     tourRefId: ['', Validators.required],
@@ -248,7 +248,6 @@ export class ManualBooking {
 
   constructor() {
     void this.catalog.load().catch((e) => this.notify.error(e));
-    this.form.valueChanges.subscribe(() => (this.idempotencyKey = crypto.randomUUID()));
     // A departure from another tour is no longer valid.
     effect(() => {
       this.tourId();
@@ -308,7 +307,7 @@ export class ManualBooking {
     }
     this.saving.set(true);
     try {
-      const booking = await this.bookings.createManual(body, this.idempotencyKey);
+      const booking = await this.bookings.createManual(body, this.keys.keyFor(body));
       this.notify.success('bookings.new.created', { reference: booking.reference });
       await this.router.navigate(['/bookings', booking.id]);
     } catch (e) {

@@ -20,6 +20,7 @@ import { centsToInput, parseToCents } from '../../core/format/money';
 import { I18n } from '../../core/i18n/i18n.service';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { injectDialog } from '../../shared/dialog';
+import { IdempotencyKeys } from '../../shared/idempotency';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
 import { DeparturesApi } from '../departures/departures.api';
@@ -34,9 +35,6 @@ const COMMON = [
   HlmLabelImports,
   HlmTextareaImports,
 ];
-
-/** A fresh key per dialog open: retries of the same submit reuse it, so a double click cannot pay twice. */
-const newKey = () => crypto.randomUUID();
 
 // ---------------------------------------------------------------- cancel
 
@@ -351,7 +349,7 @@ export class ManualPaymentDialog {
   private readonly api = inject(BookingsApi);
   private readonly notify = inject(Notify);
   private readonly fb = inject(FormBuilder).nonNullable;
-  private readonly idempotencyKey = newKey();
+  private readonly keys = new IdempotencyKeys();
   protected readonly booking = this.dialog.context.booking;
   protected readonly methods = ['CASH', 'TRANSFER', 'YAPE', 'OTHER'] as const;
   protected readonly kinds: readonly PaymentKind[] = ['FULL', 'DEPOSIT', 'BALANCE'];
@@ -377,7 +375,7 @@ export class ManualPaymentDialog {
       const payment = await this.api.recordManualPayment(
         this.booking.id,
         body,
-        this.idempotencyKey,
+        this.keys.keyFor(body),
       );
       this.notify.success('bookings.payment.done');
       this.dialog.close(payment);
@@ -553,7 +551,7 @@ export class IssueDocumentDialog {
   private readonly api = inject(BookingsApi);
   private readonly notify = inject(Notify);
   private readonly fb = inject(FormBuilder).nonNullable;
-  private readonly idempotencyKey = newKey();
+  private readonly keys = new IdempotencyKeys();
   protected readonly booking = this.dialog.context.booking;
   protected readonly payments = (this.booking.payments ?? []).filter(
     (p) => p.status === 'SUCCEEDED',
@@ -565,14 +563,11 @@ export class IssueDocumentDialog {
     const v = this.form.getRawValue();
     this.busy.set(true);
     try {
-      await this.api.issueDocument(
-        this.booking.id,
-        {
-          ...(v.docType ? { docType: v.docType as 'BOLETA' | 'FACTURA' } : {}),
-          ...(v.paymentId ? { paymentId: v.paymentId } : {}),
-        },
-        this.idempotencyKey,
-      );
+      const body = {
+        ...(v.docType ? { docType: v.docType as 'BOLETA' | 'FACTURA' } : {}),
+        ...(v.paymentId ? { paymentId: v.paymentId } : {}),
+      };
+      await this.api.issueDocument(this.booking.id, body, this.keys.keyFor(body));
       this.notify.success('bookings.doc.queued');
       this.dialog.close(true);
     } catch (e) {
