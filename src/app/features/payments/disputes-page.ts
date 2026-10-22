@@ -81,6 +81,7 @@ export function evidenceUrgency(
               <thead hlmTHead>
                 <tr hlmTr>
                   <th hlmTh>{{ 'disputes.col.created' | t }}</th>
+                  <th hlmTh>{{ 'disputes.col.booking' | t }}</th>
                   <th hlmTh>{{ 'disputes.col.provider' | t }}</th>
                   <th hlmTh>{{ 'disputes.col.reason' | t }}</th>
                   <th hlmTh>{{ 'disputes.col.due' | t }}</th>
@@ -94,6 +95,11 @@ export function evidenceUrgency(
                     <td hlmTd>
                       <a [routerLink]="['/disputes', d.id]" class="font-medium hover:underline">{{
                         d.createdAt | limaDateTime
+                      }}</a>
+                    </td>
+                    <td hlmTd>
+                      <a [routerLink]="['/bookings', d.bookingId]" class="hover:underline">{{
+                        d.bookingReference
                       }}</a>
                     </td>
                     <td hlmTd>{{ d.provider | enumLabel: 'enum.provider' }}</td>

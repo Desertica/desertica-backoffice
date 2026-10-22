@@ -1,40 +1,47 @@
-import { fromRows, toRows } from './settings-model';
+import { toForm, toInput } from './settings-model';
+
+const loaded = toForm({
+  depositPercent: 30,
+  holdMinutes: 15,
+  operatorRefundLimitCents: 20000,
+  complaintDueDays: 15,
+});
 
 describe('settings model', () => {
-  it('round-trips typed values', () => {
-    const original = {
-      holdMinutes: 15,
-      sendEmails: true,
-      brand: 'Desertica',
-      templates: { en: 'Hi' },
-    };
-    const rows = toRows(original);
-    expect(rows.map((r) => r.type)).toEqual(['string', 'number', 'boolean', 'json']);
-    expect(fromRows(rows)).toEqual({ value: original });
+  it('shows money in units and the rest as plain numbers', () => {
+    expect(loaded).toEqual({
+      depositPercent: '30',
+      holdMinutes: '15',
+      operatorRefundLimitCents: '200.00',
+      complaintDueDays: '15',
+    });
   });
 
-  it('reports the first invalid row', () => {
-    expect(fromRows([{ key: 'a', type: 'number', text: 'x' }])).toEqual({
-      error: 'invalidNumber',
-      index: 0,
-    });
-    expect(fromRows([{ key: 'a', type: 'number', text: '' }])).toEqual({
-      error: 'invalidNumber',
-      index: 0,
-    });
-    expect(fromRows([{ key: 'a', type: 'json', text: '{' }])).toEqual({
-      error: 'invalidJson',
-      index: 0,
-    });
+  it('sends only what changed, money back in cents', () => {
     expect(
-      fromRows([
-        { key: 'a', type: 'string', text: '1' },
-        { key: ' a ', type: 'string', text: '2' },
-      ]),
-    ).toEqual({ error: 'duplicateKey', index: 1 });
-    expect(fromRows([{ key: ' ', type: 'string', text: '' }])).toEqual({
-      error: 'emptyKey',
-      index: 0,
+      toInput({ ...loaded, holdMinutes: '20', operatorRefundLimitCents: '150,50' }, loaded),
+    ).toEqual({
+      value: { holdMinutes: 20, operatorRefundLimitCents: 15050 },
+    });
+    expect(toInput(loaded, loaded)).toEqual({ value: {} });
+  });
+
+  it('rejects malformed and out-of-range values with the offending field', () => {
+    expect(toInput({ ...loaded, holdMinutes: 'x' }, loaded)).toEqual({
+      error: 'invalidNumber',
+      key: 'holdMinutes',
+    });
+    expect(toInput({ ...loaded, depositPercent: '101' }, loaded)).toEqual({
+      error: 'outOfRange',
+      key: 'depositPercent',
+    });
+    expect(toInput({ ...loaded, holdMinutes: '0' }, loaded)).toEqual({
+      error: 'outOfRange',
+      key: 'holdMinutes',
+    });
+    expect(toInput({ ...loaded, complaintDueDays: '61' }, loaded)).toEqual({
+      error: 'outOfRange',
+      key: 'complaintDueDays',
     });
   });
 });

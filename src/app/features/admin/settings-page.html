@@ -14,72 +14,27 @@
     } @else if (!settings.hasValue()) {
       <hlm-skeleton class="h-32" />
     } @else {
-      @if (rows().length === 0) {
-        <p class="text-sm text-muted-foreground">{{ 'settings.empty' | t }}</p>
-      }
-      <div class="space-y-2">
-        @for (r of rows(); track $index; let i = $index) {
-          <div class="grid items-start gap-2 sm:grid-cols-[12rem_8rem_1fr_auto]">
+      <div class="grid gap-4 sm:grid-cols-2">
+        @for (f of fields; track f.key) {
+          <label class="grid gap-1.5">
+            <span hlmLabel>{{ f.label | t }}</span>
             <input
               hlmInput
-              [attr.aria-label]="'settings.key' | t"
-              [placeholder]="'settings.key' | t"
-              [ngModel]="r.key"
-              (ngModelChange)="update(i, { key: $event })"
-              [disabled]="!settings.hasValue()"
+              inputmode="decimal"
+              [ngModel]="form()[f.key]"
+              (ngModelChange)="setField(f.key, $event)"
+              [disabled]="!auth.has('settings:write')"
             />
-            <select
-              hlmInput
-              [attr.aria-label]="'settings.type.string' | t"
-              [ngModel]="r.type"
-              (ngModelChange)="update(i, { type: $event })"
-            >
-              @for (t of types; track t.value) {
-                <option [value]="t.value">{{ t.label | t }}</option>
-              }
-            </select>
-            @if (r.type === 'boolean') {
-              <select
-                hlmInput
-                [attr.aria-label]="'settings.value' | t"
-                [ngModel]="r.text"
-                (ngModelChange)="update(i, { text: $event })"
-              >
-                <option value="true">✓</option>
-                <option value="false">✗</option>
-              </select>
-            } @else if (r.type === 'json') {
-              <textarea
-                hlmInput
-                rows="3"
-                class="font-mono text-xs"
-                [attr.aria-label]="'settings.value' | t"
-                [ngModel]="r.text"
-                (ngModelChange)="update(i, { text: $event })"
-              ></textarea>
-            } @else {
-              <input
-                hlmInput
-                [attr.aria-label]="'settings.value' | t"
-                [ngModel]="r.text"
-                (ngModelChange)="update(i, { text: $event })"
-              />
-            }
-            <button hlmBtn variant="ghost" size="sm" type="button" (click)="remove(i)">
-              {{ 'settings.remove' | t }}
-            </button>
-            @if (rowError(); as e) {
-              @if (e.index === i) {
-                <p class="text-xs text-destructive sm:col-span-4" role="alert">{{ e.key | t }}</p>
+            <span class="text-xs text-muted-foreground">{{ f.hint | t }}</span>
+            @if (fieldError(); as e) {
+              @if (e.key === f.key) {
+                <span class="text-xs text-destructive" role="alert">{{ e.message | t }}</span>
               }
             }
-          </div>
+          </label>
         }
       </div>
-      <div *appHasPermission="'settings:write'" class="flex justify-between">
-        <button hlmBtn variant="outline" size="sm" type="button" (click)="add()">
-          {{ 'settings.add' | t }}
-        </button>
+      <div *appHasPermission="'settings:write'" class="flex justify-end">
         <button hlmBtn type="button" [disabled]="saving()" (click)="save()">
           {{ 'common.save' | t }}
         </button>
@@ -89,7 +44,14 @@
 
   <section *appHasPermission="'fraud:read'" aria-labelledby="fr-h" class="space-y-3">
     <h2 id="fr-h" class="text-lg font-medium">{{ 'settings.section.fraud' | t }}</h2>
-    @if (blocked.value(); as list) {
+    @if (blocked.error()) {
+      <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+        {{ 'common.loadError' | t }}
+        <button hlmBtn size="sm" variant="outline" (click)="blocked.reload()">
+          {{ 'common.retry' | t }}
+        </button>
+      </div>
+    } @else if (blocked.value(); as list) {
       @if (list.length === 0) {
         <p class="text-sm text-muted-foreground">{{ 'blocked.empty' | t }}</p>
       } @else {

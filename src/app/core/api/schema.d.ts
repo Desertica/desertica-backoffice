@@ -4,4648 +4,4853 @@
  */
 
 export interface paths {
-  '/health': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Liveness */
-    get: operations['getHealth'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/health/ready': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Readiness (base de datos y Redis) */
-    get: operations['getHealthReady'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/tours/{slug}/availability': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Disponibilidad y precios de un tour para un mes */
-    get: operations['getTourAvailability'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/quotes': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Cotizar una reserva */
-    post: operations['createQuote'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/holds': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Bloquear cupo temporalmente
-     * @description Reserva los asientos durante unos minutos mientras el cliente completa el pago.
-     */
-    post: operations['createHold'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/holds/{token}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Liberar un bloqueo de cupo */
-    delete: operations['releaseHold'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/bookings': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Crear una reserva desde un bloqueo de cupo */
-    post: operations['createPublicBooking'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/bookings/access': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Pedir acceso a "mi reserva"
-     * @description Envía por email un enlace con el token de acceso. Responde igual exista o no la reserva.
-     */
-    post: operations['requestBookingAccess'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/bookings/{reference}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Ver una reserva con el token del cliente */
-    get: operations['getPublicBooking'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/bookings/{reference}/payments/stripe-intent': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Crear un PaymentIntent de Stripe (USD) */
-    post: operations['createBookingStripeIntent'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/bookings/{reference}/payments/culqi-charge': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Cobrar con un token de Culqi (USD o PEN) */
-    post: operations['createBookingCulqiCharge'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/payment-links/{token}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Ver un enlace de pago */
-    get: operations['getPaymentLinkInfo'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/payment-links/{token}/stripe-intent': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Crear un PaymentIntent para un enlace de pago */
-    post: operations['createLinkStripeIntent'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/payment-links/{token}/culqi-charge': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Cobrar con Culqi desde un enlace de pago */
-    post: operations['createLinkCulqiCharge'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/waivers/{token}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Ver el descargo de responsabilidad a firmar */
-    get: operations['getWaiverForm'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/waivers/{token}/sign': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Firmar el descargo de responsabilidad */
-    post: operations['signWaiver'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/complaints': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Registrar un reclamo o queja (Libro de Reclamaciones) */
-    post: operations['createComplaint'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/contact-messages': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Enviar un mensaje de contacto */
-    post: operations['createContactMessage'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/consents': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Registrar el consentimiento de cookies */
-    post: operations['recordConsent'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/public/legal-documents/current': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Versiones vigentes de los documentos legales */
-    get: operations['getCurrentLegalDocuments'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/webhooks/stripe': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Eventos de Stripe
-     * @description Valida `Stripe-Signature`, guarda el evento y responde 2xx aunque ya estuviera procesado.
-     */
-    post: operations['receiveStripeWebhook'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/webhooks/culqi': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Eventos de Culqi */
-    post: operations['receiveCulqiWebhook'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/auth/google': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Iniciar sesión con Google (solo dominio de la empresa) */
-    post: operations['loginWithGoogle'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/auth/refresh': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Renovar el token de acceso */
-    post: operations['refreshSession'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/auth/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Cerrar sesión (revoca el refresh token) */
-    post: operations['logout'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/auth/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Usuario autenticado y sus permisos */
-    get: operations['getMe'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/tour-refs': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar tours operativos */
-    get: operations['listTourRefs'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/tour-refs/sync': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Sincronizar tours desde el CMS */
-    post: operations['syncTourRefs'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/tour-refs/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    /** Ver un tour operativo */
-    get: operations['getTourRef'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Editar ajustes operativos de un tour */
-    patch: operations['updateTourRef'];
-    trace?: never;
-  };
-  '/departures': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar salidas */
-    get: operations['listDepartures'];
-    put?: never;
-    /** Crear una salida (o una serie) */
-    post: operations['createDepartures'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/departures/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    /** Ver una salida */
-    get: operations['getDeparture'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Editar una salida */
-    patch: operations['updateDeparture'];
-    trace?: never;
-  };
-  '/departures/{id}/manifest': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Manifiesto de pasajeros de una salida */
-    get: operations['getDepartureManifest'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/departures/{id}/cancel': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Cancelar una salida por decisión de la empresa
-     * @description Aplica a todas las reservas confirmadas de la salida. Con `resolution = REFUND` reembolsa el 100 %
-     *     y emite notas de crédito; con `RESCHEDULE` mueve las reservas a `targetDepartureId`. Notifica
-     *     a los clientes.
-     */
-    post: operations['cancelDeparture'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/price-rules': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar reglas de precio */
-    get: operations['listPriceRules'];
-    put?: never;
-    /** Crear una regla de precio */
-    post: operations['createPriceRule'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/price-rules/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    get?: never;
-    /** Reemplazar una regla de precio */
-    put: operations['replacePriceRule'];
-    post?: never;
-    /** Desactivar una regla de precio */
-    delete: operations['deactivatePriceRule'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/blackouts': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar fechas bloqueadas */
-    get: operations['listBlackouts'];
-    put?: never;
-    /** Crear una fecha bloqueada */
-    post: operations['createBlackout'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/blackouts/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Eliminar una fecha bloqueada */
-    delete: operations['deleteBlackout'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/cancellation-policies': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar políticas de cancelación */
-    get: operations['listCancellationPolicies'];
-    put?: never;
-    /** Crear una versión de política de cancelación */
-    post: operations['createCancellationPolicy'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/bookings': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar reservas */
-    get: operations['listBookings'];
-    put?: never;
-    /**
-     * Crear una reserva manual (asistida)
-     * @description Para ventas por WhatsApp o en persona. Descuenta cupo sin pasar por el bloqueo temporal.
-     */
-    post: operations['createManualBooking'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/bookings/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    /** Ver una reserva con pagos, comprobantes y descargos */
-    get: operations['getBooking'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Editar notas, datos de contacto o pasajeros */
-    patch: operations['updateBooking'];
-    trace?: never;
-  };
-  '/bookings/{id}/cancel': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Cancelar una reserva
-     * @description Calcula el reembolso con la política de cancelación vigente al reservar. Con `refund = POLICY`
-     *     devuelve lo que corresponde; con `FULL` o `NONE` fuerza el monto (requiere `bookings:override`).
-     */
-    post: operations['cancelBooking'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/bookings/{id}/reschedule': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Mover una reserva a otra salida
-     * @description Si cambia el precio, devuelve `adjustment` con el cobro adicional o el reembolso parcial.
-     */
-    post: operations['rescheduleBooking'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/bookings/{id}/status': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Marcar una reserva como completada o no-show */
-    post: operations['setBookingStatus'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/bookings/{id}/payment-links': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Generar un enlace de pago
-     * @description Para cobrar el total, el depósito o el saldo de una reserva (también enviado por email/WhatsApp).
-     */
-    post: operations['createPaymentLink'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/bookings/{id}/payments/manual': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Registrar un pago manual
-     * @description Efectivo, transferencia o Yape personal. No pasa por pasarela.
-     */
-    post: operations['recordManualPayment'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/bookings/{id}/documents': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Emitir el comprobante de una reserva */
-    post: operations['issueDocument'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/payments': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar pagos */
-    get: operations['listPayments'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/payments/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Ver un pago */
-    get: operations['getPayment'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/payments/{id}/refunds': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Reembolsar un pago
-     * @description Ejecuta la devolución en la pasarela (o la registra si el pago fue manual), actualiza la reserva y
-     *     emite la nota de crédito si había comprobante. Los montos superiores al tope del operador requieren
-     *     `payments:refund-any`.
-     */
-    post: operations['createRefund'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/refunds': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar reembolsos */
-    get: operations['listRefunds'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/disputes': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar disputas y contracargos */
-    get: operations['listDisputes'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/disputes/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    /** Ver una disputa */
-    get: operations['getDispute'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Actualizar estado o notas de una disputa */
-    patch: operations['updateDispute'];
-    trace?: never;
-  };
-  '/disputes/{id}/evidence': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Descargar el paquete de evidencia de una disputa
-     * @description ZIP con confirmación, políticas aceptadas, descargo firmado, manifiesto y comprobante.
-     */
-    get: operations['downloadDisputeEvidence'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/documents': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar comprobantes */
-    get: operations['listDocuments'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/documents/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Ver un comprobante */
-    get: operations['getDocument'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/documents/{id}/retry': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Reintentar el envío de un comprobante en error o rechazado */
-    post: operations['retryDocument'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/documents/{id}/void': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Anular un comprobante (comunicación de baja) */
-    post: operations['voidDocument'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/documents/{id}/credit-note': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Emitir una nota de crédito sobre un comprobante */
-    post: operations['createCreditNote'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/documents/{id}/files/{kind}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Descargar el XML, el CDR o el PDF */
-    get: operations['downloadDocumentFile'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/customers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar clientes */
-    get: operations['listCustomers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/customers/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    /** Ver un cliente con su historial de reservas */
-    get: operations['getCustomer'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Editar un cliente */
-    patch: operations['updateCustomer'];
-    trace?: never;
-  };
-  '/customers/{id}/erase': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Atender un pedido de eliminación de datos (ARCO)
-     * @description Anonimiza lo que no deba conservarse por obligación legal (comprobantes).
-     */
-    post: operations['eraseCustomer'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/complaints': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar reclamos y quejas */
-    get: operations['listComplaints'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/complaints/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    /** Ver un reclamo */
-    get: operations['getComplaint'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/complaints/{id}/answer': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Responder un reclamo
-     * @description Guarda la respuesta y la envía por correo al consumidor.
-     */
-    post: operations['answerComplaint'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/waivers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar descargos de responsabilidad */
-    get: operations['listWaivers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/legal-documents': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Publicar una nueva versión de un documento legal */
-    post: operations['publishLegalDocument'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/users': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar usuarios del staff */
-    get: operations['listUsers'];
-    put?: never;
-    /** Dar de alta a un usuario (correo del dominio de la empresa) */
-    post: operations['createUser'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/users/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Cambiar rol o desactivar a un usuario */
-    patch: operations['updateUser'];
-    trace?: never;
-  };
-  '/roles': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar roles y permisos */
-    get: operations['listRoles'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/companies/current': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Datos fiscales de la empresa emisora */
-    get: operations['getCompany'];
-    /**
-     * Guardar los datos fiscales de la empresa
-     * @description El certificado digital y las credenciales SOL no pasan por este API; viven en `desertica-billing`.
-     */
-    put: operations['saveCompany'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/series': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar series de comprobantes */
-    get: operations['listSeries'];
-    put?: never;
-    /** Crear una serie */
-    post: operations['createSeries'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/settings': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Leer los ajustes operativos */
-    get: operations['getSettings'];
-    /**
-     * Guardar ajustes operativos
-     * @description Tope de reembolso del operador, duración del bloqueo de cupo, plantillas de email y similares.
-     */
-    put: operations['saveSettings'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/blocked-identities': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Listar correos e IP bloqueados */
-    get: operations['listBlockedIdentities'];
-    put?: never;
-    /** Bloquear un correo o una IP */
-    post: operations['createBlockedIdentity'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/audit-logs': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Consultar la auditoría */
-    get: operations['listAuditLogs'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/summary': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Resumen del panel (ventas, ocupación y pendientes) */
-    get: operations['getDashboardSummary'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/reports/sales': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Reporte de ventas */
-    get: operations['getSalesReport'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liveness */
+        get: operations["getHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Readiness (base de datos y Redis) */
+        get: operations["getHealthReady"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/tours/{slug}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Disponibilidad y precios de un tour para un mes */
+        get: operations["getTourAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/quotes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cotizar una reserva */
+        post: operations["createQuote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/holds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bloquear cupo temporalmente
+         * @description Reserva los asientos durante unos minutos mientras el cliente completa el pago.
+         */
+        post: operations["createHold"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/holds/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Liberar un bloqueo de cupo */
+        delete: operations["releaseHold"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Crear una reserva desde un bloqueo de cupo */
+        post: operations["createPublicBooking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/bookings/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pedir acceso a "mi reserva"
+         * @description Envía por email un enlace con el token de acceso. Responde igual exista o no la reserva.
+         */
+        post: operations["requestBookingAccess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/bookings/{reference}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver una reserva con el token del cliente */
+        get: operations["getPublicBooking"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/bookings/{reference}/payments/stripe-intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Crear un PaymentIntent de Stripe (USD) */
+        post: operations["createBookingStripeIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/bookings/{reference}/payments/culqi-charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cobrar con un token de Culqi (USD o PEN) */
+        post: operations["createBookingCulqiCharge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/payment-links/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver un enlace de pago */
+        get: operations["getPaymentLinkInfo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/payment-links/{token}/stripe-intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Crear un PaymentIntent para un enlace de pago */
+        post: operations["createLinkStripeIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/payment-links/{token}/culqi-charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cobrar con Culqi desde un enlace de pago */
+        post: operations["createLinkCulqiCharge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/waivers/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver el descargo de responsabilidad a firmar */
+        get: operations["getWaiverForm"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/waivers/{token}/sign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Firmar el descargo de responsabilidad */
+        post: operations["signWaiver"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/complaints": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Registrar un reclamo o queja (Libro de Reclamaciones) */
+        post: operations["createComplaint"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/contact-messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enviar un mensaje de contacto */
+        post: operations["createContactMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/consents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Registrar el consentimiento de cookies */
+        post: operations["recordConsent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/legal-documents/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Versiones vigentes de los documentos legales */
+        get: operations["getCurrentLegalDocuments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/webhooks/stripe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Eventos de Stripe
+         * @description Valida `Stripe-Signature`, guarda el evento y responde 2xx aunque ya estuviera procesado.
+         */
+        post: operations["receiveStripeWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/webhooks/culqi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Eventos de Culqi */
+        post: operations["receiveCulqiWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Iniciar sesión con Google (solo dominio de la empresa) */
+        post: operations["loginWithGoogle"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Renovar el token de acceso
+         * @description Lee la cookie `desertica_refresh`, la rota y devuelve un token de acceso nuevo con una cookie nueva.
+         *     Reutilizar un refresh ya rotado revoca todas las sesiones del usuario.
+         */
+        post: operations["refreshSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cerrar sesión
+         * @description Revoca el refresh token de la cookie `desertica_refresh` y la borra.
+         */
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Usuario autenticado y sus permisos */
+        get: operations["getMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tour-refs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar tours operativos */
+        get: operations["listTourRefs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tour-refs/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sincronizar tours desde el CMS */
+        post: operations["syncTourRefs"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tour-refs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Ver un tour operativo */
+        get: operations["getTourRef"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Editar ajustes operativos de un tour */
+        patch: operations["updateTourRef"];
+        trace?: never;
+    };
+    "/departures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar salidas */
+        get: operations["listDepartures"];
+        put?: never;
+        /** Crear una salida (o una serie) */
+        post: operations["createDepartures"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/departures/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Ver una salida */
+        get: operations["getDeparture"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Editar una salida */
+        patch: operations["updateDeparture"];
+        trace?: never;
+    };
+    "/departures/{id}/manifest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Manifiesto de pasajeros de una salida */
+        get: operations["getDepartureManifest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/departures/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancelar una salida por decisión de la empresa
+         * @description Aplica a todas las reservas confirmadas de la salida. Con `resolution = REFUND` reembolsa el 100 %
+         *     y emite notas de crédito; con `RESCHEDULE` mueve las reservas a `targetDepartureId`. Notifica
+         *     a los clientes.
+         */
+        post: operations["cancelDeparture"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/price-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar reglas de precio */
+        get: operations["listPriceRules"];
+        put?: never;
+        /** Crear una regla de precio */
+        post: operations["createPriceRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/price-rules/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /** Reemplazar una regla de precio */
+        put: operations["replacePriceRule"];
+        post?: never;
+        /** Desactivar una regla de precio */
+        delete: operations["deactivatePriceRule"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/blackouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar fechas bloqueadas */
+        get: operations["listBlackouts"];
+        put?: never;
+        /** Crear una fecha bloqueada */
+        post: operations["createBlackout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/blackouts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Eliminar una fecha bloqueada */
+        delete: operations["deleteBlackout"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cancellation-policies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar políticas de cancelación */
+        get: operations["listCancellationPolicies"];
+        put?: never;
+        /** Crear una versión de política de cancelación */
+        post: operations["createCancellationPolicy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar reservas */
+        get: operations["listBookings"];
+        put?: never;
+        /**
+         * Crear una reserva manual (asistida)
+         * @description Para ventas por WhatsApp o en persona. Descuenta cupo sin pasar por el bloqueo temporal.
+         */
+        post: operations["createManualBooking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Ver una reserva con pagos, comprobantes y descargos */
+        get: operations["getBooking"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Editar notas, datos de contacto o pasajeros */
+        patch: operations["updateBooking"];
+        trace?: never;
+    };
+    "/bookings/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cotizar una reserva manual
+         * @description Igual que la cotización pública, pero admite un precio acordado (`overrideTotalCents`, requiere `bookings:override`).
+         */
+        post: operations["createStaffQuote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}/cancellation-quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ver cuánto se reembolsaría antes de cancelar
+         * @description Calcula el reembolso con la política vigente al reservar, sin cambiar nada.
+         */
+        get: operations["getCancellationQuote"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancelar una reserva
+         * @description Calcula el reembolso con la política de cancelación vigente al reservar. Con `refund = POLICY`
+         *     devuelve lo que corresponde; con `FULL` o `NONE` fuerza el monto (requiere `bookings:override`).
+         */
+        post: operations["cancelBooking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}/reschedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mover una reserva a otra salida
+         * @description Si cambia el precio, devuelve `adjustment` con el cobro adicional o el reembolso parcial.
+         */
+        post: operations["rescheduleBooking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marcar una reserva como completada o no-show */
+        post: operations["setBookingStatus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}/payment-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generar un enlace de pago
+         * @description Para cobrar el total, el depósito o el saldo de una reserva (también enviado por email/WhatsApp).
+         */
+        post: operations["createPaymentLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}/payments/manual": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Registrar un pago manual
+         * @description Efectivo, transferencia o Yape personal. No pasa por pasarela.
+         */
+        post: operations["recordManualPayment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Emitir el comprobante de una reserva */
+        post: operations["issueDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar pagos */
+        get: operations["listPayments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver un pago */
+        get: operations["getPayment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/{id}/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reembolsar un pago
+         * @description Ejecuta la devolución en la pasarela (o la registra si el pago fue manual), actualiza la reserva y
+         *     emite la nota de crédito si había comprobante. Los montos superiores al tope del operador requieren
+         *     `payments:refund-any`.
+         */
+        post: operations["createRefund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar reembolsos */
+        get: operations["listRefunds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/disputes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar disputas y contracargos */
+        get: operations["listDisputes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/disputes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Ver una disputa */
+        get: operations["getDispute"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar estado o notas de una disputa */
+        patch: operations["updateDispute"];
+        trace?: never;
+    };
+    "/disputes/{id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Descargar el paquete de evidencia de una disputa
+         * @description ZIP con confirmación, políticas aceptadas, descargo firmado, manifiesto y comprobante.
+         */
+        get: operations["downloadDisputeEvidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar comprobantes */
+        get: operations["listDocuments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver un comprobante */
+        get: operations["getDocument"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reintentar el envío de un comprobante en error o rechazado */
+        post: operations["retryDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Anular un comprobante (comunicación de baja) */
+        post: operations["voidDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/credit-note": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Emitir una nota de crédito sobre un comprobante */
+        post: operations["createCreditNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/files/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar el XML, el CDR o el PDF */
+        get: operations["downloadDocumentFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar clientes */
+        get: operations["listCustomers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Ver un cliente con su historial de reservas */
+        get: operations["getCustomer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Editar un cliente */
+        patch: operations["updateCustomer"];
+        trace?: never;
+    };
+    "/customers/{id}/erase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Atender un pedido de eliminación de datos (ARCO)
+         * @description Anonimiza lo que no deba conservarse por obligación legal (comprobantes).
+         */
+        post: operations["eraseCustomer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/complaints": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar reclamos y quejas */
+        get: operations["listComplaints"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/complaints/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        /** Ver un reclamo */
+        get: operations["getComplaint"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/complaints/{id}/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Responder un reclamo
+         * @description Guarda la respuesta y la envía por correo al consumidor.
+         */
+        post: operations["answerComplaint"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/waivers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar descargos de responsabilidad */
+        get: operations["listWaivers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/legal-documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publicar una nueva versión de un documento legal
+         * @description Trae la página `cmsSlug` del CMS en el idioma `locale` y guarda un snapshot inmutable de su texto
+         *     (un trigger de la base impide modificarlo o borrarlo). La versión es la siguiente de `(kind, locale)`.
+         *     Responde 422 si el CMS no tiene esa página y 503 si el CMS no responde.
+         */
+        post: operations["publishLegalDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar usuarios del staff */
+        get: operations["listUsers"];
+        put?: never;
+        /** Dar de alta a un usuario (correo del dominio de la empresa) */
+        post: operations["createUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cambiar rol o desactivar a un usuario */
+        patch: operations["updateUser"];
+        trace?: never;
+    };
+    "/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar roles y permisos */
+        get: operations["listRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Datos fiscales de la empresa emisora */
+        get: operations["getCompany"];
+        /**
+         * Guardar los datos fiscales de la empresa
+         * @description El certificado digital y las credenciales SOL no pasan por este API; viven en `desertica-billing`.
+         */
+        put: operations["saveCompany"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar series de comprobantes */
+        get: operations["listSeries"];
+        put?: never;
+        /** Crear una serie */
+        post: operations["createSeries"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Leer los ajustes operativos */
+        get: operations["getSettings"];
+        /**
+         * Guardar ajustes operativos
+         * @description Solo cambia las claves enviadas. Las claves conocidas se validan por rango.
+         */
+        put: operations["saveSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/blocked-identities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar correos e IP bloqueados */
+        get: operations["listBlockedIdentities"];
+        put?: never;
+        /** Bloquear un correo o una IP */
+        post: operations["createBlockedIdentity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/audit-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consultar la auditoría */
+        get: operations["listAuditLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resumen del panel (ventas, ocupación y pendientes) */
+        get: operations["getDashboardSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reporte de ventas */
+        get: operations["getSalesReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    Error: {
-      statusCode: number;
-      error: string;
-      message: string | string[];
-      details?: {
-        [key: string]: unknown;
-      };
-    };
-    Meta: {
-      page: number;
-      pageSize: number;
-      total: number;
-    };
-    /** @enum {string} */
-    Currency: 'USD' | 'PEN';
-    /** @enum {string} */
-    IdDocType: 'DNI' | 'CE' | 'PASSPORT' | 'RUC';
-    /** @enum {string} */
-    TourFormat: 'SHARED' | 'PRIVATE';
-    /** @enum {string} */
-    PriceUnit: 'PER_PERSON' | 'PER_GROUP';
-    /** @enum {string} */
-    DepartureStatus: 'OPEN' | 'CLOSED' | 'CANCELLED' | 'COMPLETED';
-    /** @enum {string} */
-    BookingStatus: 'PENDING_PAYMENT' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
-    /** @enum {string} */
-    PaymentProvider: 'STRIPE' | 'CULQI' | 'MANUAL';
-    /** @enum {string} */
-    PaymentMethod: 'CARD' | 'WALLET' | 'YAPE' | 'CASH' | 'TRANSFER' | 'OTHER';
-    /** @enum {string} */
-    PaymentKind: 'FULL' | 'DEPOSIT' | 'BALANCE';
-    /** @enum {string} */
-    PaymentStatus:
-      | 'PENDING'
-      | 'REQUIRES_ACTION'
-      | 'SUCCEEDED'
-      | 'FAILED'
-      | 'CANCELLED'
-      | 'PARTIALLY_REFUNDED'
-      | 'REFUNDED'
-      | 'DISPUTED';
-    /** @enum {string} */
-    DisputeStatus: 'OPEN' | 'WON' | 'LOST' | 'CLOSED';
-    /** @enum {string} */
-    DocumentType: 'BOLETA' | 'FACTURA' | 'NOTA_CREDITO' | 'NOTA_DEBITO';
-    /** @enum {string} */
-    DocumentStatus: 'PENDING' | 'ISSUED' | 'ACCEPTED' | 'REJECTED' | 'VOIDED' | 'ERROR';
-    /** @enum {string} */
-    WaiverStatus: 'PENDING' | 'SIGNED';
-    /** @enum {string} */
-    ComplaintStatus: 'OPEN' | 'IN_PROGRESS' | 'ANSWERED';
-    /** @enum {string} */
-    LegalDocumentKind: 'TERMS' | 'PRIVACY' | 'CANCELLATION' | 'COOKIES' | 'CONDUCT';
-    TourRef: {
-      /** Format: uuid */
-      id: string;
-      slug: string;
-      title: string;
-      durationHours?: number | null;
-      active: boolean;
-      requiresWaiver: boolean;
-      minAge?: number | null;
-      minHeightCm?: number | null;
-      defaultCapacity?: number | null;
-      /** Format: uuid */
-      cancellationPolicyId?: string | null;
-      /** Format: date-time */
-      cmsSyncedAt?: string | null;
-    };
-    UpdateTourRef: {
-      active?: boolean;
-      requiresWaiver?: boolean;
-      minAge?: number | null;
-      minHeightCm?: number | null;
-      defaultCapacity?: number | null;
-      /** Format: uuid */
-      cancellationPolicyId?: string | null;
-    };
-    Departure: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      tourRefId: string;
-      /** Format: date-time */
-      startsAt: string;
-      capacity: number;
-      seatsSold: number;
-      seatsHeld?: number;
-      format: components['schemas']['TourFormat'];
-      language: string;
-      status: components['schemas']['DepartureStatus'];
-      meetingPoint?: string | null;
-      guideName?: string | null;
-      vehicleNote?: string | null;
-      notes?: string | null;
-      cutoffMinutes?: number;
-    };
-    CreateDeparture: {
-      /** Format: uuid */
-      tourRefId: string;
-      /** Format: date-time */
-      startsAt: string;
-      capacity: number;
-      format?: components['schemas']['TourFormat'];
-      language?: string;
-      meetingPoint?: string;
-      guideName?: string;
-      vehicleNote?: string;
-      notes?: string;
-      cutoffMinutes?: number;
-      /** @description Crea una serie de salidas hasta `until` en los días indicados (0 = domingo). */
-      repeat?: {
-        /** Format: date */
-        until: string;
-        weekdays: number[];
-      };
-    };
-    UpdateDeparture: {
-      /** Format: date-time */
-      startsAt?: string;
-      capacity?: number;
-      /** @enum {string} */
-      status?: 'OPEN' | 'CLOSED';
-      meetingPoint?: string;
-      guideName?: string;
-      vehicleNote?: string;
-      notes?: string;
-      cutoffMinutes?: number;
-    };
-    PriceRule: components['schemas']['PriceRuleInput'] & {
-      /** Format: uuid */
-      id: string;
-    };
-    PriceRuleInput: {
-      /** Format: uuid */
-      tourRefId: string;
-      currency: components['schemas']['Currency'];
-      format?: components['schemas']['TourFormat'];
-      unit?: components['schemas']['PriceUnit'];
-      /** @description Con IGV incluido. */
-      adultCents: number;
-      childCents?: number | null;
-      groupCents?: number | null;
-      minPeople?: number | null;
-      maxPeople?: number | null;
-      /** Format: date */
-      validFrom?: string | null;
-      /** Format: date */
-      validTo?: string | null;
-      /** @default 0 */
-      priority: number;
-      /** @default true */
-      active: boolean;
-    };
-    Blackout: components['schemas']['BlackoutInput'] & {
-      /** Format: uuid */
-      id: string;
-    };
-    BlackoutInput: {
-      /**
-       * Format: uuid
-       * @description Nulo = todos los tours.
-       */
-      tourRefId?: string | null;
-      /** Format: date */
-      startsOn: string;
-      /** Format: date */
-      endsOn: string;
-      reason?: string;
-    };
-    CancellationPolicyInput: {
-      key: string;
-      name: string;
-      /** @description Ordenados de mayor a menor `hoursBefore`. */
-      tiers: {
-        hoursBefore: number;
-        refundPercent: number;
-      }[];
-      depositRefundable?: boolean;
-    };
-    CancellationPolicy: components['schemas']['CancellationPolicyInput'] & {
-      /** Format: uuid */
-      id: string;
-      version: number;
-      active: boolean;
-    };
-    AvailableDeparture: {
-      /** Format: uuid */
-      departureId: string;
-      /** Format: date-time */
-      startsAt: string;
-      language: string;
-      format: components['schemas']['TourFormat'];
-      seatsLeft: number;
-      meetingPoint?: string | null;
-      price: {
-        currency: components['schemas']['Currency'];
-        unit: components['schemas']['PriceUnit'];
-        adultCents: number;
-        childCents?: number | null;
-        groupCents?: number | null;
-      };
-    };
-    QuoteRequest: {
-      /** Format: uuid */
-      departureId: string;
-      adults: number;
-      /** @default 0 */
-      children: number;
-      currency: components['schemas']['Currency'];
-    };
-    Quote: {
-      currency: components['schemas']['Currency'];
-      /** @description Con IGV incluido. */
-      totalCents: number;
-      /** @description Monto del depósito según la configuración. */
-      depositCents: number;
-      lines: {
-        label: string;
-        quantity: number;
-        unitCents: number;
-        totalCents: number;
-      }[];
-      cancellationTiers?: {
-        hoursBefore?: number;
-        refundPercent?: number;
-      }[];
-    };
-    Hold: {
-      token: string;
-      /** Format: uuid */
-      departureId: string;
-      seats: number;
-      /** Format: date-time */
-      expiresAt: string;
-    };
-    /** @description Datos del receptor del comprobante. */
-    Billing: {
-      /** @enum {string} */
-      docType: 'BOLETA' | 'FACTURA';
-      /** @description Nombre o razón social. */
-      name: string;
-      idDocType: components['schemas']['IdDocType'];
-      idDocNumber: string;
-      address?: string;
-      /** Format: email */
-      email?: string;
-    };
-    CustomerInput: {
-      /** Format: email */
-      email: string;
-      firstName: string;
-      lastName: string;
-      phone?: string;
-      country?: string;
-      idDocType?: components['schemas']['IdDocType'];
-      idDocNumber?: string;
-      locale?: string;
-    };
-    PassengerInput: {
-      firstName: string;
-      lastName: string;
-      idDocType?: components['schemas']['IdDocType'];
-      idDocNumber?: string;
-      /** Format: date */
-      birthDate?: string;
-      nationality?: string;
-      emergencyContactName?: string;
-      emergencyContactPhone?: string;
-    };
-    Attribution: {
-      utmSource?: string;
-      utmMedium?: string;
-      utmCampaign?: string;
-      utmContent?: string;
-      utmTerm?: string;
-      gclid?: string;
-      fbclid?: string;
-      landingPath?: string;
-      referrer?: string;
-    };
-    CreatePublicBooking: {
-      holdToken: string;
-      currency: components['schemas']['Currency'];
-      adults: number;
-      /** @default 0 */
-      children: number;
-      customer: components['schemas']['CustomerInput'];
-      passengers?: components['schemas']['PassengerInput'][];
-      billing: components['schemas']['Billing'];
-      /** @enum {string} */
-      paymentKind: 'FULL' | 'DEPOSIT';
-      /** @description Versiones de términos, privacidad y política de cancelación aceptadas. */
-      acceptedLegalDocumentIds: string[];
-      notes?: string;
-      locale?: string;
-      attribution?: components['schemas']['Attribution'];
-      turnstileToken?: string;
-    };
-    CreateManualBooking: {
-      /** Format: uuid */
-      departureId: string;
-      currency: components['schemas']['Currency'];
-      adults: number;
-      /** @default 0 */
-      children: number;
-      customer: components['schemas']['CustomerInput'];
-      passengers?: components['schemas']['PassengerInput'][];
-      billing: components['schemas']['Billing'];
-      depositCents?: number;
-      /** @description Precio acordado distinto del de lista; requiere `bookings:override`. */
-      overrideTotalCents?: number;
-      notes?: string;
-      /** @default true */
-      sendConfirmation: boolean;
-    };
-    UpdateBooking: {
-      notes?: string;
-      customer?: components['schemas']['CustomerInput'];
-      billing?: components['schemas']['Billing'];
-      passengers?: components['schemas']['PassengerInput'][];
-    };
-    Passenger: components['schemas']['PassengerInput'] & {
-      /** Format: uuid */
-      id: string;
-    };
-    BookingSummary: {
-      /** Format: uuid */
-      id: string;
-      reference: string;
-      status: components['schemas']['BookingStatus'];
-      /** @enum {string} */
-      source?: 'WEB' | 'MANUAL';
-      /** Format: uuid */
-      departureId: string;
-      /** Format: date-time */
-      startsAt: string;
-      tourSlug: string;
-      customerName: string;
-      adults?: number;
-      children?: number;
-      currency: components['schemas']['Currency'];
-      totalCents: number;
-      paidCents: number;
-      /** Format: date-time */
-      createdAt?: string;
-    };
-    Booking: components['schemas']['BookingSummary'] & {
-      customer?: components['schemas']['Customer'];
-      depositCents?: number | null;
-      refundedCents?: number;
-      billing?: components['schemas']['Billing'];
-      notes?: string | null;
-      locale?: string;
-      priceSnapshot?: {
-        [key: string]: unknown;
-      };
-      cancellationSnapshot?: {
-        [key: string]: unknown;
-      };
-      attribution?: components['schemas']['Attribution'];
-      /** Format: date-time */
-      cancelledAt?: string | null;
-      cancelReason?: string | null;
-      passengers?: components['schemas']['Passenger'][];
-      payments?: components['schemas']['Payment'][];
-      documents?: components['schemas']['Document'][];
-      waivers?: components['schemas']['Waiver'][];
-    };
-    /** @description Vista de la reserva para el cliente (sin datos internos). */
-    PublicBooking: {
-      reference: string;
-      status: components['schemas']['BookingStatus'];
-      tourSlug: string;
-      /** Format: date-time */
-      startsAt: string;
-      meetingPoint?: string | null;
-      adults?: number;
-      children?: number;
-      currency: components['schemas']['Currency'];
-      totalCents: number;
-      paidCents: number;
-      pendingCents: number;
-      depositCents?: number | null;
-      cancellationTiers?: {
-        hoursBefore?: number;
-        refundPercent?: number;
-      }[];
-      waivers?: {
-        token?: string;
-        passengerName?: string | null;
-        status?: components['schemas']['WaiverStatus'];
-      }[];
-      documents?: {
-        docType?: components['schemas']['DocumentType'];
-        /** @example B001-00000012 */
-        number?: string;
-        /** Format: uri */
-        pdfUrl?: string;
-      }[];
-    };
-    PublicBookingCreated: {
-      booking: components['schemas']['PublicBooking'];
-      /** @description Se envía como `X-Booking-Token` en las llamadas siguientes y por email. */
-      accessToken: string;
-      /** @description Pasarelas disponibles para la moneda de la reserva. */
-      paymentOptions?: {
-        /** @enum {string} */
-        provider: 'STRIPE' | 'CULQI';
-        kinds: components['schemas']['PaymentKind'][];
-      }[];
-    };
-    CreatePaymentRequest: {
-      kind: components['schemas']['PaymentKind'];
-    };
-    CulqiChargeRequest: {
-      kind: components['schemas']['PaymentKind'];
-      /** @description Token generado por Culqi.js en el navegador. */
-      token: string;
-      /** Format: email */
-      email: string;
-    };
-    StripeIntent: {
-      /** Format: uuid */
-      paymentId: string;
-      clientSecret: string;
-      publishableKey: string;
-      amountCents: number;
-      /** @enum {string} */
-      currency: 'USD';
-    };
-    CulqiChargeResult: {
-      /** Format: uuid */
-      paymentId: string;
-      status: components['schemas']['PaymentStatus'];
-      /** @description Presente cuando el banco exige autenticación 3DS. */
-      action?: {
-        /** @enum {string} */
-        type?: 'THREE_DS';
-        parameters?: {
-          [key: string]: unknown;
+    schemas: {
+        Error: {
+            statusCode: number;
+            error: string;
+            message: string | string[];
+            details?: {
+                [key: string]: unknown;
+            };
         };
-      };
-      failureMessage?: string | null;
+        Meta: {
+            page: number;
+            pageSize: number;
+            total: number;
+        };
+        /** @enum {string} */
+        Currency: "USD" | "PEN";
+        /** @enum {string} */
+        IdDocType: "DNI" | "CE" | "PASSPORT" | "RUC";
+        /** @enum {string} */
+        TourFormat: "SHARED" | "PRIVATE";
+        /** @enum {string} */
+        PriceUnit: "PER_PERSON" | "PER_GROUP";
+        /** @enum {string} */
+        DepartureStatus: "OPEN" | "CLOSED" | "CANCELLED" | "COMPLETED";
+        /** @enum {string} */
+        BookingStatus: "PENDING_PAYMENT" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
+        /** @enum {string} */
+        PaymentProvider: "STRIPE" | "CULQI" | "MANUAL";
+        /** @enum {string} */
+        PaymentMethod: "CARD" | "WALLET" | "YAPE" | "CASH" | "TRANSFER" | "OTHER";
+        /** @enum {string} */
+        PaymentKind: "FULL" | "DEPOSIT" | "BALANCE";
+        /** @enum {string} */
+        PaymentStatus: "PENDING" | "REQUIRES_ACTION" | "SUCCEEDED" | "FAILED" | "CANCELLED" | "PARTIALLY_REFUNDED" | "REFUNDED" | "DISPUTED";
+        /** @enum {string} */
+        DisputeStatus: "OPEN" | "WON" | "LOST" | "CLOSED";
+        /** @enum {string} */
+        DocumentType: "BOLETA" | "FACTURA" | "NOTA_CREDITO" | "NOTA_DEBITO";
+        /** @enum {string} */
+        DocumentStatus: "PENDING" | "ISSUED" | "ACCEPTED" | "REJECTED" | "VOIDED" | "ERROR";
+        /** @enum {string} */
+        WaiverStatus: "PENDING" | "SIGNED";
+        /** @enum {string} */
+        ComplaintStatus: "OPEN" | "IN_PROGRESS" | "ANSWERED";
+        /** @enum {string} */
+        LegalDocumentKind: "TERMS" | "PRIVACY" | "CANCELLATION" | "COOKIES" | "CONDUCT";
+        TourRef: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            title: string;
+            durationHours?: number | null;
+            active: boolean;
+            requiresWaiver: boolean;
+            minAge?: number | null;
+            minHeightCm?: number | null;
+            defaultCapacity?: number | null;
+            /** Format: uuid */
+            cancellationPolicyId?: string | null;
+            /** Format: date-time */
+            cmsSyncedAt?: string | null;
+        };
+        UpdateTourRef: {
+            active?: boolean;
+            requiresWaiver?: boolean;
+            minAge?: number | null;
+            minHeightCm?: number | null;
+            defaultCapacity?: number | null;
+            /** Format: uuid */
+            cancellationPolicyId?: string | null;
+        };
+        Departure: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            tourRefId: string;
+            tourSlug: string;
+            /** @description Título del tour en el idioma de la petición (`Accept-Language`) con respaldo al inglés. */
+            tourTitle: string;
+            /** Format: date-time */
+            startsAt: string;
+            capacity: number;
+            seatsSold: number;
+            seatsHeld?: number;
+            format: components["schemas"]["TourFormat"];
+            language: string;
+            status: components["schemas"]["DepartureStatus"];
+            meetingPoint?: string | null;
+            guideName?: string | null;
+            vehicleNote?: string | null;
+            notes?: string | null;
+            cutoffMinutes?: number;
+        };
+        CreateDeparture: {
+            /** Format: uuid */
+            tourRefId: string;
+            /** Format: date-time */
+            startsAt: string;
+            capacity: number;
+            format?: components["schemas"]["TourFormat"];
+            language?: string;
+            meetingPoint?: string;
+            guideName?: string;
+            vehicleNote?: string;
+            notes?: string;
+            cutoffMinutes?: number;
+            /** @description Crea una serie de salidas hasta `until` en los días indicados (0 = domingo). */
+            repeat?: {
+                /** Format: date */
+                until: string;
+                weekdays: number[];
+            };
+        };
+        UpdateDeparture: {
+            /** Format: date-time */
+            startsAt?: string;
+            capacity?: number;
+            /** @enum {string} */
+            status?: "OPEN" | "CLOSED";
+            meetingPoint?: string;
+            guideName?: string;
+            vehicleNote?: string;
+            notes?: string;
+            cutoffMinutes?: number;
+        };
+        PriceRule: components["schemas"]["PriceRuleInput"] & {
+            /** Format: uuid */
+            id: string;
+        };
+        PriceRuleInput: {
+            /** Format: uuid */
+            tourRefId: string;
+            currency: components["schemas"]["Currency"];
+            format?: components["schemas"]["TourFormat"];
+            unit?: components["schemas"]["PriceUnit"];
+            /** @description Con IGV incluido. */
+            adultCents: number;
+            childCents?: number | null;
+            groupCents?: number | null;
+            minPeople?: number | null;
+            maxPeople?: number | null;
+            /** Format: date */
+            validFrom?: string | null;
+            /** Format: date */
+            validTo?: string | null;
+            /** @default 0 */
+            priority: number;
+            /** @default true */
+            active: boolean;
+        };
+        Blackout: components["schemas"]["BlackoutInput"] & {
+            /** Format: uuid */
+            id: string;
+        };
+        BlackoutInput: {
+            /**
+             * Format: uuid
+             * @description Nulo = todos los tours.
+             */
+            tourRefId?: string | null;
+            /** Format: date */
+            startsOn: string;
+            /** Format: date */
+            endsOn: string;
+            reason?: string;
+        };
+        CancellationPolicyInput: {
+            key: string;
+            name: string;
+            /** @description Ordenados de mayor a menor `hoursBefore`. */
+            tiers: {
+                hoursBefore: number;
+                refundPercent: number;
+            }[];
+            depositRefundable?: boolean;
+        };
+        CancellationPolicy: components["schemas"]["CancellationPolicyInput"] & {
+            /** Format: uuid */
+            id: string;
+            version: number;
+            active: boolean;
+        };
+        AvailableDeparture: {
+            /** Format: uuid */
+            departureId: string;
+            /** Format: date-time */
+            startsAt: string;
+            language: string;
+            format: components["schemas"]["TourFormat"];
+            /** @description Cupos libres; 0 significa agotada. */
+            seatsLeft: number;
+            meetingPoint?: string | null;
+            price: {
+                currency: components["schemas"]["Currency"];
+                unit: components["schemas"]["PriceUnit"];
+                adultCents: number;
+                childCents?: number | null;
+                groupCents?: number | null;
+            };
+        };
+        QuoteRequest: {
+            /** Format: uuid */
+            departureId: string;
+            adults: number;
+            /** @default 0 */
+            children: number;
+            currency: components["schemas"]["Currency"];
+        };
+        Quote: {
+            currency: components["schemas"]["Currency"];
+            /** @description Con IGV incluido. */
+            totalCents: number;
+            /** @description Monto del depósito según la configuración. */
+            depositCents: number;
+            lines: {
+                label: string;
+                quantity: number;
+                unitCents: number;
+                totalCents: number;
+            }[];
+            cancellationTiers?: {
+                hoursBefore?: number;
+                refundPercent?: number;
+            }[];
+        };
+        Hold: {
+            token: string;
+            /** Format: uuid */
+            departureId: string;
+            seats: number;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        /** @description Datos del receptor del comprobante. */
+        Billing: {
+            /** @enum {string} */
+            docType: "BOLETA" | "FACTURA";
+            /** @description Nombre o razón social. */
+            name: string;
+            idDocType: components["schemas"]["IdDocType"];
+            idDocNumber: string;
+            address?: string;
+            /** Format: email */
+            email?: string;
+        };
+        CustomerInput: {
+            /** Format: email */
+            email: string;
+            firstName: string;
+            lastName: string;
+            phone?: string;
+            country?: string;
+            idDocType?: components["schemas"]["IdDocType"];
+            idDocNumber?: string;
+            locale?: string;
+        };
+        PassengerInput: {
+            firstName: string;
+            lastName: string;
+            idDocType?: components["schemas"]["IdDocType"];
+            idDocNumber?: string;
+            /** Format: date */
+            birthDate?: string;
+            nationality?: string;
+            emergencyContactName?: string;
+            emergencyContactPhone?: string;
+        };
+        Attribution: {
+            utmSource?: string;
+            utmMedium?: string;
+            utmCampaign?: string;
+            utmContent?: string;
+            utmTerm?: string;
+            gclid?: string;
+            fbclid?: string;
+            landingPath?: string;
+            referrer?: string;
+        };
+        CreatePublicBooking: {
+            holdToken: string;
+            currency: components["schemas"]["Currency"];
+            adults: number;
+            /** @default 0 */
+            children: number;
+            customer: components["schemas"]["CustomerInput"];
+            passengers?: components["schemas"]["PassengerInput"][];
+            billing: components["schemas"]["Billing"];
+            /** @enum {string} */
+            paymentKind: "FULL" | "DEPOSIT";
+            /** @description Versiones de términos, privacidad y política de cancelación aceptadas. */
+            acceptedLegalDocumentIds: string[];
+            notes?: string;
+            locale?: string;
+            attribution?: components["schemas"]["Attribution"];
+            /** @description Identificador anónimo del visitante (el mismo del consentimiento de cookies). Permite saber si hubo consentimiento de marketing al enviar eventos desde el servidor. */
+            anonymousId?: string;
+            turnstileToken?: string;
+        };
+        CreateManualBooking: {
+            /** Format: uuid */
+            departureId: string;
+            currency: components["schemas"]["Currency"];
+            adults: number;
+            /** @default 0 */
+            children: number;
+            customer: components["schemas"]["CustomerInput"];
+            passengers?: components["schemas"]["PassengerInput"][];
+            billing: components["schemas"]["Billing"];
+            depositCents?: number;
+            /** @description Precio acordado distinto del de lista; requiere `bookings:override`. */
+            overrideTotalCents?: number;
+            notes?: string;
+            /** @default true */
+            sendConfirmation: boolean;
+        };
+        UpdateBooking: {
+            notes?: string;
+            customer?: components["schemas"]["CustomerInput"];
+            billing?: components["schemas"]["Billing"];
+            passengers?: components["schemas"]["PassengerInput"][];
+        };
+        Passenger: components["schemas"]["PassengerInput"] & {
+            /** Format: uuid */
+            id: string;
+        };
+        BookingSummary: {
+            /** Format: uuid */
+            id: string;
+            reference: string;
+            status: components["schemas"]["BookingStatus"];
+            /** @enum {string} */
+            source?: "WEB" | "MANUAL";
+            /** Format: uuid */
+            departureId: string;
+            /** Format: date-time */
+            startsAt: string;
+            tourSlug: string;
+            tourTitle: string;
+            customerName: string;
+            adults?: number;
+            children?: number;
+            currency: components["schemas"]["Currency"];
+            totalCents: number;
+            paidCents: number;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        Booking: components["schemas"]["BookingSummary"] & {
+            customer?: components["schemas"]["Customer"];
+            depositCents?: number | null;
+            /** @description Devuelto efectivamente por la pasarela o a mano. */
+            refundedCents?: number;
+            /** @description Reembolsos calculados (cancelación, cambio de precio) que aún no se ejecutaron. */
+            refundDueCents?: number;
+            billing?: components["schemas"]["Billing"];
+            notes?: string | null;
+            locale?: string;
+            priceSnapshot?: {
+                [key: string]: unknown;
+            };
+            cancellationSnapshot?: {
+                [key: string]: unknown;
+            };
+            attribution?: components["schemas"]["Attribution"];
+            /** Format: date-time */
+            cancelledAt?: string | null;
+            cancelReason?: string | null;
+            passengers?: components["schemas"]["Passenger"][];
+            payments?: components["schemas"]["Payment"][];
+            documents?: components["schemas"]["Document"][];
+            waivers?: components["schemas"]["Waiver"][];
+        };
+        /** @description Vista de la reserva para el cliente (sin datos internos). */
+        PublicBooking: {
+            reference: string;
+            status: components["schemas"]["BookingStatus"];
+            tourSlug: string;
+            /** Format: date-time */
+            startsAt: string;
+            meetingPoint?: string | null;
+            adults?: number;
+            children?: number;
+            currency: components["schemas"]["Currency"];
+            totalCents: number;
+            paidCents: number;
+            pendingCents: number;
+            depositCents?: number | null;
+            format: components["schemas"]["TourFormat"];
+            passengers?: {
+                firstName: string;
+                lastName: string;
+            }[];
+            paymentOptions: components["schemas"]["PaymentOptions"];
+            cancellationTiers?: {
+                hoursBefore?: number;
+                refundPercent?: number;
+            }[];
+            waivers?: {
+                token?: string;
+                passengerName?: string | null;
+                status?: components["schemas"]["WaiverStatus"];
+            }[];
+            documents?: {
+                docType?: components["schemas"]["DocumentType"];
+                /** @example B001-00000012 */
+                number?: string;
+                /** Format: uri */
+                pdfUrl?: string;
+            }[];
+        };
+        /** @description Pasarelas y tipos de pago disponibles para la moneda y el saldo de la reserva (vacío si no queda saldo). */
+        PaymentOptions: {
+            /** @enum {string} */
+            provider: "STRIPE" | "CULQI";
+            kinds: components["schemas"]["PaymentKind"][];
+        }[];
+        PublicBookingCreated: {
+            booking: components["schemas"]["PublicBooking"];
+            /** @description Se envía como `X-Booking-Token` en las llamadas siguientes y por email. */
+            accessToken: string;
+            paymentOptions?: components["schemas"]["PaymentOptions"];
+        };
+        CreatePaymentRequest: {
+            kind: components["schemas"]["PaymentKind"];
+        };
+        CulqiChargeRequest: {
+            kind: components["schemas"]["PaymentKind"];
+            /** @description Token generado por Culqi.js en el navegador. */
+            token: string;
+            /** Format: email */
+            email: string;
+        };
+        StripeIntent: {
+            /** Format: uuid */
+            paymentId: string;
+            clientSecret: string;
+            publishableKey: string;
+            amountCents: number;
+            /** @enum {string} */
+            currency: "USD";
+        };
+        CulqiChargeResult: {
+            /** Format: uuid */
+            paymentId: string;
+            status: components["schemas"]["PaymentStatus"];
+            /** @description Presente cuando el banco exige autenticación 3DS. */
+            action?: {
+                /** @enum {string} */
+                type?: "THREE_DS";
+                parameters?: {
+                    [key: string]: unknown;
+                };
+            };
+            failureMessage?: string | null;
+        };
+        PaymentLink: {
+            /** Format: uuid */
+            id: string;
+            token: string;
+            /** Format: uri */
+            url: string;
+            kind: components["schemas"]["PaymentKind"];
+            currency: components["schemas"]["Currency"];
+            amountCents: number;
+            /** Format: date-time */
+            expiresAt: string;
+            /** Format: date-time */
+            usedAt?: string | null;
+        };
+        PaymentLinkInfo: {
+            reference: string;
+            tourSlug?: string;
+            /** Format: date-time */
+            startsAt?: string;
+            kind: components["schemas"]["PaymentKind"];
+            currency: components["schemas"]["Currency"];
+            amountCents: number;
+            /** Format: date-time */
+            expiresAt: string;
+            paymentOptions: ("STRIPE" | "CULQI")[];
+        };
+        Payment: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            bookingId: string;
+            bookingReference: string;
+            provider: components["schemas"]["PaymentProvider"];
+            method: components["schemas"]["PaymentMethod"];
+            kind: components["schemas"]["PaymentKind"];
+            status: components["schemas"]["PaymentStatus"];
+            currency: components["schemas"]["Currency"];
+            amountCents: number;
+            refundedCents?: number;
+            providerRef?: string | null;
+            failureCode?: string | null;
+            /** Format: date-time */
+            paidAt?: string | null;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        Refund: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            paymentId: string;
+            /** Format: uuid */
+            bookingId: string;
+            bookingReference: string;
+            currency: components["schemas"]["Currency"];
+            amountCents: number;
+            reason: string;
+            /** @enum {string} */
+            status: "PENDING" | "SUCCEEDED" | "FAILED";
+            /** Format: uuid */
+            creditNoteId?: string | null;
+            requestedBy?: string | null;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        Dispute: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            paymentId: string;
+            /** Format: uuid */
+            bookingId: string;
+            bookingReference: string;
+            provider: components["schemas"]["PaymentProvider"];
+            providerRef?: string;
+            status: components["schemas"]["DisputeStatus"];
+            reason?: string | null;
+            amountCents: number;
+            currency: components["schemas"]["Currency"];
+            /** Format: date-time */
+            evidenceDueAt?: string | null;
+            notes?: string | null;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        Document: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            bookingId: string;
+            bookingReference: string;
+            /** @description Nombre o razón social del receptor del comprobante. */
+            customerName: string;
+            /** Format: uuid */
+            paymentId?: string | null;
+            docType: components["schemas"]["DocumentType"];
+            status: components["schemas"]["DocumentStatus"];
+            /** @example B001 */
+            series: string;
+            number: number;
+            currency: components["schemas"]["Currency"];
+            totalCents: number;
+            /** @description Base imponible. */
+            taxableCents: number;
+            igvCents: number;
+            /** @description Tipo de cambio SUNAT si es en USD. */
+            exchangeRate?: string | null;
+            sunatCode?: string | null;
+            sunatMessage?: string | null;
+            /** Format: uuid */
+            relatedDocumentId?: string | null;
+            hasXml?: boolean;
+            hasCdr?: boolean;
+            hasPdf?: boolean;
+            /** Format: date-time */
+            issuedAt?: string | null;
+            /** Format: date-time */
+            voidedAt?: string | null;
+        };
+        Customer: components["schemas"]["CustomerInput"] & {
+            /** Format: uuid */
+            id: string;
+            bookings?: components["schemas"]["BookingSummary"][];
+        };
+        Waiver: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            bookingId: string;
+            /** Format: uuid */
+            passengerId?: string | null;
+            version: number;
+            status: components["schemas"]["WaiverStatus"];
+            signerName?: string | null;
+            /** Format: date-time */
+            signedAt?: string | null;
+            hasPdf?: boolean;
+        };
+        WaiverForm: {
+            status: components["schemas"]["WaiverStatus"];
+            version: number;
+            tourSlug: string;
+            /** Format: date-time */
+            startsAt: string;
+            passengerName?: string | null;
+            minAge?: number | null;
+            minHeightCm?: number | null;
+        };
+        /**
+         * @description Versión publicada de un documento legal. Al publicar se guarda un snapshot inmutable del texto
+         *     traído del CMS (título, Markdown y su hash); es la evidencia de lo que aceptó el cliente. El texto
+         *     no se devuelve aquí: la web lo muestra desde el CMS y `contentHash` permite comprobar que coincide.
+         */
+        LegalDocument: {
+            /** @description Título de la página en el CMS al publicar. */
+            title: string;
+            /** @description SHA-256 (hex) de título y texto del snapshot. */
+            contentHash: string;
+            /** Format: uuid */
+            id: string;
+            kind: components["schemas"]["LegalDocumentKind"];
+            locale: string;
+            version: number;
+            cmsSlug: string;
+            /** Format: date-time */
+            publishedAt: string;
+        };
+        CreateComplaint: {
+            /** @enum {string} */
+            kind: "RECLAMO" | "QUEJA";
+            /** @enum {string} */
+            goodType: "PRODUCT" | "SERVICE";
+            consumerName: string;
+            idDocType: components["schemas"]["IdDocType"];
+            idDocNumber: string;
+            address: string;
+            /** Format: email */
+            email: string;
+            phone?: string;
+            isMinor?: boolean;
+            bookingRef?: string;
+            amountCents?: number;
+            currency?: components["schemas"]["Currency"];
+            /** @description Identificación del bien contratado. */
+            description: string;
+            detail: string;
+            /** @description Pedido del consumidor. */
+            request: string;
+            turnstileToken?: string;
+        };
+        Complaint: components["schemas"]["CreateComplaint"] & {
+            id: number;
+            status: components["schemas"]["ComplaintStatus"];
+            answer?: string | null;
+            /** Format: date-time */
+            answeredAt?: string | null;
+            /** Format: date-time */
+            dueAt: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        Session: {
+            accessToken: string;
+            /** @description Segundos de vigencia del token de acceso. */
+            expiresIn: number;
+            user: components["schemas"]["User"];
+        };
+        Role: {
+            /** Format: uuid */
+            id: string;
+            key: string;
+            name: string;
+            permissions: string[];
+        };
+        User: {
+            /** Format: uuid */
+            id: string;
+            /** Format: email */
+            email: string;
+            name: string;
+            active: boolean;
+            role: components["schemas"]["Role"];
+            /** Format: date-time */
+            lastLoginAt?: string | null;
+        };
+        CompanyInput: {
+            ruc: string;
+            legalName: string;
+            tradeName?: string;
+            fiscalAddress: string;
+            ubigeo?: string;
+            /** @example 0.1800 */
+            igvRate?: string;
+            /** @enum {string} */
+            environment?: "BETA" | "PRODUCTION";
+        };
+        Company: components["schemas"]["CompanyInput"] & {
+            /** Format: uuid */
+            id: string;
+        };
+        Series: {
+            /** Format: uuid */
+            id: string;
+            docType: components["schemas"]["DocumentType"];
+            prefix: string;
+            nextNumber: number;
+            active: boolean;
+        };
+        BlockedIdentity: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "EMAIL" | "IP";
+            value: string;
+            reason?: string | null;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        AuditLog: {
+            /** Format: uuid */
+            id: string;
+            actor?: string | null;
+            action: string;
+            entity: string;
+            entityId: string;
+            before?: {
+                [key: string]: unknown;
+            } | null;
+            after?: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        StaffQuoteRequest: components["schemas"]["QuoteRequest"] & {
+            overrideTotalCents?: number;
+        };
+        CancellationQuote: {
+            currency: components["schemas"]["Currency"];
+            /** @description Total cobrado hasta ahora. */
+            paidCents: number;
+            refundCents: number;
+            refundPercent: number;
+            /** @description Tramo de la política aplicado. */
+            tier?: {
+                hoursBefore?: number;
+                refundPercent?: number;
+            } | null;
+            policyVersion?: number | null;
+            /** @description Por qué no corresponde reembolso, si es el caso. */
+            reason?: string | null;
+        };
+        /** @description Ajustes operativos con su valor por defecto. Se permiten claves adicionales. */
+        Settings: {
+            /**
+             * @description Porcentaje del total que se cobra como depósito.
+             * @default 30
+             */
+            depositPercent: number;
+            /**
+             * @description Duración del bloqueo de cupo.
+             * @default 15
+             */
+            holdMinutes: number;
+            /**
+             * @description Tope de reembolso de un operador sin `payments:refund-any`.
+             * @default 20000
+             */
+            operatorRefundLimitCents: number;
+            /**
+             * @description Días hábiles para responder un reclamo (a confirmar con el abogado).
+             * @default 15
+             */
+            complaintDueDays: number;
+        } & {
+            [key: string]: unknown;
+        };
+        SettingsInput: {
+            depositPercent?: number;
+            holdMinutes?: number;
+            operatorRefundLimitCents?: number;
+            complaintDueDays?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        Manifest: {
+            departure: components["schemas"]["Departure"];
+            passengers: {
+                bookingReference: string;
+                name: string;
+                idDocType?: components["schemas"]["IdDocType"];
+                idDocNumber?: string | null;
+                phone?: string | null;
+                emergencyContactName?: string | null;
+                emergencyContactPhone?: string | null;
+                medicalNotes?: string | null;
+                waiverStatus: components["schemas"]["WaiverStatus"];
+                /** @description Saldo por cobrar el día de la salida. */
+                balanceDueCents?: number;
+                currency?: components["schemas"]["Currency"];
+            }[];
+        };
+        DashboardSummary: {
+            sales: {
+                currency: components["schemas"]["Currency"];
+                grossCents: number;
+                refundedCents: number;
+                bookings: number;
+            }[];
+            occupancy: {
+                seatsSold?: number;
+                seatsCapacity?: number;
+            };
+            pending: {
+                unpaidBookings?: number;
+                documentsInError?: number;
+                waiversPending?: number;
+                openDisputes?: number;
+                complaintsDueSoon?: number;
+            };
+        };
     };
-    PaymentLink: {
-      /** Format: uuid */
-      id: string;
-      token: string;
-      /** Format: uri */
-      url: string;
-      kind: components['schemas']['PaymentKind'];
-      currency: components['schemas']['Currency'];
-      amountCents: number;
-      /** Format: date-time */
-      expiresAt: string;
-      /** Format: date-time */
-      usedAt?: string | null;
+    responses: {
+        /** @description Error */
+        Error: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
     };
-    PaymentLinkInfo: {
-      reference: string;
-      tourSlug?: string;
-      /** Format: date-time */
-      startsAt?: string;
-      kind: components['schemas']['PaymentKind'];
-      currency: components['schemas']['Currency'];
-      amountCents: number;
-      /** Format: date-time */
-      expiresAt: string;
-      paymentOptions: ('STRIPE' | 'CULQI')[];
+    parameters: {
+        Id: string;
+        Reference: string;
+        TourSlug: string;
+        LinkToken: string;
+        Page: number;
+        PageSize: number;
+        IdempotencyKey: string;
     };
-    Payment: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      bookingId: string;
-      bookingReference?: string;
-      provider: components['schemas']['PaymentProvider'];
-      method: components['schemas']['PaymentMethod'];
-      kind: components['schemas']['PaymentKind'];
-      status: components['schemas']['PaymentStatus'];
-      currency: components['schemas']['Currency'];
-      amountCents: number;
-      refundedCents?: number;
-      providerRef?: string | null;
-      failureCode?: string | null;
-      /** Format: date-time */
-      paidAt?: string | null;
-      /** Format: date-time */
-      createdAt?: string;
+    requestBodies: never;
+    headers: {
+        /**
+         * @description `desertica_refresh=<token>; HttpOnly; Secure; SameSite=Strict; Path=/api/auth`. El navegador la
+         *     envía solo a `/api/auth/*`; el SPA nunca lee el refresh token. Al cerrar sesión se emite vacía y
+         *     con `Max-Age=0`.
+         */
+        RefreshCookie: string;
     };
-    Refund: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      paymentId: string;
-      amountCents: number;
-      reason: string;
-      /** @enum {string} */
-      status: 'PENDING' | 'SUCCEEDED' | 'FAILED';
-      /** Format: uuid */
-      creditNoteId?: string | null;
-      requestedBy?: string | null;
-      /** Format: date-time */
-      createdAt?: string;
-    };
-    Dispute: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      paymentId: string;
-      provider: components['schemas']['PaymentProvider'];
-      providerRef?: string;
-      status: components['schemas']['DisputeStatus'];
-      reason?: string | null;
-      amountCents: number;
-      currency: components['schemas']['Currency'];
-      /** Format: date-time */
-      evidenceDueAt?: string | null;
-      notes?: string | null;
-      /** Format: date-time */
-      createdAt?: string;
-    };
-    Document: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      bookingId: string;
-      /** Format: uuid */
-      paymentId?: string | null;
-      docType: components['schemas']['DocumentType'];
-      status: components['schemas']['DocumentStatus'];
-      /** @example B001 */
-      series: string;
-      number: number;
-      currency: components['schemas']['Currency'];
-      totalCents: number;
-      /** @description Base imponible. */
-      taxableCents: number;
-      igvCents: number;
-      /** @description Tipo de cambio SUNAT si es en USD. */
-      exchangeRate?: string | null;
-      sunatCode?: string | null;
-      sunatMessage?: string | null;
-      /** Format: uuid */
-      relatedDocumentId?: string | null;
-      hasXml?: boolean;
-      hasCdr?: boolean;
-      hasPdf?: boolean;
-      /** Format: date-time */
-      issuedAt?: string | null;
-      /** Format: date-time */
-      voidedAt?: string | null;
-    };
-    Customer: components['schemas']['CustomerInput'] & {
-      /** Format: uuid */
-      id: string;
-      bookings?: components['schemas']['BookingSummary'][];
-    };
-    Waiver: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      bookingId: string;
-      /** Format: uuid */
-      passengerId?: string | null;
-      version: number;
-      status: components['schemas']['WaiverStatus'];
-      signerName?: string | null;
-      /** Format: date-time */
-      signedAt?: string | null;
-      hasPdf?: boolean;
-    };
-    WaiverForm: {
-      status: components['schemas']['WaiverStatus'];
-      version: number;
-      tourSlug: string;
-      /** Format: date-time */
-      startsAt: string;
-      passengerName?: string | null;
-      minAge?: number | null;
-      minHeightCm?: number | null;
-    };
-    LegalDocument: {
-      /** Format: uuid */
-      id: string;
-      kind: components['schemas']['LegalDocumentKind'];
-      locale: string;
-      version: number;
-      cmsSlug: string;
-      /** Format: date-time */
-      publishedAt: string;
-    };
-    CreateComplaint: {
-      /** @enum {string} */
-      kind: 'RECLAMO' | 'QUEJA';
-      /** @enum {string} */
-      goodType: 'PRODUCT' | 'SERVICE';
-      consumerName: string;
-      idDocType: components['schemas']['IdDocType'];
-      idDocNumber: string;
-      address: string;
-      /** Format: email */
-      email: string;
-      phone?: string;
-      isMinor?: boolean;
-      bookingRef?: string;
-      amountCents?: number;
-      currency?: components['schemas']['Currency'];
-      /** @description Identificación del bien contratado. */
-      description: string;
-      detail: string;
-      /** @description Pedido del consumidor. */
-      request: string;
-      turnstileToken?: string;
-    };
-    Complaint: components['schemas']['CreateComplaint'] & {
-      id: number;
-      status: components['schemas']['ComplaintStatus'];
-      answer?: string | null;
-      /** Format: date-time */
-      answeredAt?: string | null;
-      /** Format: date-time */
-      dueAt: string;
-      /** Format: date-time */
-      createdAt: string;
-    };
-    Session: {
-      accessToken: string;
-      refreshToken: string;
-      /** @description Segundos de vigencia del token de acceso. */
-      expiresIn: number;
-      user: components['schemas']['User'];
-    };
-    Role: {
-      /** Format: uuid */
-      id: string;
-      key: string;
-      name: string;
-      permissions: string[];
-    };
-    User: {
-      /** Format: uuid */
-      id: string;
-      /** Format: email */
-      email: string;
-      name: string;
-      active: boolean;
-      role: components['schemas']['Role'];
-      /** Format: date-time */
-      lastLoginAt?: string | null;
-    };
-    CompanyInput: {
-      ruc: string;
-      legalName: string;
-      tradeName?: string;
-      fiscalAddress: string;
-      ubigeo?: string;
-      /** @example 0.1800 */
-      igvRate?: string;
-      /** @enum {string} */
-      environment?: 'BETA' | 'PRODUCTION';
-    };
-    Company: components['schemas']['CompanyInput'] & {
-      /** Format: uuid */
-      id: string;
-    };
-    Series: {
-      /** Format: uuid */
-      id: string;
-      docType: components['schemas']['DocumentType'];
-      prefix: string;
-      nextNumber: number;
-      active: boolean;
-    };
-    BlockedIdentity: {
-      /** Format: uuid */
-      id: string;
-      /** @enum {string} */
-      kind: 'EMAIL' | 'IP';
-      value: string;
-      reason?: string | null;
-      /** Format: date-time */
-      createdAt?: string;
-    };
-    AuditLog: {
-      /** Format: uuid */
-      id: string;
-      actor?: string | null;
-      action: string;
-      entity: string;
-      entityId: string;
-      before?: {
-        [key: string]: unknown;
-      } | null;
-      after?: {
-        [key: string]: unknown;
-      } | null;
-      /** Format: date-time */
-      createdAt: string;
-    };
-    Manifest: {
-      departure: components['schemas']['Departure'];
-      passengers: {
-        bookingReference: string;
-        name: string;
-        idDocType?: components['schemas']['IdDocType'];
-        idDocNumber?: string | null;
-        phone?: string | null;
-        emergencyContactName?: string | null;
-        emergencyContactPhone?: string | null;
-        medicalNotes?: string | null;
-        waiverStatus: components['schemas']['WaiverStatus'];
-        /** @description Saldo por cobrar el día de la salida. */
-        balanceDueCents?: number;
-        currency?: components['schemas']['Currency'];
-      }[];
-    };
-    DashboardSummary: {
-      sales: {
-        currency: components['schemas']['Currency'];
-        grossCents: number;
-        refundedCents: number;
-        bookings: number;
-      }[];
-      occupancy: {
-        seatsSold?: number;
-        seatsCapacity?: number;
-      };
-      pending: {
-        unpaidBookings?: number;
-        documentsInError?: number;
-        waiversPending?: number;
-        openDisputes?: number;
-        complaintsDueSoon?: number;
-      };
-    };
-  };
-  responses: {
-    /** @description Error */
-    Error: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': components['schemas']['Error'];
-      };
-    };
-  };
-  parameters: {
-    Id: string;
-    Reference: string;
-    TourSlug: string;
-    LinkToken: string;
-    Page: number;
-    PageSize: number;
-    IdempotencyKey: string;
-  };
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  getHealth: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @enum {string} */
-            status: 'ok';
-            service: string;
-          };
-        };
-      };
-    };
-  };
-  getHealthReady: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Listo */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      503: components['responses']['Error'];
-    };
-  };
-  getTourAvailability: {
-    parameters: {
-      query: {
-        month: string;
-        currency: components['schemas']['Currency'];
-        format?: components['schemas']['TourFormat'];
-        language?: string;
-      };
-      header?: never;
-      path: {
-        slug: components['parameters']['TourSlug'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Salidas del mes con cupo y precio */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['AvailableDeparture'][];
-          };
-        };
-      };
-      404: components['responses']['Error'];
-    };
-  };
-  createQuote: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['QuoteRequest'];
-      };
-    };
-    responses: {
-      /** @description Cotización */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Quote'];
-        };
-      };
-      422: components['responses']['Error'];
-    };
-  };
-  createHold: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** Format: uuid */
-          departureId: string;
-          seats: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Cupo bloqueado */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Hold'];
-        };
-      };
-      /** @description Sin cupo suficiente */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      429: components['responses']['Error'];
-    };
-  };
-  releaseHold: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        token: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Liberado */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  createPublicBooking: {
-    parameters: {
-      query?: never;
-      header?: {
-        'Idempotency-Key'?: components['parameters']['IdempotencyKey'];
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreatePublicBooking'];
-      };
-    };
-    responses: {
-      /** @description Reserva creada pendiente de pago */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PublicBookingCreated'];
-        };
-      };
-      409: components['responses']['Error'];
-      /** @description El bloqueo de cupo expiró */
-      410: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      422: components['responses']['Error'];
-    };
-  };
-  requestBookingAccess: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          reference: string;
-          /** Format: email */
-          email: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Aceptado */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      429: components['responses']['Error'];
-    };
-  };
-  getPublicBooking: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        reference: components['parameters']['Reference'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Reserva */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PublicBooking'];
-        };
-      };
-      401: components['responses']['Error'];
-      404: components['responses']['Error'];
-    };
-  };
-  createBookingStripeIntent: {
-    parameters: {
-      query?: never;
-      header?: {
-        'Idempotency-Key'?: components['parameters']['IdempotencyKey'];
-      };
-      path: {
-        reference: components['parameters']['Reference'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreatePaymentRequest'];
-      };
-    };
-    responses: {
-      /** @description Intent creado */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['StripeIntent'];
-        };
-      };
-      409: components['responses']['Error'];
-      422: components['responses']['Error'];
-    };
-  };
-  createBookingCulqiCharge: {
-    parameters: {
-      query?: never;
-      header?: {
-        'Idempotency-Key'?: components['parameters']['IdempotencyKey'];
-      };
-      path: {
-        reference: components['parameters']['Reference'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CulqiChargeRequest'];
-      };
-    };
-    responses: {
-      /** @description Resultado del cobro */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CulqiChargeResult'];
-        };
-      };
-      409: components['responses']['Error'];
-      422: components['responses']['Error'];
-    };
-  };
-  getPaymentLinkInfo: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        token: components['parameters']['LinkToken'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Datos del enlace */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PaymentLinkInfo'];
-        };
-      };
-      404: components['responses']['Error'];
-      410: components['responses']['Error'];
-    };
-  };
-  createLinkStripeIntent: {
-    parameters: {
-      query?: never;
-      header?: {
-        'Idempotency-Key'?: components['parameters']['IdempotencyKey'];
-      };
-      path: {
-        token: components['parameters']['LinkToken'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Intent creado */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['StripeIntent'];
-        };
-      };
-      410: components['responses']['Error'];
-    };
-  };
-  createLinkCulqiCharge: {
-    parameters: {
-      query?: never;
-      header?: {
-        'Idempotency-Key'?: components['parameters']['IdempotencyKey'];
-      };
-      path: {
-        token: components['parameters']['LinkToken'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @description Token generado por Culqi.js */
-          token: string;
-          /** Format: email */
-          email: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Resultado del cobro */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CulqiChargeResult'];
-        };
-      };
-      410: components['responses']['Error'];
-    };
-  };
-  getWaiverForm: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        token: components['parameters']['LinkToken'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Descargo */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['WaiverForm'];
-        };
-      };
-      404: components['responses']['Error'];
-    };
-  };
-  signWaiver: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        token: components['parameters']['LinkToken'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          signerName: string;
-          signerDocType: components['schemas']['IdDocType'];
-          signerDocNumber: string;
-          onBehalfOfMinor?: boolean;
-          medicalNotes?: string;
-          emergencyContactName?: string;
-          emergencyContactPhone?: string;
-          /** @constant */
-          accepted: true;
-        };
-      };
-    };
-    responses: {
-      /** @description Firmado */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['WaiverForm'];
-        };
-      };
-      409: components['responses']['Error'];
-    };
-  };
-  createComplaint: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateComplaint'];
-      };
-    };
-    responses: {
-      /** @description Registrado; se envía copia al correo del reclamante */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            correlative: number;
-            /** Format: date-time */
-            dueAt: string;
-          };
-        };
-      };
-      429: components['responses']['Error'];
-    };
-  };
-  createContactMessage: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          name: string;
-          /** Format: email */
-          email: string;
-          whatsapp?: string;
-          country?: string;
-          message: string;
-          locale?: string;
-          turnstileToken?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Aceptado */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      429: components['responses']['Error'];
-    };
-  };
-  recordConsent: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          anonymousId: string;
-          categories: {
-            [key: string]: boolean;
-          };
-          policyVersion: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Registrado */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getCurrentLegalDocuments: {
-    parameters: {
-      query: {
-        locale: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Versiones vigentes */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['LegalDocument'][];
-          };
-        };
-      };
-    };
-  };
-  receiveStripeWebhook: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          [key: string]: unknown;
-        };
-      };
-    };
-    responses: {
-      /** @description Recibido */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      400: components['responses']['Error'];
-    };
-  };
-  receiveCulqiWebhook: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          [key: string]: unknown;
-        };
-      };
-    };
-    responses: {
-      /** @description Recibido */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      400: components['responses']['Error'];
-    };
-  };
-  loginWithGoogle: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          idToken: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Sesión */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Session'];
-        };
-      };
-      401: components['responses']['Error'];
-      403: components['responses']['Error'];
-    };
-  };
-  refreshSession: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          refreshToken: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Sesión renovada */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Session'];
-        };
-      };
-      401: components['responses']['Error'];
-    };
-  };
-  logout: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          refreshToken: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Cerrada */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getMe: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Usuario */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['User'];
-        };
-      };
-      401: components['responses']['Error'];
-    };
-  };
-  listTourRefs: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Tours */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['TourRef'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  syncTourRefs: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Resultado */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            created: number;
-            updated: number;
-          };
-        };
-      };
-    };
-  };
-  getTourRef: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Tour */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TourRef'];
-        };
-      };
-      404: components['responses']['Error'];
-    };
-  };
-  updateTourRef: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateTourRef'];
-      };
-    };
-    responses: {
-      /** @description Tour */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TourRef'];
-        };
-      };
-    };
-  };
-  listDepartures: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-        tourRefId?: string;
-        from?: string;
-        to?: string;
-        status?: components['schemas']['DepartureStatus'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Salidas */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Departure'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  createDepartures: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateDeparture'];
-      };
-    };
-    responses: {
-      /** @description Salidas creadas */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Departure'][];
-          };
-        };
-      };
-      409: components['responses']['Error'];
-    };
-  };
-  getDeparture: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Salida */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Departure'];
-        };
-      };
-      404: components['responses']['Error'];
-    };
-  };
-  updateDeparture: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateDeparture'];
-      };
-    };
-    responses: {
-      /** @description Salida */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Departure'];
-        };
-      };
-      /** @description La capacidad nueva es menor que los asientos vendidos */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  getDepartureManifest: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Manifiesto */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Manifest'];
-        };
-      };
-    };
-  };
-  cancelDeparture: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          reason: string;
-          /** @enum {string} */
-          resolution: 'REFUND' | 'RESCHEDULE' | 'CLIENT_CHOICE';
-          /** Format: uuid */
-          targetDepartureId?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Cancelación en proceso */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            affectedBookings: number;
-          };
-        };
-      };
-    };
-  };
-  listPriceRules: {
-    parameters: {
-      query?: {
-        tourRefId?: string;
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Reglas */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['PriceRule'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  createPriceRule: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PriceRuleInput'];
-      };
-    };
-    responses: {
-      /** @description Regla */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PriceRule'];
-        };
-      };
-    };
-  };
-  replacePriceRule: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PriceRuleInput'];
-      };
-    };
-    responses: {
-      /** @description Regla */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PriceRule'];
-        };
-      };
-    };
-  };
-  deactivatePriceRule: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Desactivada */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  listBlackouts: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Bloqueos */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Blackout'][];
-          };
-        };
-      };
-    };
-  };
-  createBlackout: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['BlackoutInput'];
-      };
-    };
-    responses: {
-      /** @description Bloqueo */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Blackout'];
-        };
-      };
-    };
-  };
-  deleteBlackout: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Eliminada */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  listCancellationPolicies: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Políticas */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['CancellationPolicy'][];
-          };
-        };
-      };
-    };
-  };
-  createCancellationPolicy: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CancellationPolicyInput'];
-      };
-    };
-    responses: {
-      /** @description Política */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CancellationPolicy'];
-        };
-      };
-    };
-  };
-  listBookings: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-        status?: components['schemas']['BookingStatus'];
-        departureId?: string;
-        tourRefId?: string;
-        from?: string;
-        to?: string;
-        /** @description Busca por referencia, nombre, correo o documento. */
-        q?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Reservas */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['BookingSummary'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  createManualBooking: {
-    parameters: {
-      query?: never;
-      header?: {
-        'Idempotency-Key'?: components['parameters']['IdempotencyKey'];
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateManualBooking'];
-      };
-    };
-    responses: {
-      /** @description Reserva */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Booking'];
-        };
-      };
-      409: components['responses']['Error'];
-    };
-  };
-  getBooking: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Reserva */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Booking'];
-        };
-      };
-      404: components['responses']['Error'];
-    };
-  };
-  updateBooking: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateBooking'];
-      };
-    };
-    responses: {
-      /** @description Reserva */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Booking'];
-        };
-      };
-    };
-  };
-  cancelBooking: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          reason: string;
-          /** @enum {string} */
-          refund: 'POLICY' | 'FULL' | 'NONE';
-        };
-      };
-    };
-    responses: {
-      /** @description Reserva cancelada */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Booking'];
-        };
-      };
-      409: components['responses']['Error'];
-    };
-  };
-  rescheduleBooking: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** Format: uuid */
-          targetDepartureId: string;
-          reason?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Reserva movida */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            booking: components['schemas']['Booking'];
-            adjustment?: {
-              /** @enum {string} */
-              type?: 'CHARGE' | 'REFUND';
-              amountCents?: number;
+    getHealth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "ok";
+                        service: string;
+                    };
+                };
             };
-          };
-        };
-      };
-      409: components['responses']['Error'];
-    };
-  };
-  setBookingStatus: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          status: 'COMPLETED' | 'NO_SHOW';
-        };
-      };
-    };
-    responses: {
-      /** @description Reserva */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Booking'];
-        };
-      };
-    };
-  };
-  createPaymentLink: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          kind: components['schemas']['PaymentKind'];
-          /** @description Opcional; por defecto el monto pendiente de ese tipo. */
-          amountCents?: number;
-          /** @default 48 */
-          expiresInHours?: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Enlace */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PaymentLink'];
-        };
-      };
-    };
-  };
-  recordManualPayment: {
-    parameters: {
-      query?: never;
-      header?: {
-        'Idempotency-Key'?: components['parameters']['IdempotencyKey'];
-      };
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          method: 'CASH' | 'TRANSFER' | 'YAPE' | 'OTHER';
-          kind: components['schemas']['PaymentKind'];
-          amountCents: number;
-          currency: components['schemas']['Currency'];
-          /** @description Número de operación o nota. */
-          reference?: string;
-          /** Format: date-time */
-          paidAt?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Pago */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Payment'];
-        };
-      };
-      409: components['responses']['Error'];
-    };
-  };
-  issueDocument: {
-    parameters: {
-      query?: never;
-      header?: {
-        'Idempotency-Key'?: components['parameters']['IdempotencyKey'];
-      };
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /**
-           * Format: uuid
-           * @description Pago al que corresponde; por defecto el total cobrado.
-           */
-          paymentId?: string;
-          /**
-           * @description Por defecto el elegido por el cliente al reservar.
-           * @enum {string}
-           */
-          docType?: 'BOLETA' | 'FACTURA';
-        };
-      };
-    };
-    responses: {
-      /** @description Emisión encolada */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Document'];
-        };
-      };
-      409: components['responses']['Error'];
-    };
-  };
-  listPayments: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-        status?: components['schemas']['PaymentStatus'];
-        provider?: components['schemas']['PaymentProvider'];
-        from?: string;
-        to?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Pagos */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Payment'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  getPayment: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Pago */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Payment'];
-        };
-      };
-      404: components['responses']['Error'];
-    };
-  };
-  createRefund: {
-    parameters: {
-      query?: never;
-      header?: {
-        'Idempotency-Key'?: components['parameters']['IdempotencyKey'];
-      };
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          amountCents: number;
-          reason: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Reembolso */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Refund'];
-        };
-      };
-      403: components['responses']['Error'];
-      409: components['responses']['Error'];
-    };
-  };
-  listRefunds: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Reembolsos */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Refund'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  listDisputes: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-        status?: components['schemas']['DisputeStatus'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Disputas */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Dispute'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  getDispute: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Disputa */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Dispute'];
-        };
-      };
-    };
-  };
-  updateDispute: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          status?: components['schemas']['DisputeStatus'];
-          notes?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Disputa */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Dispute'];
-        };
-      };
-    };
-  };
-  downloadDisputeEvidence: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paquete */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/zip': string;
-        };
-      };
-    };
-  };
-  listDocuments: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-        status?: components['schemas']['DocumentStatus'];
-        docType?: components['schemas']['DocumentType'];
-        from?: string;
-        to?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Comprobantes */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Document'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  getDocument: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Comprobante */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Document'];
-        };
-      };
-      404: components['responses']['Error'];
-    };
-  };
-  retryDocument: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Reencolado */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Document'];
-        };
-      };
-    };
-  };
-  voidDocument: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          reason: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Anulación encolada */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Document'];
-        };
-      };
-    };
-  };
-  createCreditNote: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          reason: string;
-          amountCents: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Nota de crédito encolada */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Document'];
-        };
-      };
-    };
-  };
-  downloadDocumentFile: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-        kind: 'xml' | 'cdr' | 'pdf';
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Archivo */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/xml': string;
-          'application/pdf': string;
-          'application/zip': string;
-        };
-      };
-      404: components['responses']['Error'];
-    };
-  };
-  listCustomers: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-        q?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Clientes */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Customer'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  getCustomer: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Cliente */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Customer'];
-        };
-      };
-    };
-  };
-  updateCustomer: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CustomerInput'];
-      };
-    };
-    responses: {
-      /** @description Cliente */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Customer'];
-        };
-      };
-    };
-  };
-  eraseCustomer: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Procesado */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  listComplaints: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-        status?: components['schemas']['ComplaintStatus'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Reclamos */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Complaint'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  getComplaint: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Reclamo */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Complaint'];
-        };
-      };
-    };
-  };
-  answerComplaint: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          answer: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Reclamo respondido */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Complaint'];
-        };
-      };
-    };
-  };
-  listWaivers: {
-    parameters: {
-      query?: {
-        bookingId?: string;
-        status?: components['schemas']['WaiverStatus'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Descargos */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Waiver'][];
-          };
-        };
-      };
-    };
-  };
-  publishLegalDocument: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          kind: components['schemas']['LegalDocumentKind'];
-          locale: string;
-          cmsSlug: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Versión publicada */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['LegalDocument'];
-        };
-      };
-    };
-  };
-  listUsers: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Usuarios */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['User'][];
-          };
-        };
-      };
-    };
-  };
-  createUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** Format: email */
-          email: string;
-          name: string;
-          /** Format: uuid */
-          roleId: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Usuario */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['User'];
-        };
-      };
-    };
-  };
-  updateUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['Id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          name?: string;
-          /** Format: uuid */
-          roleId?: string;
-          active?: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description Usuario */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['User'];
-        };
-      };
-    };
-  };
-  listRoles: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Roles */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Role'][];
-          };
-        };
-      };
-    };
-  };
-  getCompany: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Empresa */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Company'];
-        };
-      };
-    };
-  };
-  saveCompany: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CompanyInput'];
-      };
-    };
-    responses: {
-      /** @description Empresa */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Company'];
-        };
-      };
-    };
-  };
-  listSeries: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Series */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['Series'][];
-          };
-        };
-      };
-    };
-  };
-  createSeries: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          docType: components['schemas']['DocumentType'];
-          prefix: string;
-          /** @default 1 */
-          nextNumber?: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Serie */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Series'];
-        };
-      };
-    };
-  };
-  getSettings: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Ajustes */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [key: string]: unknown;
-          };
-        };
-      };
-    };
-  };
-  saveSettings: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          [key: string]: unknown;
-        };
-      };
-    };
-    responses: {
-      /** @description Ajustes */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [key: string]: unknown;
-          };
-        };
-      };
-    };
-  };
-  listBlockedIdentities: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Bloqueos */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['BlockedIdentity'][];
-          };
-        };
-      };
-    };
-  };
-  createBlockedIdentity: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          kind: 'EMAIL' | 'IP';
-          value: string;
-          reason?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Bloqueo */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['BlockedIdentity'];
-        };
-      };
-    };
-  };
-  listAuditLogs: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['Page'];
-        pageSize?: components['parameters']['PageSize'];
-        entity?: string;
-        entityId?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Eventos */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: components['schemas']['AuditLog'][];
-            meta: components['schemas']['Meta'];
-          };
-        };
-      };
-    };
-  };
-  getDashboardSummary: {
-    parameters: {
-      query: {
-        from: string;
-        to: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Resumen */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['DashboardSummary'];
-        };
-      };
-    };
-  };
-  getSalesReport: {
-    parameters: {
-      query: {
-        from: string;
-        to: string;
-        groupBy?: 'day' | 'tour' | 'provider';
-        format?: 'json' | 'csv';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Reporte */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            data: {
-              key: string;
-              currency: components['schemas']['Currency'];
-              grossCents: number;
-              refundedCents: number;
-              bookings: number;
-            }[];
-          };
-          'text/csv': string;
-        };
-      };
-    };
-  };
+        };
+    };
+    getHealthReady: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Listo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            503: components["responses"]["Error"];
+        };
+    };
+    getTourAvailability: {
+        parameters: {
+            query: {
+                month: string;
+                currency: components["schemas"]["Currency"];
+                format?: components["schemas"]["TourFormat"];
+                language?: string;
+            };
+            header?: never;
+            path: {
+                slug: components["parameters"]["TourSlug"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Salidas del mes con cupo y precio */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AvailableDeparture"][];
+                    };
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    createQuote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Cotización */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            422: components["responses"]["Error"];
+        };
+    };
+    createHold: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    departureId: string;
+                    seats: number;
+                    turnstileToken?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Cupo bloqueado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Hold"];
+                };
+            };
+            404: components["responses"]["Error"];
+            /** @description Sin cupo suficiente */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            429: components["responses"]["Error"];
+        };
+    };
+    releaseHold: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liberado */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createPublicBooking: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePublicBooking"];
+            };
+        };
+        responses: {
+            /** @description Reserva creada pendiente de pago */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicBookingCreated"];
+                };
+            };
+            409: components["responses"]["Error"];
+            /** @description El bloqueo de cupo expiró */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: components["responses"]["Error"];
+        };
+    };
+    requestBookingAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reference: string;
+                    /** Format: email */
+                    email: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Aceptado */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            429: components["responses"]["Error"];
+        };
+    };
+    getPublicBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reference: components["parameters"]["Reference"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reserva */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicBooking"];
+                };
+            };
+            401: components["responses"]["Error"];
+        };
+    };
+    createBookingStripeIntent: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                reference: components["parameters"]["Reference"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePaymentRequest"];
+            };
+        };
+        responses: {
+            /** @description Intent creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StripeIntent"];
+                };
+            };
+            409: components["responses"]["Error"];
+            422: components["responses"]["Error"];
+        };
+    };
+    createBookingCulqiCharge: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                reference: components["parameters"]["Reference"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CulqiChargeRequest"];
+            };
+        };
+        responses: {
+            /** @description Resultado del cobro */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CulqiChargeResult"];
+                };
+            };
+            409: components["responses"]["Error"];
+            422: components["responses"]["Error"];
+        };
+    };
+    getPaymentLinkInfo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: components["parameters"]["LinkToken"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Datos del enlace */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentLinkInfo"];
+                };
+            };
+            404: components["responses"]["Error"];
+            410: components["responses"]["Error"];
+        };
+    };
+    createLinkStripeIntent: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                token: components["parameters"]["LinkToken"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Intent creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StripeIntent"];
+                };
+            };
+            410: components["responses"]["Error"];
+        };
+    };
+    createLinkCulqiCharge: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                token: components["parameters"]["LinkToken"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Token generado por Culqi.js */
+                    token: string;
+                    /** Format: email */
+                    email: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Resultado del cobro */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CulqiChargeResult"];
+                };
+            };
+            410: components["responses"]["Error"];
+        };
+    };
+    getWaiverForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: components["parameters"]["LinkToken"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Descargo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaiverForm"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    signWaiver: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: components["parameters"]["LinkToken"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    signerName: string;
+                    signerDocType: components["schemas"]["IdDocType"];
+                    signerDocNumber: string;
+                    onBehalfOfMinor?: boolean;
+                    medicalNotes?: string;
+                    emergencyContactName?: string;
+                    emergencyContactPhone?: string;
+                    /** @constant */
+                    accepted: true;
+                };
+            };
+        };
+        responses: {
+            /** @description Firmado */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaiverForm"];
+                };
+            };
+            409: components["responses"]["Error"];
+        };
+    };
+    createComplaint: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateComplaint"];
+            };
+        };
+        responses: {
+            /** @description Registrado; se envía copia al correo del reclamante */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        correlative: number;
+                        /** Format: date-time */
+                        dueAt: string;
+                    };
+                };
+            };
+            429: components["responses"]["Error"];
+        };
+    };
+    createContactMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    /** Format: email */
+                    email: string;
+                    whatsapp?: string;
+                    country?: string;
+                    message: string;
+                    locale?: string;
+                    turnstileToken?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Aceptado */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            429: components["responses"]["Error"];
+        };
+    };
+    recordConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    anonymousId: string;
+                    categories: {
+                        [key: string]: boolean;
+                    };
+                    policyVersion: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Registrado */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCurrentLegalDocuments: {
+        parameters: {
+            query: {
+                locale: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Versiones vigentes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["LegalDocument"][];
+                    };
+                };
+            };
+        };
+    };
+    receiveStripeWebhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Recibido */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["Error"];
+        };
+    };
+    receiveCulqiWebhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Recibido */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["Error"];
+        };
+    };
+    loginWithGoogle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idToken: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Sesión. El refresh token viaja solo en la cookie `desertica_refresh`. */
+            200: {
+                headers: {
+                    "Set-Cookie": components["headers"]["RefreshCookie"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Session"];
+                };
+            };
+            401: components["responses"]["Error"];
+            403: components["responses"]["Error"];
+        };
+    };
+    refreshSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sesión renovada */
+            200: {
+                headers: {
+                    "Set-Cookie": components["headers"]["RefreshCookie"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Session"];
+                };
+            };
+            401: components["responses"]["Error"];
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cerrada */
+            204: {
+                headers: {
+                    "Set-Cookie": components["headers"]["RefreshCookie"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Usuario */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            401: components["responses"]["Error"];
+        };
+    };
+    listTourRefs: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tours */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TourRef"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    syncTourRefs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Resultado */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        created: number;
+                        updated: number;
+                    };
+                };
+            };
+        };
+    };
+    getTourRef: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tour */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TourRef"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    updateTourRef: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTourRef"];
+            };
+        };
+        responses: {
+            /** @description Tour */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TourRef"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    listDepartures: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                tourRefId?: string;
+                from?: string;
+                to?: string;
+                status?: components["schemas"]["DepartureStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Salidas */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Departure"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    createDepartures: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDeparture"];
+            };
+        };
+        responses: {
+            /** @description Salidas creadas */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Departure"][];
+                    };
+                };
+            };
+            409: components["responses"]["Error"];
+        };
+    };
+    getDeparture: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Salida */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Departure"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    updateDeparture: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDeparture"];
+            };
+        };
+        responses: {
+            /** @description Salida */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Departure"];
+                };
+            };
+            404: components["responses"]["Error"];
+            /** @description La capacidad nueva es menor que los asientos vendidos */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getDepartureManifest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Manifiesto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Manifest"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    cancelDeparture: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                    /** @enum {string} */
+                    resolution: "REFUND" | "RESCHEDULE" | "CLIENT_CHOICE";
+                    /** Format: uuid */
+                    targetDepartureId?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Cancelación en proceso */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        affectedBookings: number;
+                    };
+                };
+            };
+        };
+    };
+    listPriceRules: {
+        parameters: {
+            query?: {
+                tourRefId?: string;
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reglas */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PriceRule"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    createPriceRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceRuleInput"];
+            };
+        };
+        responses: {
+            /** @description Regla */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceRule"];
+                };
+            };
+        };
+    };
+    replacePriceRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceRuleInput"];
+            };
+        };
+        responses: {
+            /** @description Regla */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceRule"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    deactivatePriceRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Desactivada */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    listBlackouts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bloqueos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Blackout"][];
+                    };
+                };
+            };
+        };
+    };
+    createBlackout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BlackoutInput"];
+            };
+        };
+        responses: {
+            /** @description Bloqueo */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Blackout"];
+                };
+            };
+        };
+    };
+    deleteBlackout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Eliminada */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    listCancellationPolicies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Políticas */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CancellationPolicy"][];
+                    };
+                };
+            };
+        };
+    };
+    createCancellationPolicy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancellationPolicyInput"];
+            };
+        };
+        responses: {
+            /** @description Política */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CancellationPolicy"];
+                };
+            };
+        };
+    };
+    listBookings: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                status?: components["schemas"]["BookingStatus"];
+                departureId?: string;
+                tourRefId?: string;
+                from?: string;
+                to?: string;
+                /** @description Busca por referencia, nombre, correo o documento. */
+                q?: string;
+                source?: "WEB" | "MANUAL";
+                currency?: components["schemas"]["Currency"];
+                customerId?: string;
+                /** @description UNPAID = sin pagos; PARTIAL = pagó algo pero queda saldo; PAID = sin saldo. */
+                paymentStatus?: "UNPAID" | "PARTIAL" | "PAID";
+                /** @description PENDING = al menos un descargo sin firmar. */
+                waiverStatus?: components["schemas"]["WaiverStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reservas */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BookingSummary"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    createManualBooking: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateManualBooking"];
+            };
+        };
+        responses: {
+            /** @description Reserva */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+        };
+    };
+    getBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reserva */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    updateBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBooking"];
+            };
+        };
+        responses: {
+            /** @description Reserva */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+        };
+    };
+    createStaffQuote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffQuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Cotización */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            403: components["responses"]["Error"];
+            422: components["responses"]["Error"];
+        };
+    };
+    getCancellationQuote: {
+        parameters: {
+            query?: {
+                refund?: "POLICY" | "FULL" | "NONE";
+            };
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cálculo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CancellationQuote"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    cancelBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                    /** @enum {string} */
+                    refund: "POLICY" | "FULL" | "NONE";
+                };
+            };
+        };
+        responses: {
+            /** @description Reserva cancelada */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+        };
+    };
+    rescheduleBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    targetDepartureId: string;
+                    reason?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Reserva movida */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        booking: components["schemas"]["Booking"];
+                        adjustment?: {
+                            /** @enum {string} */
+                            type?: "CHARGE" | "REFUND";
+                            amountCents?: number;
+                        };
+                    };
+                };
+            };
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+        };
+    };
+    setBookingStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "COMPLETED" | "NO_SHOW";
+                };
+            };
+        };
+        responses: {
+            /** @description Reserva */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+        };
+    };
+    createPaymentLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    kind: components["schemas"]["PaymentKind"];
+                    /** @description Opcional; por defecto el monto pendiente de ese tipo. */
+                    amountCents?: number;
+                    /** @default 48 */
+                    expiresInHours?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Enlace */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentLink"];
+                };
+            };
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+        };
+    };
+    recordManualPayment: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    method: "CASH" | "TRANSFER" | "YAPE" | "OTHER";
+                    kind: components["schemas"]["PaymentKind"];
+                    amountCents: number;
+                    currency: components["schemas"]["Currency"];
+                    /** @description Número de operación o nota. */
+                    reference?: string;
+                    /** Format: date-time */
+                    paidAt?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Pago */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Payment"];
+                };
+            };
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+        };
+    };
+    issueDocument: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: uuid
+                     * @description Pago al que corresponde; por defecto el total cobrado.
+                     */
+                    paymentId?: string;
+                    /**
+                     * @description Por defecto el elegido por el cliente al reservar.
+                     * @enum {string}
+                     */
+                    docType?: "BOLETA" | "FACTURA";
+                };
+            };
+        };
+        responses: {
+            /** @description Emisión encolada */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+            409: components["responses"]["Error"];
+        };
+    };
+    listPayments: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                status?: components["schemas"]["PaymentStatus"];
+                provider?: components["schemas"]["PaymentProvider"];
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pagos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Payment"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    getPayment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pago */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Payment"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    createRefund: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amountCents: number;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Reembolso */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Refund"];
+                };
+            };
+            403: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+        };
+    };
+    listRefunds: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reembolsos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Refund"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    listDisputes: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                status?: components["schemas"]["DisputeStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Disputas */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Dispute"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    getDispute: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Disputa */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dispute"];
+                };
+            };
+        };
+    };
+    updateDispute: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    status?: components["schemas"]["DisputeStatus"];
+                    notes?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Disputa */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dispute"];
+                };
+            };
+        };
+    };
+    downloadDisputeEvidence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paquete */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": string;
+                };
+            };
+        };
+    };
+    listDocuments: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                status?: components["schemas"]["DocumentStatus"];
+                docType?: components["schemas"]["DocumentType"];
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Comprobantes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Document"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    getDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Comprobante */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    retryDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reencolado */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    voidDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Anulación encolada */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    createCreditNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                    amountCents: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Nota de crédito encolada */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    downloadDocumentFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+                kind: "xml" | "cdr" | "pdf";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/xml": string;
+                    "application/pdf": string;
+                    "application/zip": string;
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    listCustomers: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Clientes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Customer"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    getCustomer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cliente */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Customer"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    updateCustomer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerInput"];
+            };
+        };
+        responses: {
+            /** @description Cliente */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Customer"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    eraseCustomer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Procesado */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listComplaints: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                status?: components["schemas"]["ComplaintStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reclamos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Complaint"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    getComplaint: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reclamo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Complaint"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    answerComplaint: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    answer: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Reclamo respondido */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Complaint"];
+                };
+            };
+            404: components["responses"]["Error"];
+            409: components["responses"]["Error"];
+        };
+    };
+    listWaivers: {
+        parameters: {
+            query?: {
+                bookingId?: string;
+                status?: components["schemas"]["WaiverStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Descargos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Waiver"][];
+                    };
+                };
+            };
+        };
+    };
+    publishLegalDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    kind: components["schemas"]["LegalDocumentKind"];
+                    locale: string;
+                    cmsSlug: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Versión publicada */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LegalDocument"];
+                };
+            };
+        };
+    };
+    listUsers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Usuarios */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["User"][];
+                    };
+                };
+            };
+        };
+    };
+    createUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: email */
+                    email: string;
+                    name: string;
+                    /** Format: uuid */
+                    roleId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Usuario */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            409: components["responses"]["Error"];
+        };
+    };
+    updateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name?: string;
+                    /** Format: uuid */
+                    roleId?: string;
+                    active?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Usuario */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
+    listRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Roles */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Role"][];
+                    };
+                };
+            };
+        };
+    };
+    getCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Empresa */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Company"];
+                };
+            };
+        };
+    };
+    saveCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyInput"];
+            };
+        };
+        responses: {
+            /** @description Empresa */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Company"];
+                };
+            };
+        };
+    };
+    listSeries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Series */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Series"][];
+                    };
+                };
+            };
+        };
+    };
+    createSeries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    docType: components["schemas"]["DocumentType"];
+                    prefix: string;
+                    /** @default 1 */
+                    nextNumber?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Serie */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"];
+                };
+            };
+        };
+    };
+    getSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ajustes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settings"];
+                };
+            };
+        };
+    };
+    saveSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettingsInput"];
+            };
+        };
+        responses: {
+            /** @description Ajustes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settings"];
+                };
+            };
+            422: components["responses"]["Error"];
+        };
+    };
+    listBlockedIdentities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bloqueos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BlockedIdentity"][];
+                    };
+                };
+            };
+        };
+    };
+    createBlockedIdentity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    kind: "EMAIL" | "IP";
+                    value: string;
+                    reason?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Bloqueo */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlockedIdentity"];
+                };
+            };
+        };
+    };
+    listAuditLogs: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                entity?: string;
+                entityId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Eventos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuditLog"][];
+                        meta: components["schemas"]["Meta"];
+                    };
+                };
+            };
+        };
+    };
+    getDashboardSummary: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Resumen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardSummary"];
+                };
+            };
+        };
+    };
+    getSalesReport: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+                groupBy?: "day" | "tour" | "provider";
+                format?: "json" | "csv";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reporte */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            key: string;
+                            currency: components["schemas"]["Currency"];
+                            grossCents: number;
+                            refundedCents: number;
+                            bookings: number;
+                        }[];
+                    };
+                    "text/csv": string;
+                };
+            };
+        };
+    };
 }

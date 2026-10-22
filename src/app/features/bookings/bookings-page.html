@@ -63,6 +63,62 @@
         (ngModelChange)="setFilter('to', $event)"
       />
     </label>
+    <label class="grid gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'bookings.filter.paymentStatus' | t }}</span>
+      <select
+        hlmInput
+        class="w-36"
+        [ngModel]="paymentStatus() ?? ''"
+        (ngModelChange)="setFilter('paymentStatus', $event)"
+      >
+        <option value="">{{ 'common.all' | t }}</option>
+        @for (v of paymentStatuses; track v) {
+          <option [value]="v">{{ v | enumLabel: 'bookings.paymentStatus' }}</option>
+        }
+      </select>
+    </label>
+    <label class="grid gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'bookings.filter.source' | t }}</span>
+      <select
+        hlmInput
+        class="w-36"
+        [ngModel]="source() ?? ''"
+        (ngModelChange)="setFilter('source', $event)"
+      >
+        <option value="">{{ 'common.all' | t }}</option>
+        @for (v of sources; track v) {
+          <option [value]="v">{{ v | enumLabel: 'enum.source' }}</option>
+        }
+      </select>
+    </label>
+    <label class="grid gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'bookings.filter.waiver' | t }}</span>
+      <select
+        hlmInput
+        class="w-36"
+        [ngModel]="waiver() ?? ''"
+        (ngModelChange)="setFilter('waiver', $event)"
+      >
+        <option value="">{{ 'common.all' | t }}</option>
+        @for (v of waiverStatuses; track v) {
+          <option [value]="v">{{ v | enumLabel: 'status.waiver' }}</option>
+        }
+      </select>
+    </label>
+    <label class="grid gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'bookings.filter.currency' | t }}</span>
+      <select
+        hlmInput
+        class="w-36"
+        [ngModel]="currency() ?? ''"
+        (ngModelChange)="setFilter('currency', $event)"
+      >
+        <option value="">{{ 'common.all' | t }}</option>
+        @for (v of currencies; track v) {
+          <option [value]="v">{{ v }}</option>
+        }
+      </select>
+    </label>
     @if (hasFilters()) {
       <button hlmBtn variant="ghost" size="sm" (click)="clear()">{{ 'common.clear' | t }}</button>
     }
@@ -111,7 +167,7 @@
                   }
                 </td>
                 <td hlmTd>{{ b.customerName }}</td>
-                <td hlmTd>{{ tourTitle(b.tourSlug) }}</td>
+                <td hlmTd>{{ b.tourTitle }}</td>
                 <td hlmTd>{{ b.startsAt | limaDateTime }}</td>
                 <td hlmTd>{{ (b.adults ?? 0) + (b.children ?? 0) }}</td>
                 <td hlmTd><app-status-badge kind="booking" [value]="b.status" /></td>

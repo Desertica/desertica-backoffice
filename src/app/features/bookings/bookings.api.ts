@@ -22,6 +22,10 @@ export interface BookingQuery {
   from?: string;
   to?: string;
   q?: string;
+  paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID';
+  source?: 'WEB' | 'MANUAL';
+  waiverStatus?: 'PENDING' | 'SIGNED';
+  currency?: Currency;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -56,6 +60,15 @@ export class BookingsApi {
   ): Promise<Booking> {
     return unwrap(
       await this.http.POST('/bookings/{id}/cancel', { params: { path: { id } }, body }),
+    );
+  }
+
+  /** Read-only preview of what a cancellation would refund; nothing changes on the API. */
+  async cancellationQuote(id: string, refund: 'POLICY' | 'FULL' | 'NONE') {
+    return unwrap(
+      await this.http.GET('/bookings/{id}/cancellation-quote', {
+        params: { path: { id }, query: { refund } },
+      }),
     );
   }
 

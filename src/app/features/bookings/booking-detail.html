@@ -140,7 +140,7 @@
         </div>
         <div hlmCardContent class="space-y-1 text-sm">
           <p class="font-medium">{{ b.startsAt | limaDateTime }}</p>
-          <p>{{ b.tourSlug }}</p>
+          <p>{{ b.tourTitle }}</p>
           <p>
             {{ 'bookings.detail.people' | t: { adults: b.adults ?? 0, children: b.children ?? 0 } }}
           </p>
