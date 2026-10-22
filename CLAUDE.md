@@ -12,7 +12,7 @@ Angular 21 (standalone, zoneless), Tailwind v4, Spartan/ui. Reutiliza la misma l
 
 - **El contrato es `openapi/openapi.yaml` del repo del API.** Los tipos se generan con `openapi-typescript` y se llama con `openapi-fetch` (no hay paquete publicado); no escribas llamadas HTTP a mano ni inventes endpoints. Si falta algo, se pide un cambio de contrato por PR en el API.
 - **Login con Google** restringido al dominio de la empresa; el API emite el JWT.
-- **Sesión por cookie**: el refresh token vive en una cookie `desertica_refresh` (`HttpOnly; Secure; SameSite=Strict; Path=/api/auth`) que el navegador envía solo a `/auth/*` (`credentials: 'include'`); la app nunca la lee ni usa `sessionStorage`. El token de acceso vive solo en memoria y, al recargar, la app llama a `/auth/refresh`. **Requisito de despliegue: el backoffice y el API deben estar en el mismo sitio** (subdominios del mismo dominio, p. ej. `admin.` y `api.`), si no `SameSite=Strict` descarta la cookie; el API debe tener el origen del backoffice en `CORS_ORIGINS` (CORS con credenciales) y el CSP del nginx ya permite `connect-src` a `API_ORIGIN`. La interfaz se adapta a los permisos que devuelve `GET /auth/me` (`x-permission` de cada operación): oculta lo que el rol no puede hacer, pero la autorización real es del API.
+- **Sesión por cookie**: el refresh token vive en una cookie `desertica_refresh` (`HttpOnly; Secure; SameSite=Strict; Path=/api/auth`) que el navegador envía solo a `/auth/*` (`credentials: 'include'`); la app nunca la lee ni usa `sessionStorage`. El token de acceso vive solo en memoria y, al recargar, la app llama a `/auth/refresh`. **Requisito de despliegue: el backoffice y el API deben estar en el mismo sitio** (subdominios del mismo dominio, p. ej. `admin.` y `api.`), si no `SameSite=Strict` descarta la cookie; el API debe tener el origen del backoffice en `CORS_ORIGINS` (CORS con credenciales) y el CSP del nginx permite `connect-src` solo al origen de `API_BASE_URL` (se deriva en `docker/15-api-origin.envsh`). La interfaz se adapta a los permisos que devuelve `GET /auth/me` (`x-permission` de cada operación): oculta lo que el rol no puede hacer, pero la autorización real es del API.
 - Dinero en enteros (`*Cents`) con IGV incluido; formatea con la moneda de cada reserva (`USD` o `PEN`) y nunca sumes monedas distintas.
 - Fechas en UTC desde el API; muéstralas en `America/Lima`.
 - Todo texto de interfaz va en `en` y `es`.
@@ -31,7 +31,7 @@ npm run mock              # Prism sirve el contrato en http://localhost:4010 con
                           #   con el mock: abre http://localhost:4200/?mock (solo en dev; botón "Mock (dev)")
 npm run api:generate      # regenera src/app/core/api/schema.d.ts desde ../desertica-api/openapi/openapi.yaml (se commitea)
 npm run lint && npm test && npm run build && npm run format
-docker build -t desertica-backoffice .   # nginx non-root en :8080; env: API_BASE_URL, GOOGLE_CLIENT_ID, API_ORIGIN
+docker build -t desertica-backoffice .   # nginx non-root en :8080; env: API_BASE_URL (obligatoria, URL http(s) absoluta; si falta o es relativa el contenedor no arranca), GOOGLE_CLIENT_ID
 ```
 
 ## Estructura

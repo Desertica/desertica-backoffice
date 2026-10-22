@@ -1,0 +1,8 @@
+# Sourced by the nginx entrypoint before envsubst renders the CSP template: derives API_ORIGIN from API_BASE_URL.
+# An absolute http(s) URL is required (the backoffice and the API live on sibling subdomains); anything else aborts the start.
+if ! printf '%s' "${API_BASE_URL:-}" | grep -Eq '^https?://[A-Za-z0-9.-]+(:[0-9]+)?(/[A-Za-z0-9._~%/-]*)?$'; then
+  echo "15-api-origin: API_BASE_URL must be an absolute http(s) URL without spaces or ';' (got: '${API_BASE_URL:-}')" >&2
+  exit 1
+fi
+API_ORIGIN=$(printf '%s' "$API_BASE_URL" | sed -E 's#^(https?://[^/]+).*#\1#')
+export API_ORIGIN
