@@ -5,10 +5,10 @@ updates:
     target-branch: develop
     schedule: { interval: weekly }
     groups:
-      npm: { patterns: ["*"] }
+      npm: { patterns: ['*'] }
   - package-ecosystem: github-actions
     directory: /
     target-branch: develop
     schedule: { interval: weekly }
     groups:
-      actions: { patterns: ["*"] }
+      actions: { patterns: ['*'] }
