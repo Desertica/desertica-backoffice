@@ -23,7 +23,8 @@ import { injectDialog } from '../../shared/dialog';
 import { IdempotencyKeys } from '../../shared/idempotency';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
-import { DeparturesApi } from '../departures/departures.api';
+import { TruncatedNotice } from '../../shared/truncated-notice';
+import { DeparturesApi, upcomingRange } from '../departures/departures.api';
 import { BookingsApi } from './bookings.api';
 
 const COMMON = [
@@ -170,7 +171,7 @@ export function rescheduleTargets(
 @Component({
   selector: 'app-reschedule-booking-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [...COMMON, LimaDateTimePipe],
+  imports: [...COMMON, LimaDateTimePipe, TruncatedNotice],
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-4" novalidate>
       <hlm-dialog-header>
@@ -194,6 +195,7 @@ export function rescheduleTargets(
               </option>
             }
           </select>
+          <app-truncated-notice [show]="candidates.value()?.truncated" />
         </label>
         <label class="grid gap-1.5">
           <span hlmLabel>{{ 'bookings.reschedule.reason' | t }}</span>
@@ -228,11 +230,11 @@ export class RescheduleBookingDialog {
       this.departures.listAll({
         tourRefId: this.dialog.context.tourRefId,
         status: 'OPEN',
-        from: new Date().toISOString(),
+        ...upcomingRange(),
       }),
   });
   protected readonly targets = computed(() =>
-    rescheduleTargets(this.candidates.value() ?? [], this.booking.departureId, this.people),
+    rescheduleTargets(this.candidates.value()?.items ?? [], this.booking.departureId, this.people),
   );
 
   protected async submit() {

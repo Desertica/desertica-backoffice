@@ -177,7 +177,8 @@
     </div>
 
     @if (tab() === 'bookings') {
-      @let rows = bookings.value() ?? [];
+      @let rows = bookings.value()?.items ?? [];
+      <app-truncated-notice [show]="bookings.value()?.truncated" />
       @if (bookings.isLoading() && !bookings.hasValue()) {
         <hlm-skeleton class="h-24" />
       } @else if (rows.length === 0) {

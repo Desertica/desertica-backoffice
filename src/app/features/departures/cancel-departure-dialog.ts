@@ -17,7 +17,8 @@ import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { LimaDateTimePipe } from '../../shared/format.pipes';
 import { injectDialog } from '../../shared/dialog';
 import { Notify } from '../../shared/notify';
-import { DeparturesApi } from './departures.api';
+import { TruncatedNotice } from '../../shared/truncated-notice';
+import { DeparturesApi, upcomingRange } from './departures.api';
 
 type Resolution = 'REFUND' | 'RESCHEDULE' | 'CLIENT_CHOICE';
 
@@ -38,6 +39,7 @@ export function canAbsorb(target: Departure, source: Departure): boolean {
     TPipe,
     EnumLabelPipe,
     LimaDateTimePipe,
+    TruncatedNotice,
     HlmButtonImports,
     HlmDialogImports,
     HlmInputImports,
@@ -83,6 +85,7 @@ export function canAbsorb(target: Departure, source: Departure): boolean {
               }
             </select>
           </label>
+          <app-truncated-notice [show]="candidates.value()?.truncated" />
         }
       }
 
@@ -120,10 +123,10 @@ export class CancelDepartureDialog {
   protected readonly candidates = resource({
     params: () => (this.resolution() === 'RESCHEDULE' ? this.departure.tourRefId : undefined),
     loader: ({ params }) =>
-      this.api.listAll({ tourRefId: params, status: 'OPEN', from: new Date().toISOString() }),
+      this.api.listAll({ tourRefId: params, status: 'OPEN', ...upcomingRange() }),
   });
   protected readonly targets = computed(() =>
-    (this.candidates.value() ?? []).filter((t) => canAbsorb(t, this.departure)),
+    (this.candidates.value()?.items ?? []).filter((t) => canAbsorb(t, this.departure)),
   );
 
   constructor() {

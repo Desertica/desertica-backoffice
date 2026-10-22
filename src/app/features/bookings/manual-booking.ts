@@ -28,10 +28,11 @@ import { AuthService } from '../../core/auth/auth.service';
 import { parseToCents } from '../../core/format/money';
 import type { MessageKey } from '../../core/i18n/messages.es';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
+import { TruncatedNotice } from '../../shared/truncated-notice';
 import { IdempotencyKeys } from '../../shared/idempotency';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
-import { DeparturesApi } from '../departures/departures.api';
+import { DeparturesApi, upcomingRange } from '../departures/departures.api';
 import { BookingsApi } from './bookings.api';
 
 /** Document numbers the SUNAT-facing data needs: DNI has 8 digits, RUC 11. Other types are free text. */
@@ -142,6 +143,7 @@ export function buildManualBooking(v: ManualBookingForm): CreateManualBooking | 
     EnumLabelPipe,
     LimaDateTimePipe,
     MoneyPipe,
+    TruncatedNotice,
     HlmButtonImports,
     HlmInputImports,
     HlmLabelImports,
@@ -214,11 +216,11 @@ export class ManualBooking {
       this.departuresApi.listAll({
         tourRefId: params,
         status: 'OPEN',
-        from: new Date().toISOString(),
+        ...upcomingRange(),
       }),
   });
   protected readonly available = computed(() =>
-    (this.departures.value() ?? []).filter(
+    (this.departures.value()?.items ?? []).filter(
       (d) => d.capacity - d.seatsSold - (d.seatsHeld ?? 0) >= Math.max(1, this.people()),
     ),
   );
