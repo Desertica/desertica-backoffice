@@ -1,6 +1,6 @@
 import { buildManualBooking, idDocNumberError, type ManualBookingForm } from './manual-booking';
 import { allowedActions, documentNumber, pendingCents } from './booking-detail';
-import { buildManualPayment, rescheduleTargets } from './booking-dialogs';
+import { buildManualPayment, paidAtInFuture, rescheduleTargets } from './booking-dialogs';
 import { toBookingQuery } from './bookings-page';
 import type { Departure } from '../../core/api/types';
 
@@ -176,5 +176,14 @@ describe('bookings list query', () => {
 
   it('ignores unknown statuses and bad pages', () => {
     expect(toBookingQuery({ status: 'HACKED', page: '-2' })).toEqual({ page: 1, pageSize: 25 });
+  });
+});
+
+describe('manual payment date', () => {
+  it('rejects a paid-at time that has not happened yet (Lima wall-clock)', () => {
+    const now = Date.parse('2026-03-10T03:30:00Z'); // 22:30 on the 9th in Lima
+    expect(paidAtInFuture('2026-03-09T22:00', now)).toBe(false);
+    expect(paidAtInFuture('2026-03-09T23:00', now)).toBe(true);
+    expect(paidAtInFuture('', now)).toBe(false);
   });
 });

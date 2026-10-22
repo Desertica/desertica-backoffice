@@ -293,6 +293,13 @@ export function buildManualPayment(
   };
 }
 
+/** `datetime-local` is Lima wall-clock time; a payment cannot have happened in the future. */
+export function paidAtInFuture(paidAt: string, now = Date.now()): boolean {
+  return (
+    !!paidAt && new Date(limaToUtcIso(paidAt.slice(0, 10), paidAt.slice(11, 16))).getTime() > now
+  );
+}
+
 @Component({
   selector: 'app-manual-payment-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -324,11 +331,18 @@ export function buildManualPayment(
           <input hlmInput inputmode="decimal" formControlName="amount" />
           @if (form.controls.amount.touched && !valid()) {
             <span class="text-xs text-destructive">{{ 'bookings.payment.invalidAmount' | t }}</span>
+          } @else if (overpays()) {
+            <span class="text-xs text-amber-600" role="status">{{
+              'bookings.payment.overpay' | t
+            }}</span>
           }
         </label>
         <label class="grid gap-1.5">
           <span hlmLabel>{{ 'bookings.payment.paidAt' | t }} ({{ 'common.optional' | t }})</span>
           <input hlmInput type="datetime-local" formControlName="paidAt" />
+          @if (paidAtFuture()) {
+            <span class="text-xs text-destructive">{{ 'bookings.payment.paidAtFuture' | t }}</span>
+          }
         </label>
         <label class="grid gap-1.5 sm:col-span-2">
           <span hlmLabel>{{ 'bookings.payment.reference' | t }} ({{ 'common.optional' | t }})</span>
@@ -368,10 +382,22 @@ export class ManualPaymentDialog {
     return buildManualPayment(this.form.getRawValue(), this.booking.currency) !== null;
   }
 
+  /** A warning, not a block: staff may be recording a tip or a correction. */
+  protected overpays() {
+    const body = buildManualPayment(this.form.getRawValue(), this.booking.currency);
+    return (
+      !!body && body.amountCents > Math.max(0, this.booking.totalCents - this.booking.paidCents)
+    );
+  }
+
+  protected paidAtFuture() {
+    return paidAtInFuture(this.form.controls.paidAt.value);
+  }
+
   protected async submit() {
     this.form.markAllAsTouched();
     const body = buildManualPayment(this.form.getRawValue(), this.booking.currency);
-    if (!body) return;
+    if (!body || this.paidAtFuture()) return;
     this.busy.set(true);
     try {
       const payment = await this.api.recordManualPayment(
