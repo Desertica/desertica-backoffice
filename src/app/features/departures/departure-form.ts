@@ -12,6 +12,7 @@ import type { CreateDeparture, TourFormat } from '../../core/api/types';
 import { isDay, limaToUtcIso, limaToday } from '../../core/format/datetime';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { Notify } from '../../shared/notify';
+import { wholeNumber } from '../../shared/validators';
 import { DeparturesApi } from './departures.api';
 
 /** The `date` from the URL when it is a real day, otherwise today. */
@@ -83,7 +84,7 @@ export class DepartureForm {
       Validators.required,
     ],
     time: ['08:00', Validators.required],
-    capacity: [10, [Validators.required, Validators.min(1)]],
+    capacity: [10, [Validators.required, Validators.min(1), wholeNumber]],
     format: ['SHARED' as TourFormat],
     language: ['es'],
     meetingPoint: [''],

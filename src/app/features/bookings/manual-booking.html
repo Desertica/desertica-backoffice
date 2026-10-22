@@ -40,11 +40,11 @@
       </label>
       <label class="grid gap-1.5">
         <span hlmLabel>{{ 'bookings.new.adults' | t }}</span>
-        <input hlmInput type="number" min="1" formControlName="adults" />
+        <input hlmInput type="number" min="1" step="1" formControlName="adults" />
       </label>
       <label class="grid gap-1.5">
         <span hlmLabel>{{ 'bookings.new.children' | t }}</span>
-        <input hlmInput type="number" min="0" formControlName="children" />
+        <input hlmInput type="number" min="0" step="1" formControlName="children" />
       </label>
       <label class="grid gap-1.5">
         <span hlmLabel>{{ 'bookings.new.currency' | t }}</span>

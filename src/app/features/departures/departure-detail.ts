@@ -27,6 +27,7 @@ import { downloadCsv, toCsv } from '../../shared/csv';
 import { useDialogs } from '../../shared/dialog';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
+import { wholeNumber } from '../../shared/validators';
 import { TruncatedNotice } from '../../shared/truncated-notice';
 import { StatusBadge } from '../../shared/status-badge';
 import { BookingsApi } from '../bookings/bookings.api';
@@ -131,7 +132,7 @@ export class DepartureDetail {
   protected readonly form = this.fb.group({
     date: ['', Validators.required],
     time: ['', Validators.required],
-    capacity: [1, [Validators.required, Validators.min(1)]],
+    capacity: [1, [Validators.required, Validators.min(1), wholeNumber]],
     meetingPoint: [''],
     guideName: [''],
     vehicleNote: [''],

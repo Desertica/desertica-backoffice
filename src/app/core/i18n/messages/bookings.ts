@@ -172,6 +172,8 @@ export const bookings = defineMessages({
     'bookings.new.docInvalid': 'Revisa el documento: DNI de 8 dígitos o RUC de 11 dígitos.',
     'bookings.new.billingNameMissing': 'Falta el nombre o razón social del comprobante.',
     'bookings.new.facturaRuc': 'Una factura necesita un RUC.',
+    'bookings.new.facturaAddress': 'Una factura necesita la dirección de la empresa.',
+    'bookings.new.noSeats': 'La salida elegida no tiene cupo para todos los pasajeros.',
   },
   en: {
     'bookings.title': 'Bookings',
@@ -344,5 +346,7 @@ export const bookings = defineMessages({
     'bookings.new.docInvalid': 'Check the document: DNI has 8 digits, RUC has 11.',
     'bookings.new.billingNameMissing': 'The invoice name or company name is missing.',
     'bookings.new.facturaRuc': 'An invoice (factura) needs a RUC.',
+    'bookings.new.facturaAddress': 'An invoice (factura) needs the company address.',
+    'bookings.new.noSeats': 'The chosen departure does not have room for all passengers.',
   },
 });

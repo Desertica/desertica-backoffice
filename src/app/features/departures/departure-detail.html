@@ -115,7 +115,13 @@
         /></label>
         <label class="grid gap-1.5">
           <span hlmLabel>{{ 'departures.form.capacity' | t }}</span>
-          <input hlmInput type="number" [min]="d.seatsSold || 1" formControlName="capacity" />
+          <input
+            hlmInput
+            type="number"
+            step="1"
+            [min]="d.seatsSold || 1"
+            formControlName="capacity"
+          />
           <span class="text-xs text-muted-foreground">{{
             'departures.detail.capacityConflict' | t
           }}</span>
