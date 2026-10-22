@@ -1,34 +1,28 @@
-# Proteccion de ramas
+# Ramas y CI
 
-Hoy el repo tiene una sola rama protegible: `main`. Si creas otras ramas de larga vida (por ejemplo `develop`), repite estos pasos para cada una. Las ramas de trabajo (`feature/*`, `chore/*`) no se protegen.
+| Rama | Para qué | Quién escribe en ella |
+| --- | --- | --- |
+| `main` | Base del repo. No se despliega. | Nadie (no se toca). |
+| `develop` | Desarrollo. Aquí entra todo el trabajo. | PR desde `feat/*`, `fix/*`, `chore/*`. |
+| `staging` | Pruebas. Es lo que se despliega en staging. | PR solo desde `develop`. |
+| `prod` | Producción. Es lo que se despliega en producción. | PR solo desde `staging`. |
 
-## Antes de empezar
+Las demás ramas son de trabajo: se borran al mezclar el PR.
 
-1. Copia `docs/pipelines/ci.yml` a `.github/workflows/ci.yml` (en un PR) y espera a que corra al menos una vez: GitHub solo ofrece como requeridos los checks que ya se ejecutaron.
-2. Gitleaks: en una organizacion necesita un secret. Settings -> Secrets and variables -> Actions -> New repository secret, nombre `GITLEAKS_LICENSE` (licencia gratuita en gitleaks.io). Sin ella el check `Secretos` falla.
+## Qué comprueba el CI
 
-## Pasos (necesitas ser admin del repo)
+Todo corre en cada PR hacia `develop`, `staging` o `prod` y en cada push a esas tres ramas. Checks obligatorios en las tres ramas:
 
-1. GitHub -> repo `Desertica/desertica-backoffice` -> **Settings** -> **Branches**.
-2. En "Branch protection rules" pulsa **Add branch ruleset** (o **Add classic branch protection rule**) y pon el patron `main`.
-3. Marca **Require a pull request before merging** y, dentro, **Require approvals** = 1.
-4. Marca **Require status checks to pass before merging** y **Require branches to be up to date before merging**.
-5. En el buscador de checks agrega exactamente estos tres:
-   - `Secretos`
-   - `Reglas del repo`
-   - `Node`
-   - `Lint`
-6. Marca **Do not allow bypassing the above settings** (o "Include administrators") y deja desmarcado permitir force pushes y borrar la rama.
-7. **Create** / **Save changes**.
+| Workflow | Check | Qué comprueba |
+| --- | --- | --- |
+| `ci.yml` | `test-build`, `docker` | Lo propio del repo (ver `.github/workflows/ci.yml`) y que la imagen Docker construye. |
+| `security.yml` | `secrets`, `audit`, `codeql` | Secretos en el historial (reglas en `.gitleaks.toml` si existe), dependencias de producción con vulnerabilidad alta y análisis estático. Corre también cada lunes. |
+| `policy.yml` | `flow`, `commits`, `tracked-files` | Orden develop → staging → prod; commits sin `Co-Authored-By` ni autores bot (solo PR a `develop`); nada de `.env`, `.cursor/`, `.vscode/`, certificados ni basura del sistema en git. |
 
-## Notas
+## Protección en GitHub
 
-- `Node` pasa en verde sin codigo (dice "Sin package.json") y empieza a validar solo cuando llega `package.json`.
-- `npm audit` es informativo (no bloquea). Cuando este en verde, quita `continue-on-error: true` de ese paso en el workflow.
-- Dependabot (`.github/dependabot.yml`) abre PRs semanales agrupados de npm y github-actions.
+Ruleset activo en `develop`, `staging` y `prod`: PR obligatorio, checks de arriba obligatorios y al día, sin force-push ni borrado. No exige aprobaciones porque hoy hay una sola persona; añade `required_approving_review_count: 1` cuando haya más.
 
-## Lint, triggers y Lighthouse
+## Despliegue
 
-- El CI corre en cada PR y en cada push a cualquier rama; un push nuevo cancela la corrida anterior de la misma rama. Una rama con PR abierto corre dos veces (push y PR), es normal.
-- `Lint` pasa en verde sin codigo. El esqueleto de la app debe incluir `angular-eslint` y un script `npm run lint`; sin script, `Lint` pasa sin revisar nada. `Node` ya no corre lint.
-- Lighthouse (`docs/pipelines/lighthouse.yml`, copiar a `.github/workflows/lighthouse.yml`) es solo informativo: NO lo agregues como check requerido. Corre cada lunes o a mano (Actions -> Lighthouse -> Run workflow) sobre la variable de repo `PROD_URL` (Settings -> Secrets and variables -> Actions -> Variables). Si esta vacia, termina en verde. Como el backoffice esta detras de login, probablemente solo mida la pagina de login.
+Coolify construye desde Git: la app de staging sigue `staging` y la de producción sigue `prod` (Auto Deploy). El CI no despliega ni publica imágenes.

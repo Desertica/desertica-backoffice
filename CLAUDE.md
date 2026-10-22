@@ -40,3 +40,7 @@ docker build -t desertica-backoffice .   # nginx non-root en :8080; env: API_BAS
 - `src/app/layout/`: shell (barra lateral, cabecera, idioma, tema). `src/app/features/<funcionalidad>/`: una carpeta por pantalla, cargada con `loadComponent`.
 - `libs/ui/`: componentes Spartan (helm) generados con `npx ng g @spartan-ng/cli:ui <nombre>`; no se editan a mano ni se lintean.
 - Llamadas al API: siempre `ApiClient.http` (tipado por el contrato) + `unwrap()`. Textos: añade la clave en `messages.es.ts` y `messages.en.ts`.
+
+## Ramas
+
+`main` es solo la base; el trabajo entra por PR a `develop`, `develop` -> `staging` (pruebas) y `staging` -> `prod` (producción). Rama de trabajo: `feat/*`, `fix/*` o `chore/*`, se borra al mezclar. Los checks y la protección están en `docs/PROTECCION-RAMAS.md`; los workflows son `.github/workflows/{ci,security,policy}.yml` y los editas con un PR normal.
