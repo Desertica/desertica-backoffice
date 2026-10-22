@@ -1,0 +1,136 @@
+<div class="mx-auto max-w-4xl space-y-10">
+  <h1 class="text-2xl font-semibold">{{ 'settings.title' | t }}</h1>
+
+  <section aria-labelledby="op-h" class="space-y-3">
+    <h2 id="op-h" class="text-lg font-medium">{{ 'settings.section.operational' | t }}</h2>
+    <p class="text-sm text-muted-foreground">{{ 'settings.hint' | t }}</p>
+    @if (settings.error()) {
+      <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+        {{ 'settings.loadError' | t }}
+        <button hlmBtn size="sm" variant="outline" (click)="settings.reload()">
+          {{ 'common.retry' | t }}
+        </button>
+      </div>
+    } @else if (!settings.hasValue()) {
+      <hlm-skeleton class="h-32" />
+    } @else {
+      <div class="grid gap-4 sm:grid-cols-2">
+        @for (f of fields; track f.key) {
+          <label class="grid gap-1.5">
+            <span hlmLabel>{{ f.label | t }}</span>
+            <input
+              hlmInput
+              inputmode="decimal"
+              [ngModel]="form()[f.key]"
+              (ngModelChange)="setField(f.key, $event)"
+              [disabled]="!auth.has('settings:write')"
+            />
+            <span class="text-xs text-muted-foreground">{{ f.hint | t }}</span>
+            @if (fieldError(); as e) {
+              @if (e.key === f.key) {
+                <span class="text-xs text-destructive" role="alert">{{ e.message | t }}</span>
+              }
+            }
+          </label>
+        }
+      </div>
+      <div *appHasPermission="'settings:write'" class="flex justify-end">
+        <button hlmBtn type="button" [disabled]="saving()" (click)="save()">
+          {{ 'common.save' | t }}
+        </button>
+      </div>
+    }
+  </section>
+
+  <section *appHasPermission="'fraud:read'" aria-labelledby="fr-h" class="space-y-3">
+    <h2 id="fr-h" class="text-lg font-medium">{{ 'settings.section.fraud' | t }}</h2>
+    @if (blocked.error()) {
+      <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+        {{ 'common.loadError' | t }}
+        <button hlmBtn size="sm" variant="outline" (click)="blocked.reload()">
+          {{ 'common.retry' | t }}
+        </button>
+      </div>
+    } @else if (blocked.value(); as list) {
+      @if (list.length === 0) {
+        <p class="text-sm text-muted-foreground">{{ 'blocked.empty' | t }}</p>
+      } @else {
+        <div hlmTableContainer>
+          <table hlmTable>
+            <thead hlmTHead>
+              <tr hlmTr>
+                <th hlmTh>{{ 'blocked.col.kind' | t }}</th>
+                <th hlmTh>{{ 'blocked.col.value' | t }}</th>
+                <th hlmTh>{{ 'blocked.col.reason' | t }}</th>
+                <th hlmTh>{{ 'blocked.col.date' | t }}</th>
+              </tr>
+            </thead>
+            <tbody hlmTBody>
+              @for (b of list; track b.id) {
+                <tr hlmTr>
+                  <td hlmTd>{{ b.kind | enumLabel: 'blocked.kind' }}</td>
+                  <td hlmTd class="font-medium">{{ b.value }}</td>
+                  <td hlmTd>{{ b.reason || '—' }}</td>
+                  <td hlmTd>{{ b.createdAt | limaDateTime: 'date' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+    <form
+      *appHasPermission="'fraud:write'"
+      [formGroup]="blockForm"
+      (ngSubmit)="block()"
+      class="flex flex-wrap items-end gap-3"
+      novalidate
+    >
+      <label class="grid gap-1.5 text-sm">
+        <span hlmLabel>{{ 'blocked.col.kind' | t }}</span>
+        <select hlmInput class="w-32" formControlName="kind">
+          <option value="EMAIL">{{ 'EMAIL' | enumLabel: 'blocked.kind' }}</option>
+          <option value="IP">{{ 'IP' | enumLabel: 'blocked.kind' }}</option>
+        </select>
+      </label>
+      <label class="grid gap-1.5 text-sm">
+        <span hlmLabel>{{ 'blocked.col.value' | t }}</span>
+        <input hlmInput class="w-64" formControlName="value" />
+      </label>
+      <label class="grid gap-1.5 text-sm">
+        <span hlmLabel>{{ 'blocked.col.reason' | t }}</span>
+        <input hlmInput class="w-64" formControlName="reason" />
+      </label>
+      <button hlmBtn type="submit" variant="outline">{{ 'blocked.new' | t }}</button>
+    </form>
+  </section>
+
+  <section *appHasPermission="'legal:write'" aria-labelledby="lg-h" class="space-y-3">
+    <h2 id="lg-h" class="text-lg font-medium">{{ 'settings.section.legal' | t }}</h2>
+    <p class="text-sm text-muted-foreground">{{ 'legal.hint' | t }}</p>
+    <form
+      [formGroup]="legalForm"
+      (ngSubmit)="publish()"
+      class="flex flex-wrap items-end gap-3"
+      novalidate
+    >
+      <label class="grid gap-1.5 text-sm">
+        <span hlmLabel>{{ 'legal.kind' | t }}</span>
+        <select hlmInput class="w-56" formControlName="kind">
+          @for (k of legalKinds; track k) {
+            <option [value]="k">{{ k | enumLabel: 'legal.kind' }}</option>
+          }
+        </select>
+      </label>
+      <label class="grid gap-1.5 text-sm">
+        <span hlmLabel>{{ 'legal.locale' | t }}</span>
+        <input hlmInput class="w-20" maxlength="5" formControlName="locale" />
+      </label>
+      <label class="grid gap-1.5 text-sm">
+        <span hlmLabel>{{ 'legal.cmsSlug' | t }}</span>
+        <input hlmInput class="w-64" formControlName="cmsSlug" />
+      </label>
+      <button hlmBtn type="submit" variant="outline">{{ 'legal.publish' | t }}</button>
+    </form>
+  </section>
+</div>

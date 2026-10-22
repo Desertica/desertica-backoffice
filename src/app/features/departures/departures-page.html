@@ -1,0 +1,203 @@
+<div class="space-y-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-semibold">{{ 'departures.title' | t }}</h1>
+    <a *appHasPermission="'departures:write'" hlmBtn routerLink="/departures/new">
+      <ng-icon name="lucidePlus" />
+      {{ 'departures.new' | t }}
+    </a>
+  </div>
+
+  <div class="flex flex-wrap items-end gap-3">
+    <div class="flex items-center gap-1">
+      <button
+        hlmBtn
+        variant="outline"
+        size="icon-sm"
+        [attr.aria-label]="'departures.month.prev' | t"
+        (click)="prev()"
+      >
+        <ng-icon name="lucideChevronLeft" />
+      </button>
+      <span class="min-w-40 text-center font-medium capitalize" aria-live="polite">{{
+        monthLabel()
+      }}</span>
+      <button
+        hlmBtn
+        variant="outline"
+        size="icon-sm"
+        [attr.aria-label]="'departures.month.next' | t"
+        (click)="next()"
+      >
+        <ng-icon name="lucideChevronRight" />
+      </button>
+      <button hlmBtn variant="ghost" size="sm" (click)="goToday()">
+        {{ 'departures.month.today' | t }}
+      </button>
+    </div>
+
+    <label class="grid gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'departures.filter.tour' | t }}</span>
+      <select hlmInput class="w-52" [ngModel]="tourId()" (ngModelChange)="tourId.set($event)">
+        <option value="">{{ 'common.all' | t }}</option>
+        @for (tour of catalog.tours(); track tour.id) {
+          <option [value]="tour.id">{{ tour.title }}</option>
+        }
+      </select>
+    </label>
+    <label class="grid gap-1 text-sm">
+      <span class="text-muted-foreground">{{ 'departures.filter.status' | t }}</span>
+      <select hlmInput class="w-40" [ngModel]="status()" (ngModelChange)="status.set($event)">
+        <option value="">{{ 'common.all' | t }}</option>
+        @for (s of statuses; track s) {
+          <option [value]="s">{{ s | enumLabel: 'status.departure' }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="ml-auto flex gap-1" role="group">
+      <button
+        hlmBtn
+        size="sm"
+        [variant]="view() === 'calendar' ? 'default' : 'outline'"
+        [attr.aria-pressed]="view() === 'calendar'"
+        (click)="view.set('calendar')"
+      >
+        {{ 'departures.view.calendar' | t }}
+      </button>
+      <button
+        hlmBtn
+        size="sm"
+        [variant]="view() === 'list' ? 'default' : 'outline'"
+        [attr.aria-pressed]="view() === 'list'"
+        (click)="view.set('list')"
+      >
+        {{ 'departures.view.list' | t }}
+      </button>
+    </div>
+  </div>
+
+  @if (departures.error()) {
+    <div
+      class="flex items-center gap-3 rounded-lg border border-destructive/40 p-4 text-sm text-destructive"
+      role="alert"
+    >
+      {{ 'departures.loadError' | t }}
+      <button hlmBtn size="sm" variant="outline" (click)="departures.reload()">
+        {{ 'common.retry' | t }}
+      </button>
+    </div>
+  } @else if (departures.isLoading() && !departures.hasValue()) {
+    <hlm-skeleton class="h-96" />
+  } @else if (view() === 'calendar') {
+    <div class="overflow-x-auto">
+      <div
+        class="grid min-w-[44rem] grid-cols-7 gap-px rounded-lg border border-border bg-border"
+        role="grid"
+      >
+        @for (k of weekdayKeys; track k) {
+          <div
+            class="bg-muted px-2 py-1 text-xs font-medium text-muted-foreground"
+            role="columnheader"
+          >
+            {{ k | t }}
+          </div>
+        }
+        @for (week of weeks(); track week[0].day) {
+          @for (cell of week; track cell.day) {
+            <div
+              class="min-h-28 space-y-1 bg-background p-1.5"
+              [class.opacity-50]="!cell.inMonth"
+              role="gridcell"
+            >
+              <div class="flex items-center justify-between">
+                <span
+                  class="inline-flex size-6 items-center justify-center rounded-full text-xs"
+                  [class.bg-primary]="cell.day === today"
+                  [class.text-primary-foreground]="cell.day === today"
+                >
+                  {{ dayNumber(cell.day) }}
+                </span>
+                <a
+                  *appHasPermission="'departures:write'"
+                  routerLink="/departures/new"
+                  [queryParams]="{ date: cell.day }"
+                  class="text-muted-foreground hover:text-foreground"
+                  [attr.aria-label]="'departures.calendar.addHere' | t: { date: cell.day }"
+                >
+                  <ng-icon name="lucidePlus" class="text-xs" />
+                </a>
+              </div>
+              @for (d of (byDay().get(cell.day) ?? []).slice(0, 3); track d.id) {
+                <a
+                  [routerLink]="['/departures', d.id]"
+                  class="block truncate rounded px-1.5 py-0.5 text-xs hover:ring-1 hover:ring-ring"
+                  [class]="
+                    d.status === 'CANCELLED'
+                      ? 'bg-muted text-muted-foreground line-through'
+                      : d.status === 'CLOSED'
+                        ? 'bg-amber-500/15'
+                        : 'bg-emerald-500/15'
+                  "
+                >
+                  <span class="font-medium">{{ chipTime(d) }}</span>
+                  {{ tourTitle(d) }}
+                  <span class="text-muted-foreground">{{
+                    'departures.seats' | t: { sold: d.seatsSold, capacity: d.capacity }
+                  }}</span>
+                </a>
+              }
+              @if ((byDay().get(cell.day)?.length ?? 0) > 3) {
+                <p class="px-1.5 text-xs text-muted-foreground">
+                  {{ 'departures.calendar.more' | t: { count: byDay().get(cell.day)!.length - 3 } }}
+                </p>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+  } @else {
+    @let rows = departures.value() ?? [];
+    @if (rows.length === 0) {
+      <p class="text-muted-foreground">{{ 'common.empty' | t }}</p>
+    } @else {
+      <div hlmTableContainer>
+        <table hlmTable>
+          <thead hlmTHead>
+            <tr hlmTr>
+              <th hlmTh>{{ 'departures.col.time' | t }}</th>
+              <th hlmTh>{{ 'departures.col.tour' | t }}</th>
+              <th hlmTh>{{ 'departures.col.language' | t }}</th>
+              <th hlmTh>{{ 'departures.col.format' | t }}</th>
+              <th hlmTh>{{ 'departures.col.seats' | t }}</th>
+              <th hlmTh>{{ 'departures.col.status' | t }}</th>
+            </tr>
+          </thead>
+          <tbody hlmTBody>
+            @for (d of rows; track d.id) {
+              <tr hlmTr>
+                <td hlmTd>
+                  <a [routerLink]="['/departures', d.id]" class="font-medium hover:underline">{{
+                    d.startsAt | limaDateTime
+                  }}</a>
+                </td>
+                <td hlmTd>{{ tourTitle(d) }}</td>
+                <td hlmTd class="uppercase">{{ d.language }}</td>
+                <td hlmTd>{{ d.format | enumLabel: 'enum.format' }}</td>
+                <td hlmTd>
+                  {{ 'departures.seats' | t: { sold: d.seatsSold, capacity: d.capacity } }}
+                  @if (d.seatsHeld) {
+                    <span class="text-xs text-muted-foreground"
+                      >({{ 'departures.seatsHeld' | t: { held: d.seatsHeld } }})</span
+                    >
+                  }
+                </td>
+                <td hlmTd><app-status-badge kind="departure" [value]="d.status" /></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

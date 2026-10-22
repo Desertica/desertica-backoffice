@@ -1,0 +1,36 @@
+server {
+  listen 8080;
+  server_name _;
+  root /usr/share/nginx/html;
+  index index.html;
+
+  gzip on;
+  gzip_types text/css application/javascript application/json image/svg+xml;
+
+  location = /healthz {
+    access_log off;
+    default_type text/plain;
+    return 200 "ok\n";
+  }
+
+  # Runtime config and the app shell must never be cached; hashed assets can be cached forever.
+  location = /config.json {
+    include /etc/nginx/conf.d/snippets/security-headers.conf;
+    add_header Cache-Control "no-store" always;
+  }
+  location = /index.html {
+    include /etc/nginx/conf.d/snippets/security-headers.conf;
+    add_header Cache-Control "no-cache" always;
+  }
+  location ~* \.(?:js|css|woff2?|svg|ico|png|jpg|webp)$ {
+    include /etc/nginx/conf.d/snippets/security-headers.conf;
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+    try_files $uri =404;
+  }
+
+  location / {
+    include /etc/nginx/conf.d/snippets/security-headers.conf;
+    add_header Cache-Control "no-cache" always;
+    try_files $uri /index.html;
+  }
+}

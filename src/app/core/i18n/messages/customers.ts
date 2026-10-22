@@ -1,0 +1,36 @@
+import { defineMessages } from './define';
+
+export const customers = defineMessages({
+  es: {
+    'customers.title': 'Clientes',
+    'customers.search': 'Nombre, correo o documento',
+    'customers.col.name': 'Nombre',
+    'customers.col.email': 'Correo',
+    'customers.col.phone': 'Teléfono',
+    'customers.col.country': 'País',
+    'customers.col.bookings': 'Reservas',
+    'customers.loadError': 'No se pudieron cargar los clientes.',
+    'customers.detail.notFound': 'No se encontró el cliente.',
+    'customers.detail.data': 'Datos del cliente',
+    'customers.detail.history': 'Historial de reservas',
+    'customers.detail.noBookings': 'Este cliente aún no tiene reservas.',
+    'customers.detail.locale': 'Idioma',
+    'customers.detail.saved': 'Cliente actualizado',
+  },
+  en: {
+    'customers.title': 'Customers',
+    'customers.search': 'Name, email or document',
+    'customers.col.name': 'Name',
+    'customers.col.email': 'Email',
+    'customers.col.phone': 'Phone',
+    'customers.col.country': 'Country',
+    'customers.col.bookings': 'Bookings',
+    'customers.loadError': 'Could not load customers.',
+    'customers.detail.notFound': 'Customer not found.',
+    'customers.detail.data': 'Customer details',
+    'customers.detail.history': 'Booking history',
+    'customers.detail.noBookings': 'This customer has no bookings yet.',
+    'customers.detail.locale': 'Language',
+    'customers.detail.saved': 'Customer updated',
+  },
+});

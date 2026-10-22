@@ -1,7 +1,22 @@
+/dist
+/tmp
+/out-tsc
+/node_modules
+npm-debug.log
+.angular/
+/coverage
+__screenshots__/
+
+# Secrets and local tooling (never commit)
 .env
 .env.*
 !.env.example
 .cursor/
 .vscode/
+
+.idea/
+.DS_Store
+Thumbs.db
+.mock/
 node_modules/
 dist/

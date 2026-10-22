@@ -1,0 +1,114 @@
+<div class="mx-auto max-w-2xl space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-semibold">{{ 'departures.form.title' | t }}</h1>
+    <a hlmBtn variant="ghost" routerLink="/departures">{{ 'common.back' | t }}</a>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-4 sm:grid-cols-2" novalidate>
+    <label class="grid gap-1.5 sm:col-span-2">
+      <span hlmLabel>{{ 'departures.form.tour' | t }}</span>
+      <select hlmInput formControlName="tourRefId">
+        <option value="">{{ 'departures.form.tourPlaceholder' | t }}</option>
+        @for (tour of activeTours(); track tour.id) {
+          <option [value]="tour.id">{{ tour.title }}</option>
+        }
+      </select>
+      @if (form.controls.tourRefId.touched && form.controls.tourRefId.invalid) {
+        <span class="text-xs text-destructive">{{ 'common.required' | t }}</span>
+      }
+    </label>
+
+    <label class="grid gap-1.5">
+      <span hlmLabel>{{ 'departures.form.date' | t }}</span>
+      <input hlmInput type="date" formControlName="date" />
+    </label>
+    <label class="grid gap-1.5">
+      <span hlmLabel>{{ 'departures.form.time' | t }}</span>
+      <input hlmInput type="time" formControlName="time" />
+    </label>
+
+    <label class="grid gap-1.5">
+      <span hlmLabel>{{ 'departures.form.capacity' | t }}</span>
+      <input hlmInput type="number" min="1" formControlName="capacity" />
+      @if (form.controls.capacity.invalid) {
+        <span class="text-xs text-destructive">{{ 'common.required' | t }}</span>
+      }
+    </label>
+    <label class="grid gap-1.5">
+      <span hlmLabel>{{ 'departures.form.format' | t }}</span>
+      <select hlmInput formControlName="format">
+        <option value="SHARED">{{ 'SHARED' | enumLabel: 'enum.format' }}</option>
+        <option value="PRIVATE">{{ 'PRIVATE' | enumLabel: 'enum.format' }}</option>
+      </select>
+    </label>
+
+    <label class="grid gap-1.5">
+      <span hlmLabel>{{ 'departures.form.language' | t }}</span>
+      <input hlmInput formControlName="language" maxlength="5" />
+    </label>
+    <label class="grid gap-1.5">
+      <span hlmLabel>{{ 'departures.form.cutoff' | t }} ({{ 'common.optional' | t }})</span>
+      <input hlmInput type="number" min="0" formControlName="cutoffMinutes" />
+    </label>
+
+    <label class="grid gap-1.5 sm:col-span-2">
+      <span hlmLabel>{{ 'departures.form.meetingPoint' | t }} ({{ 'common.optional' | t }})</span>
+      <input hlmInput formControlName="meetingPoint" />
+    </label>
+    <label class="grid gap-1.5">
+      <span hlmLabel>{{ 'departures.form.guide' | t }} ({{ 'common.optional' | t }})</span>
+      <input hlmInput formControlName="guideName" />
+    </label>
+    <label class="grid gap-1.5">
+      <span hlmLabel>{{ 'departures.form.vehicle' | t }} ({{ 'common.optional' | t }})</span>
+      <input hlmInput formControlName="vehicleNote" />
+    </label>
+    <label class="grid gap-1.5 sm:col-span-2">
+      <span hlmLabel>{{ 'departures.form.notes' | t }} ({{ 'common.optional' | t }})</span>
+      <textarea hlmTextarea rows="2" formControlName="notes"></textarea>
+    </label>
+
+    <fieldset class="grid gap-3 rounded-lg border border-border p-4 sm:col-span-2">
+      <label class="flex items-center gap-2 text-sm font-medium">
+        <input type="checkbox" formControlName="repeat" />
+        {{ 'departures.form.repeat' | t }}
+      </label>
+      @if (repeat()) {
+        <p class="text-xs text-muted-foreground">{{ 'departures.form.repeatHint' | t }}</p>
+        <label class="grid gap-1.5 sm:w-1/2">
+          <span hlmLabel>{{ 'departures.form.repeatUntil' | t }}</span>
+          <input hlmInput type="date" formControlName="until" />
+        </label>
+        <div class="grid gap-1.5">
+          <span hlmLabel>{{ 'departures.form.repeatWeekdays' | t }}</span>
+          <div class="flex flex-wrap gap-3">
+            @for (d of weekdays; track d) {
+              <label class="flex items-center gap-1.5 text-sm">
+                <input
+                  type="checkbox"
+                  [checked]="form.controls.weekdays.value.includes(d)"
+                  (change)="toggleWeekday(d, $any($event.target).checked)"
+                />
+                {{ d | enumLabel: 'weekday' }}
+              </label>
+            }
+          </div>
+        </div>
+        @if (seriesError(); as err) {
+          <p class="text-xs text-destructive" role="alert">
+            {{
+              err === 'weekdaysRequired'
+                ? ('departures.form.weekdaysRequired' | t)
+                : ('departures.form.untilBeforeStart' | t)
+            }}
+          </p>
+        }
+      }
+    </fieldset>
+
+    <div class="flex justify-end gap-2 sm:col-span-2">
+      <a hlmBtn variant="outline" routerLink="/departures">{{ 'common.cancel' | t }}</a>
+      <button hlmBtn type="submit" [disabled]="saving()">{{ 'common.create' | t }}</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,213 @@
+<div class="space-y-4">
+  <h1 class="text-2xl font-semibold">{{ 'payments.title' | t }}</h1>
+
+  <div class="flex gap-1 border-b border-border" role="tablist">
+    <button
+      role="tab"
+      hlmBtn
+      variant="ghost"
+      size="sm"
+      [attr.aria-selected]="tab() === 'payments'"
+      [class.font-semibold]="tab() === 'payments'"
+      (click)="setTab('payments')"
+    >
+      {{ 'payments.tab.payments' | t }}
+    </button>
+    <button
+      role="tab"
+      hlmBtn
+      variant="ghost"
+      size="sm"
+      [attr.aria-selected]="tab() === 'refunds'"
+      [class.font-semibold]="tab() === 'refunds'"
+      (click)="setTab('refunds')"
+    >
+      {{ 'payments.tab.refunds' | t }}
+    </button>
+  </div>
+
+  @if (tab() === 'payments') {
+    <div class="flex flex-wrap items-end gap-3">
+      <label class="grid gap-1 text-sm">
+        <span class="text-muted-foreground">{{ 'payments.filter.status' | t }}</span>
+        <select
+          hlmInput
+          class="w-48"
+          [ngModel]="status() ?? ''"
+          (ngModelChange)="setFilter('status', $event)"
+        >
+          <option value="">{{ 'common.all' | t }}</option>
+          @for (s of statuses; track s) {
+            <option [value]="s">{{ s | enumLabel: 'status.payment' }}</option>
+          }
+        </select>
+      </label>
+      <label class="grid gap-1 text-sm">
+        <span class="text-muted-foreground">{{ 'payments.filter.provider' | t }}</span>
+        <select
+          hlmInput
+          class="w-40"
+          [ngModel]="provider() ?? ''"
+          (ngModelChange)="setFilter('provider', $event)"
+        >
+          <option value="">{{ 'common.all' | t }}</option>
+          @for (p of providers; track p) {
+            <option [value]="p">{{ p | enumLabel: 'enum.provider' }}</option>
+          }
+        </select>
+      </label>
+      <label class="grid gap-1 text-sm">
+        <span class="text-muted-foreground">{{ 'common.from' | t }}</span>
+        <input
+          hlmInput
+          type="date"
+          [ngModel]="from() ?? ''"
+          (ngModelChange)="setFilter('from', $event)"
+        />
+      </label>
+      <label class="grid gap-1 text-sm">
+        <span class="text-muted-foreground">{{ 'common.to' | t }}</span>
+        <input
+          hlmInput
+          type="date"
+          [ngModel]="to() ?? ''"
+          (ngModelChange)="setFilter('to', $event)"
+        />
+      </label>
+    </div>
+
+    @if (payments.error()) {
+      <div
+        class="flex items-center gap-3 rounded-lg border border-destructive/40 p-4 text-sm text-destructive"
+        role="alert"
+      >
+        {{ 'payments.loadError' | t }}
+        <button hlmBtn size="sm" variant="outline" (click)="payments.reload()">
+          {{ 'common.retry' | t }}
+        </button>
+      </div>
+    } @else if (payments.isLoading() && !payments.hasValue()) {
+      <hlm-skeleton class="h-64" />
+    } @else if (payments.value(); as res) {
+      @if (res.data.length === 0) {
+        <p class="text-muted-foreground">{{ 'common.empty' | t }}</p>
+      } @else {
+        <div hlmTableContainer>
+          <table hlmTable>
+            <thead hlmTHead>
+              <tr hlmTr>
+                <th hlmTh>{{ 'payments.col.date' | t }}</th>
+                <th hlmTh>{{ 'payments.col.booking' | t }}</th>
+                <th hlmTh>{{ 'payments.col.provider' | t }}</th>
+                <th hlmTh>{{ 'payments.col.kind' | t }}</th>
+                <th hlmTh>{{ 'payments.col.status' | t }}</th>
+                <th hlmTh class="text-right">{{ 'payments.col.amount' | t }}</th>
+                <th hlmTh></th>
+              </tr>
+            </thead>
+            <tbody hlmTBody>
+              @for (p of res.data; track p.id) {
+                <tr hlmTr>
+                  <td hlmTd>{{ p.paidAt ?? p.createdAt | limaDateTime }}</td>
+                  <td hlmTd>
+                    <a
+                      [routerLink]="['/bookings', p.bookingId]"
+                      class="font-medium hover:underline"
+                      >{{ p.bookingReference }}</a
+                    >
+                  </td>
+                  <td hlmTd>
+                    {{ p.provider | enumLabel: 'enum.provider' }} ·
+                    {{ p.method | enumLabel: 'enum.paymentMethod' }}
+                  </td>
+                  <td hlmTd>{{ p.kind | enumLabel: 'enum.paymentKind' }}</td>
+                  <td hlmTd><app-status-badge kind="payment" [value]="p.status" /></td>
+                  <td hlmTd class="text-right">
+                    {{ p.amountCents | money: p.currency }}
+                    @if (p.refundedCents) {
+                      <span class="block text-xs text-muted-foreground"
+                        >−{{ p.refundedCents | money: p.currency }}</span
+                      >
+                    }
+                  </td>
+                  <td hlmTd class="text-right">
+                    @if (refundable(p) > 0) {
+                      <button
+                        *appHasPermission="'payments:refund'"
+                        hlmBtn
+                        variant="outline"
+                        size="xs"
+                        (click)="refund(p)"
+                      >
+                        {{ 'payments.refund.action' | t }}
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <app-pager
+          [page]="res.meta.page"
+          [pageSize]="res.meta.pageSize"
+          [total]="res.meta.total"
+          (pageChange)="goTo($event)"
+        />
+      }
+    }
+  } @else {
+    @if (refunds.error()) {
+      <button hlmBtn size="sm" variant="outline" (click)="refunds.reload()">
+        {{ 'common.retry' | t }}
+      </button>
+    } @else if (refunds.isLoading() && !refunds.hasValue()) {
+      <hlm-skeleton class="h-64" />
+    } @else if (refunds.value(); as res) {
+      @if (res.data.length === 0) {
+        <p class="text-muted-foreground">{{ 'common.empty' | t }}</p>
+      } @else {
+        <div hlmTableContainer>
+          <table hlmTable>
+            <thead hlmTHead>
+              <tr hlmTr>
+                <th hlmTh>{{ 'payments.refunds.col.date' | t }}</th>
+                <th hlmTh>{{ 'payments.refunds.col.booking' | t }}</th>
+                <th hlmTh>{{ 'payments.refunds.col.reason' | t }}</th>
+                <th hlmTh>{{ 'payments.refunds.col.by' | t }}</th>
+                <th hlmTh>{{ 'payments.refunds.col.status' | t }}</th>
+                <th hlmTh class="text-right">{{ 'payments.refunds.col.amount' | t }}</th>
+              </tr>
+            </thead>
+            <tbody hlmTBody>
+              @for (r of res.data; track r.id) {
+                <tr hlmTr>
+                  <td hlmTd>{{ r.createdAt | limaDateTime }}</td>
+                  <td hlmTd>
+                    <a
+                      [routerLink]="['/bookings', r.bookingId]"
+                      class="font-medium hover:underline"
+                      >{{ r.bookingReference }}</a
+                    >
+                  </td>
+                  <td hlmTd>{{ r.reason }}</td>
+                  <td hlmTd>{{ r.requestedBy || '—' }}</td>
+                  <td hlmTd>{{ r.status | enumLabel: 'refund.status' }}</td>
+                  <td hlmTd class="text-right tabular-nums">
+                    {{ r.amountCents | money: r.currency }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <app-pager
+          [page]="res.meta.page"
+          [pageSize]="res.meta.pageSize"
+          [total]="res.meta.total"
+          (pageChange)="goTo($event)"
+        />
+      }
+    }
+  }
+</div>
