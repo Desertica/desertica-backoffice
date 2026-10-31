@@ -9,7 +9,10 @@ import { TPipe } from '../core/i18n/t.pipe';
   imports: [HlmButtonImports, TPipe],
   template: `
     @if (total() > 0) {
-      <nav class="flex items-center justify-between gap-2 text-sm" aria-label="pagination">
+      <nav
+        class="flex items-center justify-between gap-2 text-sm"
+        [attr.aria-label]="'pager.label' | t"
+      >
         <span class="text-muted-foreground">
           {{ 'pager.summary' | t: { from: from(), to: to(), total: total() } }}
         </span>

@@ -15,7 +15,7 @@ import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { HlmTableImports } from '@spartan-ng/helm/table';
 import type { PaymentProvider, PaymentStatus } from '../../core/api/types';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
-import { addDays, limaToUtcIso } from '../../core/format/datetime';
+import { addDays, isDay, limaToUtcIso } from '../../core/format/datetime';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { useDialogs } from '../../shared/dialog';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
@@ -49,8 +49,8 @@ export function toPaymentQuery(f: {
     q.status = f.status as PaymentStatus;
   if (f.provider && (PROVIDERS as readonly string[]).includes(f.provider))
     q.provider = f.provider as PaymentProvider;
-  if (f.from) q.from = limaToUtcIso(f.from);
-  if (f.to) q.to = limaToUtcIso(addDays(f.to, 1));
+  if (f.from && isDay(f.from)) q.from = limaToUtcIso(f.from);
+  if (f.to && isDay(f.to)) q.to = limaToUtcIso(addDays(f.to, 1));
   return q;
 }
 

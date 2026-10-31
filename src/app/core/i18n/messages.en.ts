@@ -48,6 +48,7 @@ export const en: Record<MessageKey, string> = {
   'login.subtitle': 'Use your company Google account.',
   'login.notConfigured': 'The Google client id is not configured (GOOGLE_CLIENT_ID).',
   'login.loadError': 'Could not load Google sign-in.',
+  'auth.sessionExpired': 'Your session expired. Sign in again.',
   'login.error.401': 'We could not verify your Google account.',
   'login.error.403': 'This account has no access. Use your company email.',
   'login.error.generic': 'Could not sign in. Please try again.',

@@ -14,7 +14,7 @@ import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { HlmTableImports } from '@spartan-ng/helm/table';
 import type { Document, DocumentStatus, DocumentType } from '../../core/api/types';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
-import { addDays, limaToUtcIso } from '../../core/format/datetime';
+import { addDays, isDay, limaToUtcIso } from '../../core/format/datetime';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
 import { useDialogs } from '../../shared/dialog';
 import { saveBlob } from '../../shared/download';
@@ -47,8 +47,8 @@ export function toDocumentQuery(f: {
     q.status = f.status as DocumentStatus;
   if (f.docType && (TYPES as readonly string[]).includes(f.docType))
     q.docType = f.docType as DocumentType;
-  if (f.from) q.from = limaToUtcIso(f.from);
-  if (f.to) q.to = limaToUtcIso(addDays(f.to, 1));
+  if (f.from && isDay(f.from)) q.from = limaToUtcIso(f.from);
+  if (f.to && isDay(f.to)) q.to = limaToUtcIso(addDays(f.to, 1));
   return q;
 }
 

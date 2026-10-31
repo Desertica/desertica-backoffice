@@ -9,6 +9,7 @@ import type { Payment, Refund } from '../../core/api/types';
 import { centsToInput, parseToCents } from '../../core/format/money';
 import { TPipe } from '../../core/i18n/t.pipe';
 import { injectDialog } from '../../shared/dialog';
+import { IdempotencyKeys } from '../../shared/idempotency';
 import { MoneyPipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
 import { PaymentsApi } from './payments.api';
@@ -80,7 +81,7 @@ export class RefundDialog {
   private readonly api = inject(PaymentsApi);
   private readonly notify = inject(Notify);
   private readonly fb = inject(FormBuilder).nonNullable;
-  private readonly idempotencyKey = crypto.randomUUID();
+  private readonly keys = new IdempotencyKeys();
   protected readonly payment = this.dialog.context.payment;
   protected readonly max = refundableCents(this.payment);
   protected readonly busy = signal(false);
@@ -99,11 +100,8 @@ export class RefundDialog {
     if (amountCents === null || this.form.invalid) return;
     this.busy.set(true);
     try {
-      const refund = await this.api.refund(
-        this.payment.id,
-        { amountCents, reason: this.form.controls.reason.value.trim() },
-        this.idempotencyKey,
-      );
+      const body = { amountCents, reason: this.form.controls.reason.value.trim() };
+      const refund = await this.api.refund(this.payment.id, body, this.keys.keyFor(body));
       this.notify.success('payments.refund.done');
       this.dialog.close(refund);
     } catch (e) {

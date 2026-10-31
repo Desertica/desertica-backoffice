@@ -52,7 +52,11 @@ export const admin = defineMessages({
     'series.new': 'Nueva serie',
     'series.field.prefix': 'Serie (ej. B001)',
     'series.field.next': 'Número inicial',
-    'series.prefixInvalid': 'Empieza con B, F o E y tiene 4 caracteres.',
+    'series.prefixInvalid':
+      'Tiene 4 caracteres: B para boletas, F para facturas, B o F para notas, o E.',
+    'company.productionTitle': 'Pasar a producción',
+    'company.productionWarning':
+      'Desde ahora los comprobantes se emiten ante SUNAT con valor real y no se pueden deshacer.',
     'series.created': 'Serie creada',
     'series.empty': 'Aún no hay series.',
 
@@ -161,7 +165,11 @@ export const admin = defineMessages({
     'series.new': 'New series',
     'series.field.prefix': 'Series (e.g. B001)',
     'series.field.next': 'Starting number',
-    'series.prefixInvalid': 'Starts with B, F or E and has 4 characters.',
+    'series.prefixInvalid':
+      'Has 4 characters: B for boletas, F for facturas, B or F for notes, or E.',
+    'company.productionTitle': 'Switch to production',
+    'company.productionWarning':
+      'From now on documents are issued to SUNAT for real and cannot be undone.',
     'series.created': 'Series created',
     'series.empty': 'There are no series yet.',
 

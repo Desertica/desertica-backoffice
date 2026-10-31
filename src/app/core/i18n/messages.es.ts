@@ -48,6 +48,7 @@ export const es = {
   'login.subtitle': 'Usa tu cuenta de Google de la empresa.',
   'login.notConfigured': 'Falta configurar el client id de Google (GOOGLE_CLIENT_ID).',
   'login.loadError': 'No se pudo cargar el inicio de sesión de Google.',
+  'auth.sessionExpired': 'Tu sesión expiró. Inicia sesión de nuevo.',
   'login.error.401': 'No pudimos verificar tu cuenta de Google.',
   'login.error.403': 'Esta cuenta no tiene acceso. Usa tu correo de la empresa.',
   'login.error.generic': 'No se pudo iniciar sesión. Inténtalo de nuevo.',

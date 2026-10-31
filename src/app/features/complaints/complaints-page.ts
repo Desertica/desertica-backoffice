@@ -100,7 +100,7 @@ export function dueState(
                     <td hlmTd>{{ c.createdAt | limaDateTime: 'date' }}</td>
                     <td hlmTd>
                       {{ c.dueAt | limaDateTime: 'date' }}
-                      @if (due(c.status, c.dueAt); as d) {
+                      @if (dueOf(c.status, c.dueAt); as d) {
                         <span class="ml-1 text-xs font-medium text-destructive">{{
                           d === 'overdue'
                             ? ('complaints.due.overdue' | t)
@@ -128,12 +128,15 @@ export function dueState(
 export class ComplaintsPage {
   readonly status = input<string>();
   readonly page = input<string>();
+  /** `soon` lists the unanswered complaints that are due within 3 days or overdue. */
+  readonly due = input<string>();
   private readonly api = inject(ComplaintsApi);
   private readonly router = inject(Router);
   protected readonly statuses = COMPLAINT_STATUSES;
-  protected readonly due = dueState;
+  protected readonly dueOf = dueState;
 
   protected readonly query = computed(() => ({
+    dueSoon: this.due() === 'soon',
     page: Number(this.page()) > 0 ? Number(this.page()) : 1,
     pageSize: 25,
     ...((COMPLAINT_STATUSES as readonly string[]).includes(this.status() ?? '')
@@ -142,12 +145,13 @@ export class ComplaintsPage {
   }));
   protected readonly complaints = resource({
     params: () => this.query(),
-    loader: ({ params }) => this.api.list(params),
+    loader: ({ params: { dueSoon, ...params } }) =>
+      dueSoon ? this.api.listDueSoon() : this.api.list(params),
   });
 
   protected setStatus(value: string) {
     void this.router.navigate([], {
-      queryParams: { status: value || null, page: null },
+      queryParams: { status: value || null, due: null, page: null },
       queryParamsHandling: 'merge',
     });
   }

@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   resource,
   signal,
@@ -28,9 +27,12 @@ import { AuthService } from '../../core/auth/auth.service';
 import { parseToCents } from '../../core/format/money';
 import type { MessageKey } from '../../core/i18n/messages.es';
 import { EnumLabelPipe, TPipe } from '../../core/i18n/t.pipe';
+import { TruncatedNotice } from '../../shared/truncated-notice';
+import { IdempotencyKeys } from '../../shared/idempotency';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
-import { DeparturesApi } from '../departures/departures.api';
+import { wholeNumber } from '../../shared/validators';
+import { DeparturesApi, upcomingRange } from '../departures/departures.api';
 import { BookingsApi } from './bookings.api';
 
 /** Document numbers the SUNAT-facing data needs: DNI has 8 digits, RUC 11. Other types are free text. */
@@ -71,6 +73,13 @@ export interface ManualBookingForm {
   sendConfirmation: boolean;
 }
 
+/** A factura needs the company's own data, so the customer's cannot be reused for it. */
+export function billingFromCustomer(
+  v: Pick<ManualBookingForm, 'billingSame' | 'billing'>,
+): boolean {
+  return v.billingSame && v.billing.docType !== 'FACTURA';
+}
+
 /** Form to API body. Returns `null` when a money field is not a valid amount. */
 export function buildManualBooking(v: ManualBookingForm): CreateManualBooking | 'invalidMoney' {
   const c = v.customer;
@@ -89,7 +98,7 @@ export function buildManualBooking(v: ManualBookingForm): CreateManualBooking | 
         ? { idDocType: c.idDocType, idDocNumber: c.idDocNumber.trim() }
         : {}),
     },
-    billing: v.billingSame
+    billing: billingFromCustomer(v)
       ? {
           docType: v.billing.docType,
           name: `${c.firstName.trim()} ${c.lastName.trim()}`,
@@ -141,6 +150,7 @@ export function buildManualBooking(v: ManualBookingForm): CreateManualBooking | 
     EnumLabelPipe,
     LimaDateTimePipe,
     MoneyPipe,
+    TruncatedNotice,
     HlmButtonImports,
     HlmInputImports,
     HlmLabelImports,
@@ -161,15 +171,14 @@ export class ManualBooking {
   protected readonly currencies: readonly Currency[] = ['USD', 'PEN'];
   protected readonly saving = signal(false);
   protected readonly errors = signal<MessageKey[]>([]);
-  /** Reused on retries so a double click cannot create two bookings; renewed when the data changes. */
-  private idempotencyKey = crypto.randomUUID();
+  private readonly keys = new IdempotencyKeys();
 
   protected readonly form = this.fb.group({
     tourRefId: ['', Validators.required],
     departureId: ['', Validators.required],
     currency: ['USD' as Currency],
-    adults: [1, [Validators.required, Validators.min(1)]],
-    children: [0, [Validators.required, Validators.min(0)]],
+    adults: [1, [Validators.required, Validators.min(1), wholeNumber]],
+    children: [0, [Validators.required, Validators.min(0), wholeNumber]],
     customer: this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -205,7 +214,15 @@ export class ManualBooking {
   protected readonly people = computed(
     () => (this.values()?.adults ?? 0) + (this.values()?.children ?? 0),
   );
-  protected readonly billingSame = computed(() => this.values()?.billingSame ?? true);
+  // The checkbox is disabled (so absent from `values()`) while a factura is selected.
+  protected readonly billingSame = computed(() =>
+    billingFromCustomer({
+      billingSame: this.values()?.billingSame ?? false,
+      billing: {
+        docType: this.values()?.billing?.docType ?? 'BOLETA',
+      } as ManualBookingForm['billing'],
+    }),
+  );
   protected readonly activeTours = computed(() => this.catalog.tours().filter((t) => t.active));
 
   protected readonly departures = resource({
@@ -214,11 +231,11 @@ export class ManualBooking {
       this.departuresApi.listAll({
         tourRefId: params,
         status: 'OPEN',
-        from: new Date().toISOString(),
+        ...upcomingRange(),
       }),
   });
   protected readonly available = computed(() =>
-    (this.departures.value() ?? []).filter(
+    (this.departures.value()?.items ?? []).filter(
       (d) => d.capacity - d.seatsSold - (d.seatsHeld ?? 0) >= Math.max(1, this.people()),
     ),
   );
@@ -248,11 +265,15 @@ export class ManualBooking {
 
   constructor() {
     void this.catalog.load().catch((e) => this.notify.error(e));
-    this.form.valueChanges.subscribe(() => (this.idempotencyKey = crypto.randomUUID()));
-    // A departure from another tour is no longer valid.
-    effect(() => {
-      this.tourId();
-      this.form.controls.departureId.setValue('', { emitEvent: false });
+    // A departure from another tour is no longer valid; emitting keeps the quote in step.
+    this.form.controls.tourRefId.valueChanges.subscribe(() =>
+      this.form.controls.departureId.setValue(''),
+    );
+    this.form.controls.billing.controls.docType.valueChanges.subscribe((type) => {
+      const same = this.form.controls.billingSame;
+      if (type === 'FACTURA') same.disable();
+      else same.enable();
+      if (type === 'FACTURA') same.setValue(false);
     });
     this.addPassenger();
   }
@@ -288,16 +309,21 @@ export class ManualBooking {
     const customerDocBad =
       v.customer.idDocNumber.trim() !== '' &&
       idDocNumberError(v.customer.idDocType, v.customer.idDocNumber);
-    const billing = v.billingSame
+    const same = billingFromCustomer(v);
+    const billing = same
       ? { type: v.customer.idDocType, number: v.customer.idDocNumber }
       : { type: v.billing.idDocType, number: v.billing.idDocNumber };
     const billingBad = idDocNumberError(billing.type, billing.number);
-    const nameMissing = !v.billingSame && !v.billing.name.trim();
+    const nameMissing = !same && !v.billing.name.trim();
+    const addressMissing = v.billing.docType === 'FACTURA' && !v.billing.address.trim();
+    const noSeats = !this.available().some((d) => d.id === v.departureId);
     const facturaNeedsRuc = v.billing.docType === 'FACTURA' && billing.type !== 'RUC';
     const errors: MessageKey[] = [];
     if (this.form.invalid) errors.push('common.required');
     if (customerDocBad || billingBad) errors.push('bookings.new.docInvalid');
     if (nameMissing) errors.push('bookings.new.billingNameMissing');
+    if (addressMissing) errors.push('bookings.new.facturaAddress');
+    if (noSeats) errors.push('bookings.new.noSeats');
     if (facturaNeedsRuc) errors.push('bookings.new.facturaRuc');
     this.errors.set(errors);
     if (errors.length) return;
@@ -308,7 +334,7 @@ export class ManualBooking {
     }
     this.saving.set(true);
     try {
-      const booking = await this.bookings.createManual(body, this.idempotencyKey);
+      const booking = await this.bookings.createManual(body, this.keys.keyFor(body));
       this.notify.success('bookings.new.created', { reference: booking.reference });
       await this.router.navigate(['/bookings', booking.id]);
     } catch (e) {

@@ -4,7 +4,7 @@ set -eu
 esc() { printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'; }
 cat > /usr/share/nginx/html/config.json <<JSON
 {
-  "apiBaseUrl": "$(esc "${API_BASE_URL:-/api}")",
+  "apiBaseUrl": "$(esc "${API_BASE_URL}")",
   "googleClientId": "$(esc "${GOOGLE_CLIENT_ID:-}")"
 }
 JSON

@@ -27,6 +27,8 @@ import { downloadCsv, toCsv } from '../../shared/csv';
 import { useDialogs } from '../../shared/dialog';
 import { LimaDateTimePipe, MoneyPipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
+import { wholeNumber } from '../../shared/validators';
+import { TruncatedNotice } from '../../shared/truncated-notice';
 import { StatusBadge } from '../../shared/status-badge';
 import { BookingsApi } from '../bookings/bookings.api';
 import { CancelDepartureDialog } from './cancel-departure-dialog';
@@ -72,6 +74,7 @@ export function diffUpdate(
     LimaDateTimePipe,
     MoneyPipe,
     StatusBadge,
+    TruncatedNotice,
     HasPermissionDirective,
     HlmButtonImports,
     HlmCardImports,
@@ -103,8 +106,10 @@ export class DepartureDetail {
   });
   protected readonly bookings = resource({
     params: () => this.id(),
-    loader: async ({ params }) =>
-      (await this.bookingsApi.list({ departureId: params, pageSize: 100 })).data,
+    loader: async ({ params }) => {
+      const page = await this.bookingsApi.list({ departureId: params, pageSize: 100 });
+      return { items: page.data, truncated: page.meta.total > page.data.length };
+    },
   });
   protected readonly manifest = resource({
     params: () => (this.tab() === 'manifest' ? this.id() : undefined),
@@ -127,7 +132,7 @@ export class DepartureDetail {
   protected readonly form = this.fb.group({
     date: ['', Validators.required],
     time: ['', Validators.required],
-    capacity: [1, [Validators.required, Validators.min(1)]],
+    capacity: [1, [Validators.required, Validators.min(1), wholeNumber]],
     meetingPoint: [''],
     guideName: [''],
     vehicleNote: [''],
