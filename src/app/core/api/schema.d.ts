@@ -3384,8 +3384,11 @@ export interface operations {
             200: {
                 headers: {
                     [name: string]: unknown;
+                        /** Tours nuevos; nacen inactivos */
                 };
                 content: {
+                        /** Tours que ya no están publicados en el CMS */
+                        deactivated: number;
                     "application/json": {
                         data: components["schemas"]["Blackout"][];
                     };
