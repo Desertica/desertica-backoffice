@@ -3042,8 +3042,11 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** Tours nuevos; nacen inactivos */
                         created: number;
                         updated: number;
+                        /** Tours que ya no están publicados en el CMS */
+                        deactivated: number;
                     };
                 };
             };
