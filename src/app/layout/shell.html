@@ -17,7 +17,11 @@
     tabindex="-1"
   >
     <div class="flex h-14 items-center justify-between px-4">
-      <a routerLink="/" class="text-base font-semibold tracking-tight">{{ 'app.name' | t }}</a>
+      <a routerLink="/" class="flex items-center gap-2" [attr.aria-label]="'app.name' | t">
+        <img src="/brand/mark-on-olive.svg" alt="" class="size-8 rounded-full" />
+        <span class="font-heading text-lg tracking-tight">Desértica</span>
+        <span class="text-xs font-medium text-muted-foreground">Backoffice</span>
+      </a>
       <button
         hlmBtn
         variant="ghost"
@@ -32,7 +36,7 @@
     <nav class="flex-1 space-y-5 overflow-y-auto px-2 py-3" [attr.aria-label]="'app.name' | t">
       @for (group of groups(); track group.label) {
         <div>
-          <p class="px-2 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <p class="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {{ group.label | t }}
           </p>
           <ul class="space-y-0.5">
@@ -40,8 +44,8 @@
               <li>
                 <a
                   [routerLink]="item.path"
-                  routerLinkActive="bg-sidebar-accent text-sidebar-accent-foreground"
-                  class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent"
+                  routerLinkActive="bg-sidebar-primary! text-sidebar-primary-foreground"
+                  class="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm hover:bg-sidebar-accent"
                   (click)="menuOpen.set(false)"
                 >
                   <ng-icon [name]="item.icon" class="text-base" />

@@ -9,6 +9,6 @@ import { classes } from '@spartan-ng/helm/utils';
 })
 export class HlmSelectGroup {
   constructor() {
-    classes(() => 'scroll-my-1 p-1');
+    classes(() => 'scroll-my-1.5 p-1.5');
   }
 }
