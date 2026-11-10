@@ -125,7 +125,10 @@
       </div>
       <p class="text-sm text-muted-foreground" id="legal-current">
         @if (legalCurrent(); as current) {
-          {{ 'legal.current' | t: { version: current.version, date: (current.publishedAt | limaDateTime) } }}
+          {{
+            'legal.current'
+              | t: { version: current.version, date: (current.publishedAt | limaDateTime) }
+          }}
         } @else {
           {{ 'legal.none' | t }}
         }
