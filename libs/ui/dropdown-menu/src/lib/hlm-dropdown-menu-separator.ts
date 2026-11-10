@@ -7,6 +7,6 @@ import { classes } from '@spartan-ng/helm/utils';
 })
 export class HlmDropdownMenuSeparator {
   constructor() {
-    classes(() => 'bg-border -mx-1 my-1 h-px block');
+    classes(() => 'bg-border/50 -mx-1.5 my-1.5 h-px block');
   }
 }
