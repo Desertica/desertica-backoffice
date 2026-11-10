@@ -48,6 +48,7 @@ export type Series = S['Series'];
 export type BlockedIdentity = S['BlockedIdentity'];
 export type AuditLog = S['AuditLog'];
 export type LegalDocument = S['LegalDocument'];
+export type LegalDocumentWithText = S['LegalDocumentWithText'];
 export type LegalDocumentKind = S['LegalDocumentKind'];
 export type PaymentStatus = S['PaymentStatus'];
 export type PaymentProvider = S['PaymentProvider'];

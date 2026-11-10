@@ -1,18 +1,21 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   effect,
   inject,
   resource,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { HlmTableImports } from '@spartan-ng/helm/table';
-import type { LegalDocumentKind } from '../../core/api/types';
+import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
+import type { LegalDocumentKind, LegalDocumentWithText } from '../../core/api/types';
 import { AuthService } from '../../core/auth/auth.service';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
 import type { MessageKey } from '../../core/i18n/messages.es';
@@ -28,7 +31,7 @@ import {
   toInput,
 } from './settings-model';
 
-const LEGAL_KINDS: readonly LegalDocumentKind[] = [
+const LEGAL_KINDS: readonly Exclude<LegalDocumentKind, 'WAIVER'>[] = [
   'TERMS',
   'PRIVACY',
   'CANCELLATION',
@@ -51,6 +54,7 @@ const LEGAL_KINDS: readonly LegalDocumentKind[] = [
     HlmLabelImports,
     HlmSkeletonImports,
     HlmTableImports,
+    HlmTextareaImports,
   ],
   templateUrl: './settings-page.html',
 })
@@ -76,12 +80,23 @@ export class SettingsPage {
     reason: [''],
   });
   protected readonly legalForm = this.fb.group({
-    kind: ['TERMS' as LegalDocumentKind],
+    kind: ['TERMS' as Exclude<LegalDocumentKind, 'WAIVER'>],
     locale: ['es', Validators.required],
-    cmsSlug: ['', Validators.required],
+    title: ['', Validators.required],
+    text: ['', Validators.required],
   });
+  /** The version in force for the chosen document and language; the editor starts from its text. */
+  protected readonly legalCurrent = signal<LegalDocumentWithText | null>(null);
+  protected readonly publishing = signal(false);
 
   constructor() {
+    this.loadCurrentLegal();
+    this.legalForm.controls.kind.valueChanges
+      .pipe(takeUntilDestroyed(inject(DestroyRef)))
+      .subscribe(() => this.loadCurrentLegal());
+    this.legalForm.controls.locale.valueChanges
+      .pipe(takeUntilDestroyed(inject(DestroyRef)))
+      .subscribe(() => this.loadCurrentLegal());
     effect(() => {
       const s = this.settings.value();
       if (!s) return;
@@ -135,20 +150,40 @@ export class SettingsPage {
     }
   }
 
+  /** Loads the version in force and puts its title and text in the editor (empty when there is none). */
+  protected async loadCurrentLegal() {
+    const { kind, locale } = this.legalForm.getRawValue();
+    if (!locale.trim()) return;
+    try {
+      const doc = await this.api.currentLegal(kind, locale.trim());
+      this.legalCurrent.set(doc);
+      this.legalForm.patchValue(
+        { title: doc?.title ?? '', text: doc?.text ?? '' },
+        { emitEvent: false },
+      );
+    } catch (e) {
+      this.notify.error(e);
+    }
+  }
+
   protected async publish() {
     this.legalForm.markAllAsTouched();
-    if (this.legalForm.invalid) return;
+    if (this.legalForm.invalid || this.publishing()) return;
     const v = this.legalForm.getRawValue();
+    this.publishing.set(true);
     try {
       const doc = await this.api.publishLegal({
         kind: v.kind,
         locale: v.locale.trim(),
-        cmsSlug: v.cmsSlug.trim(),
+        title: v.title.trim(),
+        text: v.text.trim(),
       });
       this.notify.success('legal.published', { version: doc.version });
-      this.legalForm.patchValue({ cmsSlug: '' });
+      await this.loadCurrentLegal();
     } catch (e) {
       this.notify.error(e);
+    } finally {
+      this.publishing.set(false);
     }
   }
 }

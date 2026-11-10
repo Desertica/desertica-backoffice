@@ -108,29 +108,39 @@
   <section *appHasPermission="'legal:write'" aria-labelledby="lg-h" class="space-y-3">
     <h2 id="lg-h" class="text-lg font-medium">{{ 'settings.section.legal' | t }}</h2>
     <p class="text-sm text-muted-foreground">{{ 'legal.hint' | t }}</p>
-    <form
-      [formGroup]="legalForm"
-      (ngSubmit)="publish()"
-      class="flex flex-wrap items-end gap-3"
-      novalidate
-    >
+    <form [formGroup]="legalForm" (ngSubmit)="publish()" class="grid max-w-3xl gap-3" novalidate>
+      <div class="flex flex-wrap items-end gap-3">
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'legal.kind' | t }}</span>
+          <select hlmInput class="w-56" formControlName="kind">
+            @for (k of legalKinds; track k) {
+              <option [value]="k">{{ k | enumLabel: 'legal.kind' }}</option>
+            }
+          </select>
+        </label>
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'legal.locale' | t }}</span>
+          <input hlmInput class="w-20" maxlength="5" formControlName="locale" />
+        </label>
+      </div>
+      <p class="text-sm text-muted-foreground" id="legal-current">
+        @if (legalCurrent(); as current) {
+          {{ 'legal.current' | t: { version: current.version, date: (current.publishedAt | limaDateTime) } }}
+        } @else {
+          {{ 'legal.none' | t }}
+        }
+      </p>
       <label class="grid gap-1.5 text-sm">
-        <span hlmLabel>{{ 'legal.kind' | t }}</span>
-        <select hlmInput class="w-56" formControlName="kind">
-          @for (k of legalKinds; track k) {
-            <option [value]="k">{{ k | enumLabel: 'legal.kind' }}</option>
-          }
-        </select>
+        <span hlmLabel>{{ 'legal.title' | t }}</span>
+        <input hlmInput maxlength="200" formControlName="title" />
       </label>
       <label class="grid gap-1.5 text-sm">
-        <span hlmLabel>{{ 'legal.locale' | t }}</span>
-        <input hlmInput class="w-20" maxlength="5" formControlName="locale" />
+        <span hlmLabel>{{ 'legal.text' | t }}</span>
+        <textarea hlmTextarea rows="16" class="font-mono" formControlName="text"></textarea>
       </label>
-      <label class="grid gap-1.5 text-sm">
-        <span hlmLabel>{{ 'legal.cmsSlug' | t }}</span>
-        <input hlmInput class="w-64" formControlName="cmsSlug" />
-      </label>
-      <button hlmBtn type="submit" variant="outline">{{ 'legal.publish' | t }}</button>
+      <div>
+        <button hlmBtn type="submit" [disabled]="publishing()">{{ 'legal.publish' | t }}</button>
+      </div>
     </form>
   </section>
 </div>
