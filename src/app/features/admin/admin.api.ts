@@ -10,6 +10,7 @@ import type {
   DocumentType,
   LegalDocument,
   LegalDocumentKind,
+  LegalDocumentWithText,
   Page,
   Role,
   Series,
@@ -84,8 +85,20 @@ export class AdminApi {
   async publishLegal(body: {
     kind: LegalDocumentKind;
     locale: string;
-    cmsSlug: string;
+    title: string;
+    text: string;
   }): Promise<LegalDocument> {
     return unwrap(await this.http.POST('/legal-documents', { body }));
+  }
+
+  /** The published version of a global document with its text, or `null` when none is published yet. */
+  async currentLegal(
+    kind: Exclude<LegalDocumentKind, 'WAIVER'>,
+    locale: string,
+  ): Promise<LegalDocumentWithText | null> {
+    const res = await this.http.GET('/public/legal-documents/{kind}', {
+      params: { path: { kind }, query: { locale } },
+    });
+    return res.response.status === 404 ? null : unwrap(res);
   }
 }
