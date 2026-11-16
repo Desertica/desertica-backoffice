@@ -8,6 +8,7 @@ import { customers } from './messages/customers';
 import { dashboard } from './messages/dashboard';
 import { departures } from './messages/departures';
 import { shared } from './messages/shared';
+import { tours } from './messages/tours';
 
 export const es = {
   'app.name': 'Desértica Backoffice',
@@ -22,6 +23,7 @@ export const es = {
 
   'nav.dashboard': 'Panel',
   'nav.departures': 'Salidas',
+  'nav.tours': 'Tours',
   'nav.bookings': 'Reservas',
   'nav.customers': 'Clientes',
   'nav.payments': 'Pagos y reembolsos',
@@ -69,6 +71,7 @@ export const es = {
   ...documents.es,
   ...complaints.es,
   ...admin.es,
+  ...tours.es,
 } as const;
 
 export type MessageKey = keyof typeof es;

@@ -24,6 +24,7 @@ export type EnumPrefix =
   | 'enum.paymentMethod'
   | 'enum.source'
   | 'enum.format'
+  | 'enum.priceUnit'
   | 'enum.idDocType'
   | 'enum.docType'
   | 'weekday'

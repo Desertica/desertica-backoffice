@@ -29,6 +29,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         icon: 'lucideCalendarDays',
         permission: 'departures:read',
       },
+      { path: '/tours', label: 'nav.tours', icon: 'lucideMap', permission: 'catalog:read' },
       {
         path: '/bookings',
         label: 'nav.bookings',
