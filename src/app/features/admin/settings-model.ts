@@ -6,12 +6,19 @@ export type Settings = components['schemas']['Settings'];
 export type SettingsInput = components['schemas']['SettingsInput'];
 
 export type SettingKey =
-  'depositPercent' | 'holdMinutes' | 'operatorRefundLimitCents' | 'complaintDueDays';
+  | 'depositPercent'
+  | 'holdMinutes'
+  | 'operatorRefundLimitCents'
+  | 'complaintDueDays'
+  | 'availabilityMonths'
+  | 'adultsMin'
+  | 'childrenMin'
+  | 'peopleMax';
 
 /** `unit` decides how the value is shown and parsed: money is typed in units but stored in cents. */
 export interface SettingField {
   key: SettingKey;
-  unit: 'percent' | 'minutes' | 'money' | 'days';
+  unit: 'percent' | 'minutes' | 'money' | 'days' | 'months' | 'people';
   min: number;
   max?: number;
   label: MessageKey;
@@ -50,6 +57,38 @@ export const SETTING_FIELDS: readonly SettingField[] = [
     max: 60,
     label: 'settings.complaintDueDays',
     hint: 'settings.complaintDueDays.hint',
+  },
+  {
+    key: 'availabilityMonths',
+    unit: 'months',
+    min: 1,
+    max: 12,
+    label: 'settings.availabilityMonths',
+    hint: 'settings.availabilityMonths.hint',
+  },
+  {
+    key: 'adultsMin',
+    unit: 'people',
+    min: 1,
+    max: 20,
+    label: 'settings.adultsMin',
+    hint: 'settings.adultsMin.hint',
+  },
+  {
+    key: 'childrenMin',
+    unit: 'people',
+    min: 0,
+    max: 20,
+    label: 'settings.childrenMin',
+    hint: 'settings.childrenMin.hint',
+  },
+  {
+    key: 'peopleMax',
+    unit: 'people',
+    min: 1,
+    max: 20,
+    label: 'settings.peopleMax',
+    hint: 'settings.peopleMax.hint',
   },
 ];
 

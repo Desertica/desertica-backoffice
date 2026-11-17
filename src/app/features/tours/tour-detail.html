@@ -1,0 +1,314 @@
+<div class="mx-auto max-w-4xl space-y-8">
+  <a hlmBtn variant="ghost" size="sm" routerLink="/tours">← {{ 'tours.title' | t }}</a>
+
+  @if (notFound()) {
+    <p class="text-muted-foreground">{{ 'tours.notFound' | t }}</p>
+  } @else if (tour.error()) {
+    <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+      {{ 'common.loadError' | t }}
+      <button hlmBtn size="sm" variant="outline" (click)="tour.reload()">
+        {{ 'common.retry' | t }}
+      </button>
+    </div>
+  } @else if (!tour.hasValue()) {
+    <hlm-skeleton class="h-96" />
+  } @else {
+    @let current = tour.value();
+    <header>
+      <h1 class="text-2xl font-semibold">{{ current.title }}</h1>
+      <p class="text-sm text-muted-foreground">
+        {{ current.slug }} ·
+        {{ 'tours.syncedAt' | t: { date: (current.cmsSyncedAt | limaDateTime) } }}
+      </p>
+    </header>
+
+    <section aria-labelledby="tour-h" class="space-y-3">
+      <h2 id="tour-h" class="text-lg font-medium">{{ 'tours.section.data' | t }}</h2>
+      <p class="text-sm text-muted-foreground">{{ 'tours.form.hint' | t }}</p>
+      <form [formGroup]="form" (ngSubmit)="save()" class="grid gap-4 sm:grid-cols-2" novalidate>
+        <label class="flex items-center gap-2 text-sm font-medium">
+          <input type="checkbox" formControlName="active" />
+          {{ 'tours.field.active' | t }}
+        </label>
+        <label class="flex items-center gap-2 text-sm font-medium">
+          <input type="checkbox" formControlName="requiresWaiver" />
+          {{ 'tours.field.requiresWaiver' | t }}
+        </label>
+
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'tours.field.durationHours' | t }}</span>
+          <input
+            hlmInput
+            type="number"
+            min="1"
+            max="240"
+            step="1"
+            formControlName="durationHours"
+          />
+          @if (form.controls.durationHours.invalid) {
+            <span class="text-xs text-destructive">{{ 'tours.error.durationHours' | t }}</span>
+          }
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'tours.field.format' | t }}</span>
+          <select hlmInput formControlName="format">
+            <option value="">{{ 'tours.none' | t }}</option>
+            @for (o of offers; track o) {
+              <option [value]="o">{{ o | enumLabel: 'enum.format' }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'tours.field.languages' | t }}</span>
+          <input hlmInput formControlName="languages" placeholder="es, en" />
+          @if (form.controls.languages.invalid) {
+            <span class="text-xs text-destructive">{{ 'tours.error.languages' | t }}</span>
+          } @else {
+            <span class="text-xs text-muted-foreground">{{
+              'tours.field.languages.hint' | t
+            }}</span>
+          }
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'tours.field.defaultCapacity' | t }}</span>
+          <input hlmInput type="number" min="1" step="1" formControlName="defaultCapacity" />
+          @if (form.controls.defaultCapacity.invalid) {
+            <span class="text-xs text-destructive">{{ 'tours.error.wholeNumber' | t }}</span>
+          }
+        </label>
+
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'tours.field.minAge' | t }}</span>
+          <input hlmInput type="number" min="0" step="1" formControlName="minAge" />
+          @if (form.controls.minAge.invalid) {
+            <span class="text-xs text-destructive">{{ 'tours.error.wholeNumber' | t }}</span>
+          }
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'tours.field.minHeightCm' | t }}</span>
+          <input hlmInput type="number" min="0" step="1" formControlName="minHeightCm" />
+          @if (form.controls.minHeightCm.invalid) {
+            <span class="text-xs text-destructive">{{ 'tours.error.wholeNumber' | t }}</span>
+          }
+        </label>
+
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'tours.field.meetingPointEs' | t }}</span>
+          <textarea
+            hlmTextarea
+            rows="3"
+            maxlength="2000"
+            formControlName="meetingPointEs"
+          ></textarea>
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'tours.field.meetingPointEn' | t }}</span>
+          <textarea
+            hlmTextarea
+            rows="3"
+            maxlength="2000"
+            formControlName="meetingPointEn"
+          ></textarea>
+        </label>
+
+        <label class="grid gap-1.5 sm:col-span-2">
+          <span hlmLabel>{{ 'tours.field.meetingPointUrl' | t }}</span>
+          <input hlmInput type="url" maxlength="500" formControlName="meetingPointUrl" />
+          @if (form.controls.meetingPointUrl.invalid) {
+            <span class="text-xs text-destructive">{{ 'tours.error.url' | t }}</span>
+          }
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'tours.field.latitude' | t }}</span>
+          <input hlmInput type="number" min="-90" max="90" step="any" formControlName="latitude" />
+          @if (form.controls.latitude.invalid) {
+            <span class="text-xs text-destructive">{{ 'tours.error.latitude' | t }}</span>
+          }
+        </label>
+        <label class="grid gap-1.5">
+          <span hlmLabel>{{ 'tours.field.longitude' | t }}</span>
+          <input
+            hlmInput
+            type="number"
+            min="-180"
+            max="180"
+            step="any"
+            formControlName="longitude"
+          />
+          @if (form.controls.longitude.invalid) {
+            <span class="text-xs text-destructive">{{ 'tours.error.longitude' | t }}</span>
+          }
+        </label>
+
+        <label class="grid gap-1.5 sm:col-span-2">
+          <span hlmLabel>{{ 'tours.field.cancellationPolicy' | t }}</span>
+          <select hlmInput formControlName="cancellationPolicyId">
+            <option value="">{{ 'tours.none' | t }}</option>
+            @for (p of policyOptions(); track p.id) {
+              <option [value]="p.id">{{ p.name }} (v{{ p.version }})</option>
+            }
+          </select>
+        </label>
+
+        <div *appHasPermission="'catalog:write'" class="flex justify-end sm:col-span-2">
+          <button hlmBtn type="submit" [disabled]="saving() || form.pristine">
+            {{ 'common.save' | t }}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section *appHasPermission="'prices:read'" aria-labelledby="price-h" class="space-y-3">
+      <h2 id="price-h" class="text-lg font-medium">{{ 'tours.section.prices' | t }}</h2>
+      <p class="text-sm text-muted-foreground">{{ 'tours.price.hint' | t }}</p>
+      @if (prices.error()) {
+        <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+          {{ 'common.loadError' | t }}
+          <button hlmBtn size="sm" variant="outline" (click)="prices.reload()">
+            {{ 'common.retry' | t }}
+          </button>
+        </div>
+      } @else if (prices.value(); as rules) {
+        @if (rules.length === 0) {
+          <p class="text-sm text-muted-foreground">{{ 'tours.price.empty' | t }}</p>
+        } @else {
+          <div hlmTableContainer>
+            <table hlmTable>
+              <thead hlmTHead>
+                <tr hlmTr>
+                  <th hlmTh>{{ 'tours.price.format' | t }}</th>
+                  <th hlmTh>{{ 'tours.price.unit' | t }}</th>
+                  <th hlmTh>{{ 'tours.price.adult' | t }}</th>
+                  <th hlmTh>{{ 'tours.price.child' | t }}</th>
+                  <th hlmTh>{{ 'tours.price.group' | t }}</th>
+                  <th hlmTh>{{ 'tours.price.people' | t }}</th>
+                  <th hlmTh>{{ 'tours.price.validity' | t }}</th>
+                  <th hlmTh>{{ 'tours.price.priority' | t }}</th>
+                  <th hlmTh>{{ 'tours.price.active' | t }}</th>
+                  <th *appHasPermission="'prices:write'" hlmTh>{{ 'common.actions' | t }}</th>
+                </tr>
+              </thead>
+              <tbody hlmTBody>
+                @for (r of rules; track r.id) {
+                  <tr hlmTr [class.text-muted-foreground]="!r.active">
+                    <td hlmTd>{{ r.format | enumLabel: 'enum.format' }}</td>
+                    <td hlmTd>{{ r.unit | enumLabel: 'enum.priceUnit' }}</td>
+                    <td hlmTd class="font-medium">{{ r.adultCents | money: r.currency }}</td>
+                    <td hlmTd>{{ r.childCents | money: r.currency }}</td>
+                    <td hlmTd>{{ r.groupCents | money: r.currency }}</td>
+                    <td hlmTd>{{ r.minPeople ?? '—' }} – {{ r.maxPeople ?? '—' }}</td>
+                    <td hlmTd>{{ r.validFrom ?? '—' }} – {{ r.validTo ?? '—' }}</td>
+                    <td hlmTd>{{ r.priority }}</td>
+                    <td hlmTd>{{ r.active ? '✓' : '—' }}</td>
+                    <td *appHasPermission="'prices:write'" hlmTd>
+                      <div class="flex gap-1">
+                        <button hlmBtn size="sm" variant="outline" (click)="editPrice(r)">
+                          {{ 'common.edit' | t }}
+                        </button>
+                        @if (r.active) {
+                          <button hlmBtn size="sm" variant="ghost" (click)="deactivatePrice(r)">
+                            {{ 'tours.price.deactivate' | t }}
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+
+      <form
+        *appHasPermission="'prices:write'"
+        [formGroup]="priceForm"
+        (ngSubmit)="savePrice()"
+        class="grid gap-3 rounded-lg border border-border p-4 sm:grid-cols-3"
+        novalidate
+      >
+        <h3 class="font-medium sm:col-span-3">
+          {{ (editingPrice() ? 'tours.price.editTitle' : 'tours.price.newTitle') | t }}
+        </h3>
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.currency' | t }}</span>
+          <select hlmInput formControlName="currency">
+            @for (c of currencies; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </label>
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.format' | t }}</span>
+          <select hlmInput formControlName="format">
+            @for (f of formats; track f) {
+              <option [value]="f">{{ f | enumLabel: 'enum.format' }}</option>
+            }
+          </select>
+        </label>
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.unit' | t }}</span>
+          <select hlmInput formControlName="unit">
+            @for (u of units; track u) {
+              <option [value]="u">{{ u | enumLabel: 'enum.priceUnit' }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.adult' | t }}</span>
+          <input hlmInput inputmode="decimal" placeholder="0.00" formControlName="adult" />
+        </label>
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.child' | t }} ({{ 'common.optional' | t }})</span>
+          <input hlmInput inputmode="decimal" placeholder="0.00" formControlName="child" />
+        </label>
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.group' | t }}</span>
+          <input hlmInput inputmode="decimal" placeholder="0.00" formControlName="group" />
+        </label>
+
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.minPeople' | t }} ({{ 'common.optional' | t }})</span>
+          <input hlmInput type="number" min="1" step="1" formControlName="minPeople" />
+        </label>
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.maxPeople' | t }} ({{ 'common.optional' | t }})</span>
+          <input hlmInput type="number" min="1" step="1" formControlName="maxPeople" />
+        </label>
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.priority' | t }}</span>
+          <input hlmInput type="number" step="1" formControlName="priority" />
+        </label>
+
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.validFrom' | t }} ({{ 'common.optional' | t }})</span>
+          <input hlmInput type="date" formControlName="validFrom" />
+        </label>
+        <label class="grid gap-1.5 text-sm">
+          <span hlmLabel>{{ 'tours.price.validTo' | t }} ({{ 'common.optional' | t }})</span>
+          <input hlmInput type="date" formControlName="validTo" />
+        </label>
+        <label class="flex items-center gap-2 self-end pb-2 text-sm font-medium">
+          <input type="checkbox" formControlName="active" />
+          {{ 'tours.price.active' | t }}
+        </label>
+
+        @if (priceErrorKey(); as key) {
+          <p class="text-xs text-destructive sm:col-span-3" role="alert">{{ key | t }}</p>
+        }
+        <div class="flex justify-end gap-2 sm:col-span-3">
+          @if (editingPrice()) {
+            <button hlmBtn type="button" variant="outline" (click)="editPrice(null)">
+              {{ 'common.cancel' | t }}
+            </button>
+          }
+          <button hlmBtn type="submit" [disabled]="savingPrice()">
+            {{ (editingPrice() ? 'common.save' : 'common.create') | t }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+</div>

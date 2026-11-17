@@ -62,6 +62,10 @@ schemas.Settings.example = {
   holdMinutes: 15,
   operatorRefundLimitCents: 20000,
   complaintDueDays: 15,
+  availabilityMonths: 3,
+  adultsMin: 1,
+  childrenMin: 0,
+  peopleMax: 12,
 };
 schemas.CancellationQuote.example = {
   currency: 'USD',
@@ -118,6 +122,50 @@ schemas.BookingSummary.example = {
   totalCents: 24000,
   paidCents: 7200,
   createdAt: '2026-10-02T15:30:00.000Z',
+};
+schemas.TourRef.example = {
+  id: schemas.Departure.example.tourRefId,
+  slug: 'sandboarding-huacachina',
+  title: 'Sandboarding en Huacachina',
+  durationHours: 3,
+  format: 'BOTH',
+  languages: ['es', 'en'],
+  meetingPoint: { es: 'Plaza de Armas de Ica', en: 'Ica main square' },
+  meetingPointUrl: 'https://maps.example.com/ica',
+  latitude: -14.0875,
+  longitude: -75.7626,
+  active: true,
+  requiresWaiver: true,
+  minAge: 8,
+  minHeightCm: null,
+  defaultCapacity: 12,
+  cancellationPolicyId: 'c7a1d2e3-4b5f-4a6c-8d7e-9f0a1b2c3d4e',
+  cmsSyncedAt: '2026-10-03T10:00:00.000Z',
+};
+schemas.CancellationPolicy.example = {
+  id: schemas.TourRef.example.cancellationPolicyId,
+  key: 'standard',
+  name: 'Estándar',
+  version: 3,
+  active: true,
+  depositRefundable: false,
+  tiers: schemas.Quote.example.cancellationTiers,
+};
+schemas.PriceRule.example = {
+  id: '2e4f6a8c-1b3d-4f5a-9c7e-0a2b4c6d8e1f',
+  tourRefId: schemas.TourRef.example.id,
+  currency: 'USD',
+  format: 'SHARED',
+  unit: 'PER_PERSON',
+  adultCents: 12000,
+  childCents: 8000,
+  groupCents: null,
+  minPeople: null,
+  maxPeople: null,
+  validFrom: null,
+  validTo: null,
+  priority: 0,
+  active: true,
 };
 mkdirSync('.mock', { recursive: true });
 writeFileSync('.mock/openapi.yaml', stringify(doc));

@@ -39,6 +39,13 @@ export const routes: Routes = [
         import('./features/departures/departure-detail').then((m) => m.DepartureDetail),
       ),
 
+      guarded('tours', 'catalog:read', () =>
+        import('./features/tours/tours-page').then((m) => m.ToursPage),
+      ),
+      guarded('tours/:id', 'catalog:read', () =>
+        import('./features/tours/tour-detail').then((m) => m.TourDetail),
+      ),
+
       guarded('bookings', 'bookings:read', () =>
         import('./features/bookings/bookings-page').then((m) => m.BookingsPage),
       ),

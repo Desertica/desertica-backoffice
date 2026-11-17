@@ -1,0 +1,61 @@
+<div class="space-y-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-semibold">{{ 'tours.title' | t }}</h1>
+    <button
+      *appHasPermission="'catalog:write'"
+      hlmBtn
+      type="button"
+      [disabled]="syncing()"
+      (click)="sync()"
+    >
+      {{ 'tours.sync' | t }}
+    </button>
+  </div>
+  <p class="text-sm text-muted-foreground">{{ 'tours.hint' | t }}</p>
+
+  @if (tours.error()) {
+    <div class="flex items-center gap-3 text-sm text-destructive" role="alert">
+      {{ 'common.loadError' | t }}
+      <button hlmBtn size="sm" variant="outline" (click)="tours.reload()">
+        {{ 'common.retry' | t }}
+      </button>
+    </div>
+  } @else if (!tours.hasValue()) {
+    <hlm-skeleton class="h-48" />
+  } @else if (tours.value().length === 0) {
+    <p class="text-muted-foreground">{{ 'tours.empty' | t }}</p>
+  } @else {
+    <div hlmTableContainer>
+      <table hlmTable>
+        <thead hlmTHead>
+          <tr hlmTr>
+            <th hlmTh>{{ 'tours.col.title' | t }}</th>
+            <th hlmTh>{{ 'tours.col.slug' | t }}</th>
+            <th hlmTh>{{ 'tours.col.active' | t }}</th>
+            <th hlmTh>{{ 'tours.col.format' | t }}</th>
+            <th hlmTh>{{ 'tours.col.duration' | t }}</th>
+            <th hlmTh>{{ 'tours.col.capacity' | t }}</th>
+            <th hlmTh>{{ 'tours.col.synced' | t }}</th>
+          </tr>
+        </thead>
+        <tbody hlmTBody>
+          @for (tour of tours.value(); track tour.id) {
+            <tr hlmTr>
+              <td hlmTd>
+                <a [routerLink]="['/tours', tour.id]" class="font-medium hover:underline">{{
+                  tour.title
+                }}</a>
+              </td>
+              <td hlmTd>{{ tour.slug }}</td>
+              <td hlmTd>{{ tour.active ? '✓' : '—' }}</td>
+              <td hlmTd>{{ tour.format | enumLabel: 'enum.format' }}</td>
+              <td hlmTd>{{ tour.durationHours ?? '—' }}</td>
+              <td hlmTd>{{ tour.defaultCapacity ?? '—' }}</td>
+              <td hlmTd>{{ tour.cmsSyncedAt | limaDateTime }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
