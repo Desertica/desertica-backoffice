@@ -9,12 +9,14 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { merge } from 'rxjs';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { HlmTableImports } from '@spartan-ng/helm/table';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
+import { TourCatalog } from '../../core/api/tour-catalog';
 import type { LegalDocumentKind, LegalDocumentWithText } from '../../core/api/types';
 import { AuthService } from '../../core/auth/auth.service';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
@@ -31,12 +33,13 @@ import {
   toInput,
 } from './settings-model';
 
-const LEGAL_KINDS: readonly Exclude<LegalDocumentKind, 'WAIVER'>[] = [
+const LEGAL_KINDS: readonly LegalDocumentKind[] = [
   'TERMS',
   'PRIVACY',
   'CANCELLATION',
   'COOKIES',
   'CONDUCT',
+  'WAIVER',
 ];
 
 @Component({
@@ -61,6 +64,7 @@ const LEGAL_KINDS: readonly Exclude<LegalDocumentKind, 'WAIVER'>[] = [
 export class SettingsPage {
   protected readonly auth = inject(AuthService);
   private readonly api = inject(AdminApi);
+  protected readonly catalog = inject(TourCatalog);
   private readonly notify = inject(Notify);
   private readonly fb = inject(FormBuilder).nonNullable;
 
@@ -80,7 +84,9 @@ export class SettingsPage {
     reason: [''],
   });
   protected readonly legalForm = this.fb.group({
-    kind: ['TERMS' as Exclude<LegalDocumentKind, 'WAIVER'>],
+    kind: ['TERMS' as LegalDocumentKind],
+    /** Only used by `WAIVER`, which is written per tour. */
+    tourRefId: [''],
     locale: ['es', Validators.required],
     title: ['', Validators.required],
     text: ['', Validators.required],
@@ -91,10 +97,10 @@ export class SettingsPage {
 
   constructor() {
     this.loadCurrentLegal();
-    this.legalForm.controls.kind.valueChanges
-      .pipe(takeUntilDestroyed(inject(DestroyRef)))
-      .subscribe(() => this.loadCurrentLegal());
-    this.legalForm.controls.locale.valueChanges
+    // The catalog only feeds the waiver's tour selector.
+    void this.catalog.load().catch(() => undefined);
+    const { kind, tourRefId, locale } = this.legalForm.controls;
+    merge(kind.valueChanges, tourRefId.valueChanges, locale.valueChanges)
       .pipe(takeUntilDestroyed(inject(DestroyRef)))
       .subscribe(() => this.loadCurrentLegal());
     effect(() => {
@@ -152,10 +158,10 @@ export class SettingsPage {
 
   /** Loads the version in force and puts its title and text in the editor (empty when there is none). */
   protected async loadCurrentLegal() {
-    const { kind, locale } = this.legalForm.getRawValue();
+    const { kind, locale, tourRefId } = this.legalForm.getRawValue();
     if (!locale.trim()) return;
     try {
-      const doc = await this.api.currentLegal(kind, locale.trim());
+      const doc = await this.api.currentLegal(kind, locale.trim(), tourRefId);
       this.legalCurrent.set(doc);
       this.legalForm.patchValue(
         { title: doc?.title ?? '', text: doc?.text ?? '' },
@@ -168,8 +174,10 @@ export class SettingsPage {
 
   protected async publish() {
     this.legalForm.markAllAsTouched();
-    if (this.legalForm.invalid || this.publishing()) return;
     const v = this.legalForm.getRawValue();
+    if (this.legalForm.invalid || this.publishing() || (v.kind === 'WAIVER' && !v.tourRefId)) {
+      return;
+    }
     this.publishing.set(true);
     try {
       const doc = await this.api.publishLegal({
@@ -177,6 +185,7 @@ export class SettingsPage {
         locale: v.locale.trim(),
         title: v.title.trim(),
         text: v.text.trim(),
+        ...(v.kind === 'WAIVER' ? { tourRefId: v.tourRefId } : {}),
       });
       this.notify.success('legal.published', { version: doc.version });
       await this.loadCurrentLegal();

@@ -118,6 +118,17 @@
             }
           </select>
         </label>
+        @if (legalForm.controls.kind.value === 'WAIVER') {
+          <label class="grid gap-1.5 text-sm">
+            <span hlmLabel>{{ 'legal.tour' | t }}</span>
+            <select hlmInput class="w-64" formControlName="tourRefId">
+              <option value="">{{ 'legal.tour.choose' | t }}</option>
+              @for (tour of catalog.tours(); track tour.id) {
+                <option [value]="tour.id">{{ tour.title }}</option>
+              }
+            </select>
+          </label>
+        }
         <label class="grid gap-1.5 text-sm">
           <span hlmLabel>{{ 'legal.locale' | t }}</span>
           <input hlmInput class="w-20" maxlength="5" formControlName="locale" />
@@ -142,7 +153,16 @@
         <textarea hlmTextarea rows="16" class="font-mono" formControlName="text"></textarea>
       </label>
       <div>
-        <button hlmBtn type="submit" [disabled]="publishing()">{{ 'legal.publish' | t }}</button>
+        <button
+          hlmBtn
+          type="submit"
+          [disabled]="
+            publishing() ||
+            (legalForm.controls.kind.value === 'WAIVER' && !legalForm.controls.tourRefId.value)
+          "
+        >
+          {{ 'legal.publish' | t }}
+        </button>
       </div>
     </form>
   </section>
