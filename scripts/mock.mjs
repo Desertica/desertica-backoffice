@@ -21,13 +21,10 @@ const OPERATOR = [
   'customers:write',
   'payments:read',
   'payments:write',
-  'payments:refund',
   'documents:read',
-  'documents:issue',
   'complaints:read',
   'complaints:write',
   'waivers:read',
-  'reports:read',
 ];
 
 const text = readFileSync(CONTRACT, 'utf8');
@@ -47,7 +44,7 @@ const user = {
         ? 'a1b2c3d4-0000-4000-8000-000000000001'
         : 'a1b2c3d4-0000-4000-8000-000000000002',
     key: role,
-    name: role === 'admin' ? 'Administrador' : 'Operador',
+    name: role === 'admin' ? 'Administrador' : 'Operaciones',
     permissions,
   },
   lastLoginAt: '2026-10-04T14:05:00.000Z',
@@ -56,7 +53,12 @@ const user = {
 const schemas = doc.components.schemas;
 schemas.Role.example = user.role;
 schemas.User.example = user;
-schemas.Session.example = { accessToken: 'mock-access-token', expiresIn: 900, user };
+schemas.Session.example = {
+  accessToken: 'mock-access-token',
+  expiresIn: 900,
+  sessionExpiresAt: new Date(Date.now() + 12 * 3_600_000).toISOString(),
+  user,
+};
 schemas.Settings.example = {
   depositPercent: 30,
   holdMinutes: 15,

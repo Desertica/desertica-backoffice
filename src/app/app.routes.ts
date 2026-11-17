@@ -1,5 +1,5 @@
 import type { Route, Routes } from '@angular/router';
-import { authGuard, guestGuard, permissionGuard } from './core/auth/auth.guard';
+import { authGuard, guestGuard, homeRedirect, permissionGuard } from './core/auth/auth.guard';
 
 /** A staff route: hidden (redirect to /forbidden) unless the role holds `permission`. */
 const guarded = (
@@ -24,7 +24,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./layout/shell').then((m) => m.Shell),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      { path: '', pathMatch: 'full', redirectTo: homeRedirect },
       guarded('dashboard', 'reports:read', () =>
         import('./features/dashboard/dashboard').then((m) => m.Dashboard),
       ),

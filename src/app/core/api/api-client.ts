@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import createClient, { type Client, type Middleware } from 'openapi-fetch';
 import { RUNTIME_CONFIG } from '../config/runtime-config';
 import { AuthService } from '../auth/auth.service';
+import { ReauthService, isReauthRequired } from '../auth/reauth.service';
 import type { paths } from './schema';
 
 const AUTH_PATHS = ['/auth/google', '/auth/refresh', '/auth/logout'];
@@ -9,10 +10,13 @@ const AUTH_PATHS = ['/auth/google', '/auth/refresh', '/auth/logout'];
 /**
  * Typed client generated from the contract (`openapi-fetch` + `openapi-typescript`).
  * Adds the bearer token and, on a 401, renews the session once and replays the request.
+ * On a 403 `reauth_required` (sensitive action without a recent sign-in) it asks the user to
+ * sign in with Google again and replays the request once.
  */
 @Injectable({ providedIn: 'root' })
 export class ApiClient {
   private readonly auth = inject(AuthService);
+  private readonly reauth = inject(ReauthService);
   private readonly baseUrl = inject(RUNTIME_CONFIG).apiBaseUrl;
   private readonly replayable = new Map<string, Request>();
 
@@ -35,7 +39,13 @@ export class ApiClient {
       onResponse: async ({ request, response, id }) => {
         const original = this.replayable.get(id);
         this.replayable.delete(id);
-        if (response.status !== 401 || !original || isAuthCall(request.url)) return response;
+        if (!original || isAuthCall(request.url)) return response;
+        if (await isReauthRequired(response)) {
+          if (!(await this.reauth.request())) return response;
+          original.headers.set('Authorization', `Bearer ${this.auth.accessToken()}`);
+          return fetch(original);
+        }
+        if (response.status !== 401) return response;
         const renewed = await this.auth.refresh();
         if (!renewed) return response;
         original.headers.set('Authorization', `Bearer ${this.auth.accessToken()}`);

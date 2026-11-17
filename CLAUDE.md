@@ -1,6 +1,6 @@
 # Desertica backoffice
 
-Aplicación interna del staff de Desertica para operar el negocio: reservas, calendario de salidas, pagos y reembolsos, comprobantes electrónicos, clientes, reclamos y configuración. Consume `Desertica/desertica-api`; no tiene base de datos propia. Hoy opera con 2 personas y dos roles (`admin` y `operator`).
+Aplicación interna del staff de Desertica para operar el negocio: reservas, calendario de salidas, pagos y reembolsos, comprobantes electrónicos, clientes, reclamos y configuración. Consume `Desertica/desertica-api`; no tiene base de datos propia. Hoy opera con 2 personas; el API tiene 4 roles fijos (`admin`, `operator` = Operaciones, `finance` y `readonly`).
 
 El plan completo y el contrato están en `Desertica/desertica-api` (`openapi/openapi.yaml`, `docs/PENDIENTES.md`). Solo hace falta clonarlo al lado (`../desertica-api`) para regenerar los tipos o usar el mock; instalar, lint, tests y build (y por tanto CI) no lo necesitan.
 
@@ -12,11 +12,11 @@ Angular 21 (standalone, zoneless), Tailwind v4, Spartan/ui. Usa los mismos compo
 
 - **El contrato es `openapi/openapi.yaml` del repo del API.** Los tipos se generan con `openapi-typescript` y se llama con `openapi-fetch` (no hay paquete publicado); no escribas llamadas HTTP a mano ni inventes endpoints. Si falta algo, se pide un cambio de contrato por PR en el API.
 - **Login con Google** restringido al dominio de la empresa; el API emite el JWT.
-- **Sesión por cookie**: el refresh token vive en una cookie `desertica_refresh` (`HttpOnly; Secure; SameSite=Strict; Path=/api/auth`) que el navegador envía solo a `/auth/*` (`credentials: 'include'`); la app nunca la lee ni usa `sessionStorage`. El token de acceso vive solo en memoria y, al recargar, la app llama a `/auth/refresh`. **Requisito de despliegue: el backoffice y el API deben estar en el mismo sitio** (subdominios del mismo dominio, p. ej. `admin.` y `api.`), si no `SameSite=Strict` descarta la cookie; el API debe tener el origen del backoffice en `CORS_ORIGINS` (CORS con credenciales) y el CSP del nginx permite `connect-src` solo al origen de `API_BASE_URL` (se deriva en `docker/15-api-origin.envsh`). La interfaz se adapta a los permisos que devuelve `GET /auth/me` (`x-permission` de cada operación): oculta lo que el rol no puede hacer, pero la autorización real es del API.
+- **Sesión por cookie**: el refresh token vive en una cookie `desertica_refresh` (`HttpOnly; Secure; SameSite=Strict; Path=/api/auth`) que el navegador envía solo a `/auth/*` (`credentials: 'include'`); la app nunca la lee ni usa `sessionStorage`. El token de acceso vive solo en memoria y, al recargar, la app llama a `/auth/refresh`. **Requisito de despliegue: el backoffice y el API deben estar en el mismo sitio** (subdominios del mismo dominio, p. ej. `admin.` y `api.`), si no `SameSite=Strict` descarta la cookie; el API debe tener el origen del backoffice en `CORS_ORIGINS` (CORS con credenciales) y el CSP del nginx permite `connect-src` solo al origen de `API_BASE_URL` (se deriva en `docker/15-api-origin.envsh`). **Sesión del staff**: se cierra tras 30 min sin actividad (aviso 2 min antes; la actividad en otra pestaña cuenta) y el API la corta a las 12 h del login. Ante un `403` con `details.reason = "reauth_required"` (acción delicada sin login reciente) `ApiClient` abre el diálogo para volver a entrar con Google y reintenta la petición una vez; si entra otra cuenta, se cierra todo. La interfaz se adapta a los permisos que devuelve `GET /auth/me` (`x-permission` de cada operación): oculta lo que el rol no puede hacer, pero la autorización real es del API.
 - Dinero en enteros (`*Cents`) con IGV incluido; formatea con la moneda de cada reserva (`USD` o `PEN`) y nunca sumes monedas distintas.
 - Fechas en UTC desde el API; muéstralas en `America/Lima`.
 - Todo texto de interfaz va en `en` y `es`.
-- Sin analítica de marketing ni scripts de terceros en esta aplicación. Única excepción: Google Identity Services, cargado solo en la pantalla de login.
+- Sin analítica de marketing ni scripts de terceros en esta aplicación. Única excepción: Google Identity Services, cargado solo donde hay un botón de Google (login y diálogo de reconfirmación).
 - Nunca commitees `.env`, `.cursor/` ni `.vscode/`.
 
 ## Commands

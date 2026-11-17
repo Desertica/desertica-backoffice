@@ -369,7 +369,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Firmar el descargo de responsabilidad */
+        /**
+         * Firmar el descargo de responsabilidad
+         * @description `409` si la reserva está cancelada, si ya se firmó o si pasaron más de 2 días desde el inicio del
+         *     tour. `404` si el enlace no existe o el cliente pidió que se borraran sus datos. Las notas médicas se
+         *     guardan cifradas.
+         */
         post: operations["signWaiver"];
         delete?: never;
         options?: never;
@@ -541,7 +546,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Iniciar sesión con Google (solo dominio de la empresa) */
+        /**
+         * Iniciar sesión con Google (solo dominio de la empresa)
+         * @description Exige un correo verificado del dominio de la empresa que sea una cuenta de su Google Workspace (`hd`):
+         *     una cuenta personal de Google creada con una dirección de la empresa responde 403.
+         */
         post: operations["loginWithGoogle"];
         delete?: never;
         options?: never;
@@ -930,8 +939,31 @@ export interface paths {
          * Cancelar una reserva
          * @description Calcula el reembolso con la política de cancelación vigente al reservar. Con `refund = POLICY`
          *     devuelve lo que corresponde; con `FULL` o `NONE` fuerza el monto (requiere `bookings:override`).
+         *     Anula los enlaces de "mi reserva" ya enviados; el cliente puede pedir uno nuevo.
          */
         post: operations["cancelBooking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}/access-links/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Anular los enlaces de "mi reserva"
+         * @description Invalida todos los enlaces de "mi reserva" enviados al cliente (p. ej. si reenvió el correo a otra
+         *     persona). El cliente puede pedir uno nuevo a su correo con `requestBookingAccess`. Los enlaces
+         *     también se anulan solos al cancelar la reserva, al cambiar el correo del cliente y al pedir uno nuevo.
+         */
+        post: operations["revokeBookingAccessLinks"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1006,7 +1038,8 @@ export interface paths {
         put?: never;
         /**
          * Registrar un pago manual
-         * @description Efectivo, transferencia o Yape personal. No pasa por pasarela.
+         * @description Efectivo, transferencia o Yape personal. No pasa por pasarela. Para `TRANSFER` y `YAPE` el número de
+         *     operación (`reference`) es obligatorio (422 si falta): Finanzas lo cruza con el banco.
          */
         post: operations["recordManualPayment"];
         delete?: never;
@@ -1444,15 +1477,14 @@ export interface paths {
          * Publicar una nueva versión de un documento legal
          * @description Guarda un snapshot inmutable del texto en el idioma `locale` (un trigger de la base impide
          *     modificarlo o borrarlo). El texto se escribe en el backoffice: con `text` (y `title`) se publica ese
-         *     texto tal cual y no se consulta el CMS. Sin `text` se toma del CMS como antes (en desuso: se retira
-         *     cuando la web y el backoffice dejen de usarlo).
-         *     - Documentos globales (`TERMS`, `PRIVACY`, `CANCELLATION`, `COOKIES`, `CONDUCT`): la página
-         *       `cmsSlug`; la versión es la siguiente de `(kind, locale)`.
-         *     - `WAIVER`: el campo `waiverBody` del tour `tourRefId` en ese idioma (no lleva `cmsSlug`); la versión
-         *       es la siguiente de `(tour, locale)` y la respuesta trae el slug del tour en `cmsSlug`. Los
-         *       descargos de las reservas nuevas apuntan a la última versión publicada (la del idioma de la reserva
-         *       o, si no hay, la de `en`); sin ninguna, el tour no se puede reservar (409).
-         *     Responde 422 si el CMS no tiene esa página, ese tour o su `waiverBody`, y 503 si el CMS no responde.
+         *     texto tal cual y no se consulta el CMS.
+         *     - Documentos globales (`TERMS`, `PRIVACY`, `CANCELLATION`, `COOKIES`, `CONDUCT`): la versión es la
+         *       siguiente de `(kind, locale)`. Sin `text` se toma la página `cmsSlug` del CMS (en desuso: se retira
+         *       cuando el backoffice deje de usarlo); responde 422 si el CMS no tiene esa página y 503 si no responde.
+         *     - `WAIVER`: `title` y `text` son obligatorios (el descargo ya no existe en el CMS), junto con
+         *       `tourRefId`; la versión es la siguiente de `(tour, locale)` y la respuesta trae el slug del tour en
+         *       `cmsSlug`. Los descargos de las reservas nuevas apuntan a la última versión publicada (la del idioma
+         *       de la reserva o, si no hay, la de `en`); sin ninguna, el tour no se puede reservar (409).
          */
         post: operations["publishLegalDocument"];
         delete?: never;
@@ -2497,6 +2529,11 @@ export interface components {
             accessToken: string;
             /** @description Segundos de vigencia del token de acceso. */
             expiresIn: number;
+            /**
+             * Format: date-time
+             * @description Fin absoluto de la sesión; después hay que volver a entrar con Google.
+             */
+            sessionExpiresAt: string;
             user: components["schemas"]["User"];
         };
         Role: {
@@ -2684,6 +2721,7 @@ export interface components {
                 phone?: string | null;
                 emergencyContactName?: string | null;
                 emergencyContactPhone?: string | null;
+                /** @description Notas médicas del descargo. Siempre `null` si quien consulta no tiene `waivers:read`. */
                 medicalNotes?: string | null;
                 waiverStatus: components["schemas"]["WaiverStatus"];
                 /** @description Saldo por cobrar el día de la salida. */
@@ -3305,6 +3343,7 @@ export interface operations {
                     "application/json": components["schemas"]["WaiverForm"];
                 };
             };
+            404: components["responses"]["Error"];
             409: components["responses"]["Error"];
         };
     };
@@ -4323,6 +4362,32 @@ export interface operations {
             409: components["responses"]["Error"];
         };
     };
+    revokeBookingAccessLinks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Enlaces anulados */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Cuántos enlaces vigentes se anularon. */
+                        revoked: number;
+                    };
+                };
+            };
+            404: components["responses"]["Error"];
+        };
+    };
     rescheduleBooking: {
         parameters: {
             query?: never;
@@ -5158,16 +5223,16 @@ export interface operations {
                 "application/json": {
                     kind: components["schemas"]["LegalDocumentKind"];
                     locale: string;
-                    /** @description Sin `text`, obligatorio salvo con `WAIVER`. Con `text` es opcional: por defecto el slug de la página legal de ese tipo (`terms`, `privacy`, `cancellation`, `cookies`, `conduct`). */
+                    /** @description Sin `text`, obligatorio (solo documentos globales). Con `text` es opcional: por defecto el slug de la página legal de ese tipo (`terms`, `privacy`, `cancellation`, `cookies`, `conduct`). */
                     cmsSlug?: string;
                     /**
                      * Format: uuid
                      * @description Obligatorio con `WAIVER` y no admitido con los demás.
                      */
                     tourRefId?: string;
-                    /** @description Obligatorio con `text`. */
+                    /** @description Obligatorio con `text` y con `WAIVER`. */
                     title?: string;
-                    /** @description Texto en Markdown que se publica. Sin él se toma del CMS. */
+                    /** @description Texto en Markdown que se publica. Obligatorio con `WAIVER`; en los demás, sin él se toma del CMS. */
                     text?: string;
                 };
             };

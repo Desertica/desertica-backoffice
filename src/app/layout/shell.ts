@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   Injector,
   afterNextRender,
   computed,
@@ -39,12 +40,16 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 import { AuthService } from '../core/auth/auth.service';
 import { GoogleIdentity } from '../core/auth/google-identity';
+import { IdleService } from '../core/auth/idle.service';
+import { ReauthService } from '../core/auth/reauth.service';
 import { I18n, LANGS, type Lang } from '../core/i18n/i18n.service';
 import type { MessageKey } from '../core/i18n/messages.es';
 import { TPipe } from '../core/i18n/t.pipe';
 import { NAV_GROUPS } from '../core/nav/nav-items';
 import { ThemeService, type ThemeChoice } from '../core/theme/theme.service';
+import { useDialogs } from '../shared/dialog';
 import { Notify } from '../shared/notify';
+import { ReauthDialog } from './reauth-dialog';
 
 @Component({
   selector: 'app-shell',
@@ -94,6 +99,9 @@ export class Shell {
   private readonly google = inject(GoogleIdentity);
   private readonly notify = inject(Notify);
   private readonly injector = inject(Injector);
+  protected readonly idle = inject(IdleService);
+  private readonly reauth = inject(ReauthService);
+  private readonly dialogs = useDialogs();
   private readonly sidebar = viewChild.required<ElementRef<HTMLElement>>('sidebar');
   private readonly menuButton = viewChild.required<ElementRef<HTMLElement>>('menuButton');
   private signingOut = false;
@@ -152,12 +160,26 @@ export class Shell {
       }
       wasAuthenticated = authenticated;
     });
+
+    // 30 min without activity: close the session (the API session also ends after 12 h).
+    this.idle.watch(inject(DestroyRef), () => void this.signOut('auth.idle.signedOut'));
+
+    // A sensitive action needs a fresh Google sign-in: ask, then let the API client replay it.
+    effect(() => {
+      if (!this.reauth.pending()) return;
+      void this.dialogs.open<boolean>(ReauthDialog).then((ok) => this.reauth.finish(ok === true));
+    });
   }
 
-  protected async signOut() {
+  protected async signOut(reason?: MessageKey) {
     this.signingOut = true;
     await this.auth.logout();
     this.google.disableAutoSelect();
-    await this.router.navigateByUrl('/login');
+    if (reason) {
+      this.notify.info(reason);
+      await this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+    } else {
+      await this.router.navigateByUrl('/login');
+    }
   }
 }
