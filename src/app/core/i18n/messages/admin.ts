@@ -126,6 +126,9 @@ export const admin = defineMessages({
     'legal.kind.CANCELLATION': 'Política de cancelación',
     'legal.kind.COOKIES': 'Cookies',
     'legal.kind.CONDUCT': 'Conducta',
+    'legal.kind.WAIVER': 'Descargo de responsabilidad (por tour)',
+    'legal.tour': 'Tour',
+    'legal.tour.choose': 'Elige un tour',
   },
   en: {
     'users.title': 'Users and roles',
@@ -251,5 +254,8 @@ export const admin = defineMessages({
     'legal.kind.CANCELLATION': 'Cancellation policy',
     'legal.kind.COOKIES': 'Cookies',
     'legal.kind.CONDUCT': 'Conduct',
+    'legal.kind.WAIVER': 'Liability waiver (per tour)',
+    'legal.tour': 'Tour',
+    'legal.tour.choose': 'Choose a tour',
   },
 });
