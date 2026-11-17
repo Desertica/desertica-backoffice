@@ -11,7 +11,12 @@ const user = (permissions: string[]) => ({
 });
 
 function session(permissions = ['bookings:read']) {
-  return { accessToken: 'at1', expiresIn: 900, user: user(permissions) };
+  return {
+    accessToken: 'at1',
+    expiresIn: 900,
+    sessionExpiresAt: '2026-11-18T00:00:00.000Z',
+    user: user(permissions),
+  };
 }
 
 function json(body: unknown, status = 200) {
@@ -68,6 +73,30 @@ describe('AuthService', () => {
     expect(auth.has('users:write')).toBe(false);
     expect(calls.at(-1)).toMatchObject({ url: '/api/auth/me', auth: 'Bearer at1' });
     expect(calls[0].credentials).toBe('include');
+  });
+
+  it('reauthenticates the same user with a fresh token', async () => {
+    handler = (url) => (url.endsWith('/auth/google') ? json(session()) : json(user([])));
+    const auth = TestBed.inject(AuthService);
+    await auth.loginWithGoogle('first');
+    handler = (url) =>
+      url.endsWith('/auth/google') ? json({ ...session(), accessToken: 'at2' }) : json(user([]));
+    expect(await auth.reauthenticate('again')).toBe('ok');
+    expect(auth.accessToken()).toBe('at2');
+  });
+
+  it('closes everything when another account signs in to confirm', async () => {
+    handler = (url) => (url.endsWith('/auth/google') ? json(session()) : json(user([])));
+    const auth = TestBed.inject(AuthService);
+    await auth.loginWithGoogle('first');
+    handler = (url) =>
+      url.endsWith('/auth/google')
+        ? json({ ...session(), accessToken: 'other', user: { ...user([]), id: 'u2' } })
+        : new Response(null, { status: 204 });
+    expect(await auth.reauthenticate('someone-else')).toBe('other-user');
+    expect(auth.isAuthenticated()).toBe(false);
+    expect(auth.accessToken()).toBeNull();
+    expect(calls.at(-1)).toMatchObject({ url: '/api/auth/logout', credentials: 'include' });
   });
 
   it('restores the session from the refresh cookie on init (no body, credentials included)', async () => {

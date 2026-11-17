@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, resource, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  resource,
+  signal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialogImports } from '@spartan-ng/helm/dialog';
@@ -9,11 +17,15 @@ import { HlmTableImports } from '@spartan-ng/helm/table';
 import type { Role, User } from '../../core/api/types';
 import { AuthService } from '../../core/auth/auth.service';
 import { HasPermissionDirective } from '../../core/auth/has-permission.directive';
+import type { MessageKey } from '../../core/i18n/messages.es';
 import { TPipe } from '../../core/i18n/t.pipe';
 import { injectDialog, useDialogs } from '../../shared/dialog';
 import { LimaDateTimePipe } from '../../shared/format.pipes';
 import { Notify } from '../../shared/notify';
 import { AdminApi } from './admin.api';
+
+/** The 4 fixed roles of the API (`listRoles`). */
+const FIXED_ROLES: readonly string[] = ['admin', 'operator', 'finance', 'readonly'];
 
 @Component({
   selector: 'app-user-dialog',
@@ -55,6 +67,9 @@ import { AdminApi } from './admin.api';
             <option [value]="r.id">{{ r.name }}</option>
           }
         </select>
+        @if (roleHint(); as hint) {
+          <span class="text-xs text-muted-foreground">{{ hint | t }}</span>
+        }
       </label>
       @if (user) {
         <label class="flex items-center gap-2 text-sm">
@@ -87,10 +102,25 @@ export class UserDialog {
       [Validators.required, Validators.email],
     ],
     roleId: [
-      { value: this.user?.role.id ?? this.roles[0]?.id ?? '', disabled: this.isSelf },
+      {
+        // A new user starts with the least access; an admin is never the default.
+        value:
+          this.user?.role.id ??
+          (this.roles.find((r) => r.key === 'readonly') ?? this.roles[0])?.id ??
+          '',
+        disabled: this.isSelf,
+      },
       Validators.required,
     ],
     active: [{ value: this.user?.active ?? true, disabled: this.isSelf }],
+  });
+  private readonly roleId = toSignal(this.form.controls.roleId.valueChanges, {
+    initialValue: this.form.controls.roleId.value,
+  });
+  /** What the chosen fixed role can do (other roles have no hint). */
+  protected readonly roleHint = computed(() => {
+    const key = this.roles.find((r) => r.id === this.roleId())?.key;
+    return key && FIXED_ROLES.includes(key) ? (`users.role.hint.${key}` as MessageKey) : null;
   });
 
   protected async submit() {

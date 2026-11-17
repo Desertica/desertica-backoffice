@@ -131,6 +131,21 @@ describe('booking helpers', () => {
         'USD',
       ),
     ).toBeNull();
+    // Transfer and Yape need the operation number; cash does not.
+    for (const method of ['TRANSFER', 'YAPE'] as const) {
+      expect(
+        buildManualPayment(
+          { method, kind: 'FULL', amount: '10', reference: '  ', paidAt: '' },
+          'USD',
+        ),
+      ).toBeNull();
+    }
+    expect(
+      buildManualPayment(
+        { method: 'CASH', kind: 'FULL', amount: '10', reference: '', paidAt: '' },
+        'USD',
+      ),
+    ).not.toBeNull();
   });
 
   it('lists only open departures with room for the whole party, excluding the current one', () => {

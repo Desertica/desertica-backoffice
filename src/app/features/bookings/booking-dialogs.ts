@@ -270,6 +270,9 @@ export class RescheduleBookingDialog {
 
 // -------------------------------------------------------- manual payment
 
+/** Transfers and Yape need the operation number: Finance matches it against the bank. */
+export const needsReference = (method: string) => method === 'TRANSFER' || method === 'YAPE';
+
 export function buildManualPayment(
   v: {
     method: 'CASH' | 'TRANSFER' | 'YAPE' | 'OTHER';
@@ -282,6 +285,7 @@ export function buildManualPayment(
 ) {
   const amountCents = parseToCents(v.amount);
   if (!amountCents || amountCents < 1) return null;
+  if (needsReference(v.method) && !v.reference.trim()) return null;
   return {
     method: v.method,
     kind: v.kind,
@@ -345,8 +349,22 @@ export function paidAtInFuture(paidAt: string, now = Date.now()): boolean {
           }
         </label>
         <label class="grid gap-1.5 sm:col-span-2">
-          <span hlmLabel>{{ 'bookings.payment.reference' | t }} ({{ 'common.optional' | t }})</span>
+          <span hlmLabel
+            >{{ 'bookings.payment.reference' | t }}
+            @if (!referenceRequired()) {
+              ({{ 'common.optional' | t }})
+            }
+          </span>
           <input hlmInput formControlName="reference" />
+          @if (
+            referenceRequired() &&
+            form.controls.reference.touched &&
+            !form.controls.reference.value.trim()
+          ) {
+            <span class="text-xs text-destructive">{{
+              'bookings.payment.referenceRequired' | t
+            }}</span>
+          }
         </label>
       </div>
       <hlm-dialog-footer>
@@ -377,6 +395,10 @@ export class ManualPaymentDialog {
     reference: [''],
     paidAt: [''],
   });
+
+  protected referenceRequired() {
+    return needsReference(this.form.controls.method.value);
+  }
 
   protected valid() {
     return buildManualPayment(this.form.getRawValue(), this.booking.currency) !== null;

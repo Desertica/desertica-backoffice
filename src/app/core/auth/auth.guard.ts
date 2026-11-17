@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
-import { type CanActivateFn, Router } from '@angular/router';
+import { type CanActivateFn, type RedirectFunction, Router } from '@angular/router';
+import { NAV_GROUPS } from '../nav/nav-items';
 import { AuthService } from './auth.service';
 
 /** Sends anonymous visitors to the login page, remembering where they wanted to go. */
@@ -20,4 +21,11 @@ export const permissionGuard: CanActivateFn = (route) => {
   if (!required) return true;
   const list = Array.isArray(required) ? required : [required];
   return list.some((p) => auth.has(p)) || inject(Router).createUrlTree(['/forbidden']);
+};
+
+/** Home (`/`): the first section the role may open, so a role without `reports:read` skips the dashboard. */
+export const homeRedirect: RedirectFunction = () => {
+  const auth = inject(AuthService);
+  const first = NAV_GROUPS.flatMap((g) => g.items).find((i) => auth.has(i.permission));
+  return first?.path ?? '/forbidden';
 };

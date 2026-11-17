@@ -44,6 +44,21 @@ export class AuthService {
     await this.adopt(session);
   }
 
+  /**
+   * Fresh Google sign-in for a sensitive action. It must be the same person: if another account
+   * signs in, that new session is closed too and the user goes back to the login page.
+   */
+  async reauthenticate(idToken: string): Promise<'ok' | 'other-user'> {
+    const current = this._user()?.id;
+    const session = unwrap<Session>(await this.raw.POST('/auth/google', { body: { idToken } }));
+    if (session.user.id !== current) {
+      await this.logout();
+      return 'other-user';
+    }
+    await this.adopt(session);
+    return 'ok';
+  }
+
   /** Renews the access token. Concurrent callers share one request. */
   refresh(): Promise<boolean> {
     this.inflightRefresh ??= this.doRefresh().finally(() => (this.inflightRefresh = null));

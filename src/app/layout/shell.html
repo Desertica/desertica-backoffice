@@ -143,6 +143,18 @@
       </ng-template>
     </header>
 
+    @if (idle.state(); as state) {
+      @if (state.kind === 'warning') {
+        <div
+          class="print:hidden flex flex-wrap items-center justify-between gap-3 border-b border-border bg-muted px-4 py-2 text-sm"
+          role="alert"
+        >
+          <span>{{ 'auth.idle.warning' | t: { seconds: state.secondsLeft } }}</span>
+          <button hlmBtn size="sm" (click)="idle.touch()">{{ 'auth.idle.stay' | t }}</button>
+        </div>
+      }
+    }
+
     <main class="flex-1 p-4 md:p-6">
       <router-outlet />
     </main>
