@@ -60,6 +60,27 @@ describe('AdminApi legal documents', () => {
     expect(await api.currentLegal('PRIVACY', 'es')).toBeNull();
   });
 
+  it('reads the waiver in force of a tour: newest version from the list, text from the document', async () => {
+    const api = TestBed.inject(AdminApi);
+    expect(await api.currentLegal('WAIVER', 'es')).toBeNull();
+    expect(seen).toHaveLength(0);
+
+    const doc = { id: 'w2', kind: 'WAIVER', locale: 'es', version: 2, tourRefId: 't1' };
+    reply = (req) =>
+      new URL(req.url).pathname.endsWith('/w2')
+        ? json(200, { ...doc, text: 'Descargo' })
+        : json(200, { data: [doc], meta: { page: 1, pageSize: 1, total: 2 } });
+    expect((await api.currentLegal('WAIVER', 'es', 't1'))?.text).toBe('Descargo');
+    expect(seen[0]).toMatchObject({
+      path: '/api/legal-documents',
+      search: '?kind=WAIVER&locale=es&tourRefId=t1&pageSize=1',
+    });
+    expect(seen[1].path).toBe('/api/legal-documents/w2');
+
+    reply = () => json(200, { data: [], meta: { page: 1, pageSize: 1, total: 0 } });
+    expect(await api.currentLegal('WAIVER', 'en', 't1')).toBeNull();
+  });
+
   it('publishes the title and text written in the backoffice', async () => {
     reply = () =>
       json(201, {

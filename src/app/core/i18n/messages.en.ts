@@ -8,6 +8,7 @@ import { customers } from './messages/customers';
 import { dashboard } from './messages/dashboard';
 import { departures } from './messages/departures';
 import { shared } from './messages/shared';
+import { tours } from './messages/tours';
 
 export const en: Record<MessageKey, string> = {
   'app.name': 'Desértica Backoffice',
@@ -22,6 +23,7 @@ export const en: Record<MessageKey, string> = {
 
   'nav.dashboard': 'Dashboard',
   'nav.departures': 'Departures',
+  'nav.tours': 'Tours',
   'nav.bookings': 'Bookings',
   'nav.customers': 'Customers',
   'nav.payments': 'Payments and refunds',
@@ -69,4 +71,5 @@ export const en: Record<MessageKey, string> = {
   ...documents.en,
   ...complaints.en,
   ...admin.en,
+  ...tours.en,
 };

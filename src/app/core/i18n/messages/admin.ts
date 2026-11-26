@@ -89,6 +89,15 @@ export const admin = defineMessages({
     'settings.complaintDueDays': 'Plazo de reclamos (días hábiles)',
     'settings.complaintDueDays.hint':
       'Días para responder un reclamo (1–60); a confirmar con el abogado.',
+    'settings.availabilityMonths': 'Meses del calendario web',
+    'settings.availabilityMonths.hint':
+      'Meses que muestra el calendario de la web, contando el mes en curso (1–12).',
+    'settings.adultsMin': 'Mínimo de adultos',
+    'settings.adultsMin.hint': 'Mínimo de adultos de una reserva web (1–20).',
+    'settings.childrenMin': 'Mínimo de niños',
+    'settings.childrenMin.hint': 'Mínimo de niños de una reserva web (0–20).',
+    'settings.peopleMax': 'Máximo de personas',
+    'settings.peopleMax.hint': 'Máximo de adultos más niños de una reserva web (1–20).',
     'settings.outOfRange': 'Valor fuera del rango permitido.',
     'settings.invalidNumber': 'Número no válido.',
     'settings.saved': 'Ajustes guardados',
@@ -117,6 +126,9 @@ export const admin = defineMessages({
     'legal.kind.CANCELLATION': 'Política de cancelación',
     'legal.kind.COOKIES': 'Cookies',
     'legal.kind.CONDUCT': 'Conducta',
+    'legal.kind.WAIVER': 'Descargo de responsabilidad (por tour)',
+    'legal.tour': 'Tour',
+    'legal.tour.choose': 'Elige un tour',
   },
   en: {
     'users.title': 'Users and roles',
@@ -205,6 +217,15 @@ export const admin = defineMessages({
     'settings.complaintDueDays': 'Complaint deadline (business days)',
     'settings.complaintDueDays.hint':
       'Days to answer a complaint (1–60); to be confirmed with the lawyer.',
+    'settings.availabilityMonths': 'Web calendar months',
+    'settings.availabilityMonths.hint':
+      'Months shown by the website calendar, counting the current one (1–12).',
+    'settings.adultsMin': 'Minimum adults',
+    'settings.adultsMin.hint': 'Minimum adults in a web booking (1–20).',
+    'settings.childrenMin': 'Minimum children',
+    'settings.childrenMin.hint': 'Minimum children in a web booking (0–20).',
+    'settings.peopleMax': 'Maximum people',
+    'settings.peopleMax.hint': 'Maximum adults plus children in a web booking (1–20).',
     'settings.outOfRange': 'Value outside the allowed range.',
     'settings.invalidNumber': 'Invalid number.',
     'settings.saved': 'Settings saved',
@@ -233,5 +254,8 @@ export const admin = defineMessages({
     'legal.kind.CANCELLATION': 'Cancellation policy',
     'legal.kind.COOKIES': 'Cookies',
     'legal.kind.CONDUCT': 'Conduct',
+    'legal.kind.WAIVER': 'Liability waiver (per tour)',
+    'legal.tour': 'Tour',
+    'legal.tour.choose': 'Choose a tour',
   },
 });

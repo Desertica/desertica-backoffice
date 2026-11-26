@@ -87,15 +87,34 @@ export class AdminApi {
     locale: string;
     title: string;
     text: string;
+    /** Only with `WAIVER`: the tour the waiver belongs to. */
+    tourRefId?: string;
   }): Promise<LegalDocument> {
     return unwrap(await this.http.POST('/legal-documents', { body }));
   }
 
-  /** The published version of a global document with its text, or `null` when none is published yet. */
+  /**
+   * The published version of a document with its text, or `null` when none is published yet.
+   * A `WAIVER` is per tour: pass its `tourRefId`.
+   */
   async currentLegal(
-    kind: Exclude<LegalDocumentKind, 'WAIVER'>,
+    kind: LegalDocumentKind,
     locale: string,
+    tourRefId?: string,
   ): Promise<LegalDocumentWithText | null> {
+    if (kind === 'WAIVER') {
+      if (!tourRefId) return null;
+      // The list is sorted newest first; the text only comes with the single document.
+      const [latest] = unwrap(
+        await this.http.GET('/legal-documents', {
+          params: { query: { kind, locale, tourRefId, pageSize: 1 } },
+        }),
+      ).data;
+      if (!latest) return null;
+      return unwrap(
+        await this.http.GET('/legal-documents/{id}', { params: { path: { id: latest.id } } }),
+      );
+    }
     const res = await this.http.GET('/public/legal-documents/{kind}', {
       params: { path: { kind }, query: { locale } },
     });

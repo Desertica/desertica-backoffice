@@ -45,8 +45,77 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Disponibilidad y precios de un tour para un mes */
+        /**
+         * Disponibilidad y precios de un tour para un mes
+         * @description Solo hay salidas hasta el fin del mes que queda `availabilityMonths - 1` meses después del actual (hora
+         *     de Lima): con 3, el mes en curso y los dos siguientes. Un mes posterior responde con `data` vacío.
+         */
         get: operations["getTourAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/tours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Datos operativos de los tours activos
+         * @description Duración, formato, idiomas, punto de encuentro y edad y altura mínimas de cada tour activo, para la ficha
+         *     de la web (el CMS ya no guarda esos campos). El contenido editorial sigue en el CMS; se une por `slug`.
+         */
+        get: operations["listPublicTours"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/booking-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reglas de reserva de la web
+         * @description Meses del calendario, mínimos y máximo de personas y porcentaje de depósito (ajustes del backoffice). El
+         *     API las hace cumplir: `createQuote`, `createHold` y `createPublicBooking` responden 422 a un grupo fuera
+         *     de rango y `getTourAvailability` no devuelve salidas más allá de `availabilityMonths`.
+         */
+        get: operations["getPublicBookingRules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/tour-prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Precio "desde" de cada tour activo en una moneda
+         * @description El precio más bajo vigente hoy de cada tour activo, para las tarjetas y la ficha de la web (el CMS ya no
+         *     guarda precios). Por persona cuando el tour tiene reglas por persona; si solo tiene reglas por grupo, el
+         *     precio del grupo con `unit: PER_GROUP`. Un tour sin reglas vigentes en esa moneda no aparece.
+         */
+        get: operations["getTourPrices"];
         put?: never;
         post?: never;
         delete?: never;
@@ -86,7 +155,8 @@ export interface paths {
          * @description Reserva los asientos durante unos minutos mientras el cliente completa el pago. Responde 429 si la IP
          *     ya pidió demasiados bloqueos o si la salida ya tiene el máximo de bloqueos vigentes
          *     (`maxActiveHoldsPerDeparture`, 10 por defecto): en ese caso `details.reason` es `TOO_MANY_HOLDS` y
-         *     `details.retryAfterSeconds` dice cuándo se libera el primero.
+         *     `details.retryAfterSeconds` dice cuándo se libera el primero. Responde 422 si `seats` supera `peopleMax`
+         *     o no llega a `adultsMin + childrenMin` (ver `getPublicBookingRules`).
          */
         post: operations["createHold"];
         delete?: never;
@@ -358,6 +428,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/company": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Datos del proveedor para la hoja de reclamación
+         * @description Razón social, RUC y domicilio fiscal de la empresa activa. No expone nada fiscal ni interno.
+         */
+        get: operations["getPublicCompany"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/legal-documents/{kind}": {
         parameters: {
             query?: never;
@@ -567,7 +657,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Editar ajustes operativos de un tour */
+        /** Editar datos y ajustes operativos de un tour */
         patch: operations["updateTourRef"];
         trace?: never;
     };
@@ -1674,6 +1764,11 @@ export interface components {
         IdDocType: "DNI" | "CE" | "PASSPORT" | "RUC";
         /** @enum {string} */
         TourFormat: "SHARED" | "PRIVATE";
+        /**
+         * @description Modalidades en que se ofrece un tour. Las salidas y los precios usan `TourFormat`.
+         * @enum {string}
+         */
+        TourOffer: "SHARED" | "PRIVATE" | "BOTH";
         /** @enum {string} */
         PriceUnit: "PER_PERSON" | "PER_GROUP";
         /** @enum {string} */
@@ -1706,6 +1801,14 @@ export interface components {
             slug: string;
             title: string;
             durationHours?: number | null;
+            format?: components["schemas"]["TourOffer"] | null;
+            /** @description Códigos de dos letras en minúscula. */
+            languages?: string[];
+            meetingPoint?: components["schemas"]["TourMeetingPoint"] | null;
+            /** Format: uri */
+            meetingPointUrl?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
             active: boolean;
             requiresWaiver: boolean;
             minAge?: number | null;
@@ -1716,7 +1819,45 @@ export interface components {
             /** Format: date-time */
             cmsSyncedAt?: string | null;
         };
+        /** @description Punto de encuentro por idioma. */
+        TourMeetingPoint: {
+            en?: string;
+            es?: string;
+        };
+        PublicTour: {
+            slug: string;
+            durationHours: number | null;
+            format: components["schemas"]["TourOffer"] | null;
+            languages: string[];
+            meetingPoint: components["schemas"]["TourMeetingPoint"] | null;
+            meetingPointUrl: string | null;
+            latitude: number | null;
+            longitude: number | null;
+            minAge: number | null;
+            minHeightCm: number | null;
+        };
+        PublicBookingRules: {
+            /** @description Porcentaje del total que se cobra como depósito. */
+            depositPercent: number;
+            /** @description Meses que muestra el calendario (incluye el actual). */
+            availabilityMonths: number;
+            adultsMin: number;
+            childrenMin: number;
+            /** @description Adultos más niños. */
+            peopleMax: number;
+        };
         UpdateTourRef: {
+            durationHours?: number | null;
+            format?: components["schemas"]["TourOffer"] | null;
+            languages?: string[];
+            meetingPoint?: components["schemas"]["TourMeetingPoint"] | null;
+            /**
+             * Format: uri
+             * @description Enlace http(s) al mapa.
+             */
+            meetingPointUrl?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
             active?: boolean;
             requiresWaiver?: boolean;
             minAge?: number | null;
@@ -2312,6 +2453,12 @@ export interface components {
         LegalDocumentWithText: components["schemas"]["LegalDocument"] & {
             text: string;
         };
+        PublicCompany: {
+            legalName: string;
+            tradeName?: string;
+            ruc: string;
+            fiscalAddress: string;
+        };
         CreateComplaint: {
             /** @enum {string} */
             kind: "RECLAMO" | "QUEJA";
@@ -2478,6 +2625,26 @@ export interface components {
              */
             complaintDueDays: number;
             /**
+             * @description Meses que muestra el calendario de la web (incluye el mes en curso).
+             * @default 3
+             */
+            availabilityMonths: number;
+            /**
+             * @description Mínimo de adultos de una reserva web.
+             * @default 1
+             */
+            adultsMin: number;
+            /**
+             * @description Mínimo de niños de una reserva web.
+             * @default 0
+             */
+            childrenMin: number;
+            /**
+             * @description Máximo de personas (adultos más niños) de una reserva web.
+             * @default 12
+             */
+            peopleMax: number;
+            /**
              * @description Emitir el comprobante automáticamente al confirmarse un pago (y la nota de crédito al reembolsar).
              * @default true
              */
@@ -2500,6 +2667,10 @@ export interface components {
             maxActiveHoldsPerDeparture?: number;
             operatorRefundLimitCents?: number;
             complaintDueDays?: number;
+            availabilityMonths?: number;
+            adultsMin?: number;
+            childrenMin?: number;
+            peopleMax?: number;
         } & {
             [key: string]: unknown;
         };
@@ -2646,6 +2817,79 @@ export interface operations {
             404: components["responses"]["Error"];
         };
     };
+    listPublicTours: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tours activos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PublicTour"][];
+                    };
+                };
+            };
+        };
+    };
+    getPublicBookingRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reglas vigentes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicBookingRules"];
+                };
+            };
+        };
+    };
+    getTourPrices: {
+        parameters: {
+            query: {
+                currency: components["schemas"]["Currency"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Precios desde */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            slug: string;
+                            /** @description Con IGV incluido. */
+                            fromCents: number;
+                            /** @enum {string} */
+                            unit: "PER_PERSON" | "PER_GROUP";
+                        }[];
+                    };
+                };
+            };
+            422: components["responses"]["Error"];
+        };
+    };
     createQuote: {
         parameters: {
             query?: never;
@@ -2708,6 +2952,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            422: components["responses"]["Error"];
             429: components["responses"]["Error"];
         };
     };
@@ -3150,6 +3395,27 @@ export interface operations {
                 };
                 content?: never;
             };
+        };
+    };
+    getPublicCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Datos del proveedor */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicCompany"];
+                };
+            };
+            404: components["responses"]["Error"];
         };
     };
     getPublicLegalDocument: {
