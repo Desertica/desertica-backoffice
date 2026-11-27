@@ -26,6 +26,13 @@ export const admin = defineMessages({
     'users.field.role': 'Rol',
     'users.field.active': 'Cuenta activa',
     'users.roles.permissions': 'Permisos ({count})',
+    'users.role.hint.admin': 'Todo: usuarios, empresa, ajustes, precios y reembolsos sin tope.',
+    'users.role.hint.operator':
+      'Reservas, salidas, clientes, cobros en campo, reclamos y descargos. Sin reembolsos, comprobantes ni reportes.',
+    'users.role.hint.finance':
+      'Pagos, reembolsos hasta el tope, comprobantes y anulaciones, reportes y bitácora.',
+    'users.role.hint.readonly':
+      'Ve reservas, salidas, pagos, comprobantes y reportes. Sin datos de clientes, descargos ni reclamos.',
 
     'company.title': 'Empresa y series',
     'company.section.company': 'Datos fiscales',
@@ -154,6 +161,13 @@ export const admin = defineMessages({
     'users.field.role': 'Role',
     'users.field.active': 'Active account',
     'users.roles.permissions': 'Permissions ({count})',
+    'users.role.hint.admin': 'Everything: users, company, settings, prices and uncapped refunds.',
+    'users.role.hint.operator':
+      'Bookings, departures, customers, cash taken in the field, complaints and waivers. No refunds, documents or reports.',
+    'users.role.hint.finance':
+      'Payments, refunds up to the cap, documents and voids, reports and the audit log.',
+    'users.role.hint.readonly':
+      'Sees bookings, departures, payments, documents and reports. No customer data, waivers or complaints.',
 
     'company.title': 'Company and series',
     'company.section.company': 'Tax details',
