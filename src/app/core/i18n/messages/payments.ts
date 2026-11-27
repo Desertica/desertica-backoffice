@@ -35,7 +35,6 @@ export const payments = defineMessages({
     'refund.status.PENDING': 'Pendiente',
     'refund.status.SUCCEEDED': 'Hecho',
     'refund.status.FAILED': 'Fallido',
-    'enum.provider.STRIPE': 'Stripe',
     'enum.provider.CULQI': 'Culqi',
     'enum.provider.MANUAL': 'Manual',
 
@@ -98,7 +97,6 @@ export const payments = defineMessages({
     'refund.status.PENDING': 'Pending',
     'refund.status.SUCCEEDED': 'Done',
     'refund.status.FAILED': 'Failed',
-    'enum.provider.STRIPE': 'Stripe',
     'enum.provider.CULQI': 'Culqi',
     'enum.provider.MANUAL': 'Manual',
 

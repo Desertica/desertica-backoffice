@@ -236,23 +236,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/public/bookings/{reference}/payments/stripe-intent": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Crear un PaymentIntent de Stripe (USD) */
-        post: operations["createBookingStripeIntent"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/public/bookings/{reference}/payments/culqi-charge": {
         parameters: {
             query?: never;
@@ -281,23 +264,6 @@ export interface paths {
         get: operations["getPaymentLinkInfo"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/payment-links/{token}/stripe-intent": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Crear un PaymentIntent para un enlace de pago */
-        post: operations["createLinkStripeIntent"];
         delete?: never;
         options?: never;
         head?: never;
@@ -492,29 +458,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/webhooks/stripe": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Eventos de Stripe
-         * @description Valida `Stripe-Signature` sobre el cuerpo crudo (400 si falta o no coincide), guarda el evento en
-         *     `WebhookEvent` (idempotente por `eventId`) y responde 200 aunque ya estuviera procesado. Eventos usados:
-         *     `payment_intent.succeeded|payment_failed|canceled|requires_action`, `refund.created|updated|failed` y
-         *     `charge.dispute.created|updated|closed|funds_withdrawn|funds_reinstated`. 503 si el webhook no está configurado.
-         */
-        post: operations["receiveStripeWebhook"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/webhooks/culqi": {
         parameters: {
             query?: never;
@@ -526,11 +469,36 @@ export interface paths {
         put?: never;
         /**
          * Eventos de Culqi
-         * @description Valida la firma HMAC-SHA256 del cuerpo en `x-culqi-signature` (400 si falta o no coincide; 503 si no hay
-         *     secreto configurado). El API no confía en el contenido del evento: vuelve a consultar el cargo a Culqi.
-         *     El esquema de firma está pendiente de verificar contra la documentación oficial de Culqi.
+         * @description Culqi no documenta una firma para sus webhooks. El API no confía en el cuerpo: toma solo el `id` del evento
+         *     (`evt_test_…` / `evt_live_…`) y lo consulta en `GET /v2/events/{id}` con la clave secreta; los cargos se
+         *     vuelven a consultar también. 400 si falta el id o Culqi no conoce ese evento; 503 si no hay clave secreta.
          */
         post: operations["receiveCulqiWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/webhooks/cms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Aviso de Strapi al publicar o despublicar un tour
+         * @description Webhook de Strapi (ver `docs/WEBHOOKS.md` del CMS). Exige la cabecera `X-Webhook-Secret` igual a
+         *     `CMS_WEBHOOK_SECRET` (401 si falta o no coincide; 503 si el API no tiene secreto). Para `model: tour`
+         *     sincroniza solo ese tour con la misma lógica que `syncTourRefs`: lo crea inactivo si es nuevo, refresca
+         *     su título y lo desactiva si ya no está publicado en ningún idioma. Idempotente: repetir el aviso deja
+         *     el mismo estado. Otros modelos o eventos (y el `trigger-test` del admin) responden 200 con
+         *     `ignored: true`. El botón "Sincronizar con el CMS" sigue como respaldo (Strapi no reintenta).
+         */
+        post: operations["receiveCmsWebhook"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1759,7 +1727,7 @@ export interface paths {
         /**
          * Reporte de ventas
          * @description Mismas medidas que `sales` del panel, agrupadas por `groupBy`: `day` (fecha de Lima), `tour` (slug
-         *     del tour) o `provider` (`STRIPE`, `CULQI` o `MANUAL`). Con `format=csv` devuelve el mismo contenido
+         *     del tour) o `provider` (`CULQI` o `MANUAL`). Con `format=csv` devuelve el mismo contenido
          *     como `text/csv` (columnas `key,currency,grossCents,refundedCents,bookings`); las celdas que
          *     empezarían con `=`, `+`, `-`, `@`, tabulación o retorno se prefijan con `'` para que una hoja de
          *     cálculo no las evalúe como fórmula.
@@ -1808,7 +1776,7 @@ export interface components {
         /** @enum {string} */
         BookingStatus: "PENDING_PAYMENT" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
         /** @enum {string} */
-        PaymentProvider: "STRIPE" | "CULQI" | "MANUAL";
+        PaymentProvider: "CULQI" | "MANUAL";
         /** @enum {string} */
         PaymentMethod: "CARD" | "WALLET" | "YAPE" | "CASH" | "TRANSFER" | "OTHER";
         /** @enum {string} */
@@ -2240,7 +2208,7 @@ export interface components {
         /** @description Pasarelas y tipos de pago disponibles para la moneda y el saldo de la reserva (vacío si no queda saldo). */
         PaymentOptions: {
             /** @enum {string} */
-            provider: "STRIPE" | "CULQI";
+            provider: "CULQI";
             kinds: components["schemas"]["PaymentKind"][];
         }[];
         PublicBookingCreated: {
@@ -2248,9 +2216,6 @@ export interface components {
             /** @description Se envía como `X-Booking-Token` en las llamadas siguientes y por email. */
             accessToken: string;
             paymentOptions?: components["schemas"]["PaymentOptions"];
-        };
-        CreatePaymentRequest: {
-            kind: components["schemas"]["PaymentKind"];
         };
         CulqiChargeRequest: {
             kind: components["schemas"]["PaymentKind"];
@@ -2263,19 +2228,12 @@ export interface components {
              * @description Pago `REQUIRES_ACTION` que se continúa tras la autenticación 3DS (con `authentication3DS`).
              */
             paymentId?: string;
+            /** @description Resultado de `Culqi3DS.generateDevice()`. Se envía igual en el cargo y en su reintento 3DS. */
+            deviceId?: string;
             /** @description Parámetros que devolvió la autenticación 3DS en el navegador (Culqi3DS). */
             authentication3DS?: {
                 [key: string]: unknown;
             };
-        };
-        StripeIntent: {
-            /** Format: uuid */
-            paymentId: string;
-            clientSecret: string;
-            publishableKey: string;
-            amountCents: number;
-            /** @enum {string} */
-            currency: "USD";
         };
         CulqiChargeResult: {
             /** Format: uuid */
@@ -2318,7 +2276,7 @@ export interface components {
             amountCents: number;
             /** Format: date-time */
             expiresAt: string;
-            paymentOptions: ("STRIPE" | "CULQI")[];
+            paymentOptions: "CULQI"[];
         };
         Payment: {
             /** Format: uuid */
@@ -3101,37 +3059,6 @@ export interface operations {
             401: components["responses"]["Error"];
         };
     };
-    createBookingStripeIntent: {
-        parameters: {
-            query?: never;
-            header?: {
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                reference: components["parameters"]["Reference"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePaymentRequest"];
-            };
-        };
-        responses: {
-            /** @description Intent creado */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StripeIntent"];
-                };
-            };
-            409: components["responses"]["Error"];
-            422: components["responses"]["Error"];
-            502: components["responses"]["Error"];
-        };
-    };
     createBookingCulqiCharge: {
         parameters: {
             query?: never;
@@ -3187,34 +3114,6 @@ export interface operations {
             410: components["responses"]["Error"];
         };
     };
-    createLinkStripeIntent: {
-        parameters: {
-            query?: never;
-            header?: {
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                token: components["parameters"]["LinkToken"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Intent creado */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StripeIntent"];
-                };
-            };
-            404: components["responses"]["Error"];
-            409: components["responses"]["Error"];
-            410: components["responses"]["Error"];
-            502: components["responses"]["Error"];
-        };
-    };
     createLinkCulqiCharge: {
         parameters: {
             query?: never;
@@ -3238,6 +3137,8 @@ export interface operations {
                      * @description Pago `REQUIRES_ACTION` que se continúa tras 3DS.
                      */
                     paymentId?: string;
+                    /** @description Resultado de `Culqi3DS.generateDevice()`. */
+                    deviceId?: string;
                     authentication3DS?: {
                         [key: string]: unknown;
                     };
@@ -3507,7 +3408,7 @@ export interface operations {
             };
         };
     };
-    receiveStripeWebhook: {
+    receiveCulqiWebhook: {
         parameters: {
             query?: never;
             header?: never;
@@ -3541,16 +3442,28 @@ export interface operations {
             };
         };
     };
-    receiveCulqiWebhook: {
+    receiveCmsWebhook: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Webhook-Secret": string;
+            };
             path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
                 "application/json": {
+                    /** @example entry.publish */
+                    event?: string;
+                    /** @example tour */
+                    model?: string;
+                    entry?: {
+                        slug?: string;
+                    } & {
+                        [key: string]: unknown;
+                    };
+                } & {
                     [key: string]: unknown;
                 };
             };
@@ -3561,18 +3474,18 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
-            };
-            400: components["responses"]["Error"];
-            /** @description Evento fuera de orden; ver `receiveStripeWebhook`. */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
                 content: {
-                    "application/json": components["schemas"]["Error"];
+                    "application/json": {
+                        ignored?: boolean;
+                        created?: number;
+                        updated?: number;
+                        deactivated?: number;
+                    };
                 };
             };
+            401: components["responses"]["Error"];
+            429: components["responses"]["Error"];
+            503: components["responses"]["Error"];
         };
     };
     loginWithGoogle: {

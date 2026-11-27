@@ -35,7 +35,7 @@ const STATUSES: readonly PaymentStatus[] = [
   'REFUNDED',
   'DISPUTED',
 ];
-const PROVIDERS: readonly PaymentProvider[] = ['STRIPE', 'CULQI', 'MANUAL'];
+const PROVIDERS: readonly PaymentProvider[] = ['CULQI', 'MANUAL'];
 
 export function toPaymentQuery(f: {
   status?: string;
