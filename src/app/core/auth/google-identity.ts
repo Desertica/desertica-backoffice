@@ -6,7 +6,8 @@ const GSI_SRC = 'https://accounts.google.com/gsi/client';
 
 /**
  * Google Identity Services. The script is the only third-party code in the app: it is loaded
- * on the login page only, never elsewhere, and is required by Google's sign-in flow.
+ * only when a sign-in button is shown (the login page and the re-confirmation dialog before a
+ * sensitive action), and is required by Google's sign-in flow.
  */
 @Injectable({ providedIn: 'root' })
 export class GoogleIdentity {

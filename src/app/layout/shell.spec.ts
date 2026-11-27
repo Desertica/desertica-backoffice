@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { AuthService } from '../core/auth/auth.service';
 import { GoogleIdentity } from '../core/auth/google-identity';
+import { IdleService } from '../core/auth/idle.service';
 import { Notify } from '../shared/notify';
 import { Shell } from './shell';
 
@@ -45,6 +46,30 @@ describe('Shell session expiry', () => {
       queryParams: { returnUrl: '/bookings?x=1' },
     });
     expect(info).toHaveBeenCalledWith('auth.sessionExpired');
+  });
+
+  it('signs out after inactivity, keeping where the user was', async () => {
+    let expire: () => void = () => undefined;
+    TestBed.overrideProvider(IdleService, {
+      useValue: {
+        state: signal({ kind: 'active' }),
+        watch: (_ref: unknown, onExpire: () => void) => (expire = onExpire),
+        touch: vi.fn(),
+      },
+    });
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/bookings');
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    TestBed.createComponent(Shell).detectChanges();
+    expire();
+    await vi.waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith(['/login'], {
+        queryParams: { returnUrl: '/bookings' },
+      }),
+    );
+    expect(authenticated()).toBe(false);
+    expect(info).toHaveBeenCalledWith('auth.idle.signedOut');
+    expect(info).not.toHaveBeenCalledWith('auth.sessionExpired');
   });
 
   it('does not warn on a manual sign out', async () => {

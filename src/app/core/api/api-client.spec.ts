@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { RUNTIME_CONFIG } from '../config/runtime-config';
 import { AuthService } from '../auth/auth.service';
+import { ReauthService } from '../auth/reauth.service';
 import { ApiClient } from './api-client';
 
 describe('ApiClient', () => {
@@ -42,5 +43,63 @@ describe('ApiClient', () => {
     expect(refresh).toHaveBeenCalledTimes(1);
     expect(seen.map((s) => s.auth)).toEqual(['Bearer old', 'Bearer new']);
     vi.unstubAllGlobals();
+  });
+
+  describe('403 reauth_required', () => {
+    const reauthBody = JSON.stringify({
+      statusCode: 403,
+      error: 'Forbidden',
+      message: 'Recent login required',
+      details: { reason: 'reauth_required', maxAgeMinutes: 10 },
+    });
+    const setup = (signsIn: boolean) => {
+      let token = 'stale';
+      const seen: (string | null)[] = [];
+      vi.stubGlobal('fetch', async (req: Request) => {
+        seen.push(req.headers.get('Authorization'));
+        return req.headers.get('Authorization') === 'Bearer fresh'
+          ? new Response(null, { status: 204 })
+          : new Response(reauthBody, {
+              status: 403,
+              headers: { 'content-type': 'application/json' },
+            });
+      });
+      TestBed.configureTestingModule({
+        providers: [
+          {
+            provide: RUNTIME_CONFIG,
+            useValue: { apiBaseUrl: 'http://api.test/api', googleClientId: '' },
+          },
+          { provide: AuthService, useValue: { accessToken: () => token, refresh: vi.fn() } },
+        ],
+      });
+      const reauth = TestBed.inject(ReauthService);
+      // The dialog: signs in (new token) or is cancelled.
+      vi.spyOn(reauth, 'request').mockImplementation(async () => {
+        if (signsIn) token = 'fresh';
+        return signsIn;
+      });
+      return { seen, reauth };
+    };
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('asks to sign in again and replays the request with the fresh token', async () => {
+      const { seen, reauth } = setup(true);
+      const res = await TestBed.inject(ApiClient).http.POST('/customers/{id}/erase', {
+        params: { path: { id: 'c1' } },
+      });
+      expect(res.response.status).toBe(204);
+      expect(reauth.request).toHaveBeenCalledTimes(1);
+      expect(seen).toEqual(['Bearer stale', 'Bearer fresh']);
+    });
+
+    it('returns the 403 untouched when the user cancels', async () => {
+      const { seen } = setup(false);
+      const res = await TestBed.inject(ApiClient).http.POST('/customers/{id}/erase', {
+        params: { path: { id: 'c1' } },
+      });
+      expect(res.response.status).toBe(403);
+      expect(seen).toEqual(['Bearer stale']);
+    });
   });
 });

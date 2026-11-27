@@ -1,5 +1,10 @@
 # Staff app behind login: no indexing, no framing, no third-party scripts except Google sign-in.
 # Included in every location because add_header in a location drops the inherited ones.
+# HTTPS only for a year (TLS ends at Cloudflare/Traefik; browsers still honour the header).
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+# Google sign-in opens a popup that must be able to talk back to this window.
+add_header Cross-Origin-Opener-Policy "same-origin-allow-popups" always;
+add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()" always;
 add_header X-Robots-Tag "noindex, nofollow" always;
 add_header X-Content-Type-Options "nosniff" always;
 add_header X-Frame-Options "DENY" always;

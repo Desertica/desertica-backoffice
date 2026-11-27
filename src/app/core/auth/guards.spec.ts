@@ -7,7 +7,7 @@ import {
   UrlTree,
 } from '@angular/router';
 import { RUNTIME_CONFIG } from '../config/runtime-config';
-import { authGuard, guestGuard, permissionGuard } from './auth.guard';
+import { authGuard, guestGuard, homeRedirect, permissionGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { HasPermissionDirective } from './has-permission.directive';
 
@@ -51,6 +51,18 @@ describe('guards', () => {
     expect(run(permissionGuard, { permission: 'bookings:read' })).toBe(true);
     expect(run(permissionGuard, { permission: ['users:read', 'bookings:read'] })).toBe(true);
     expect(run(permissionGuard, { permission: 'users:read' })).toBeInstanceOf(UrlTree);
+  });
+
+  it('sends home to the dashboard only when the role can read reports', () => {
+    const home = () =>
+      TestBed.runInInjectionContext(() => homeRedirect({} as Parameters<typeof homeRedirect>[0]));
+    perms.set(['reports:read', 'bookings:read']);
+    expect(home()).toBe('/dashboard');
+    // Operaciones: sin reports:read entra directo a las salidas.
+    perms.set(['departures:read', 'bookings:read']);
+    expect(home()).toBe('/departures');
+    perms.set([]);
+    expect(home()).toBe('/forbidden');
   });
 });
 

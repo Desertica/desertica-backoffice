@@ -1,6 +1,8 @@
 server {
   listen 8080;
   server_name _;
+  # No version in the Server header or error pages.
+  server_tokens off;
   root /usr/share/nginx/html;
   index index.html;
 
