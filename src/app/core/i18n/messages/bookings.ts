@@ -70,20 +70,23 @@ export const bookings = defineMessages({
     'bookings.cancel.title': 'Cancelar la reserva {reference}',
     'bookings.cancel.reason': 'Motivo',
     'bookings.cancel.refund': 'Reembolso',
-    'bookings.cancel.refund.POLICY': 'Según la política de cancelación vigente al reservar',
-    'bookings.cancel.refund.FULL': 'Reembolso total (excepción)',
+    'bookings.cancel.refund.POLICY':
+      'Según la política de cancelación (sin reembolsos por decisión del cliente)',
+    'bookings.cancel.refund.FULL':
+      'Reembolso total (el tour no sale por clima, autoridad u operador)',
     'bookings.cancel.refund.NONE': 'Sin reembolso (excepción)',
     'bookings.cancel.policyHint':
-      'El API calcula el monto con la política que el cliente aceptó. Las excepciones requieren permiso especial.',
+      'Si el cliente cancela, no hay reembolso; las reservas hechas antes de esta regla usan los tramos que aceptaron. Usa «Reembolso total» solo si el tour no sale. Las excepciones requieren permiso especial.',
     'bookings.cancel.reason.NONE_REQUESTED': 'Se eligió cancelar sin reembolso.',
     'bookings.cancel.reason.NOTHING_TO_REFUND': 'No hay nada que reembolsar.',
     'bookings.cancel.reason.NO_PAYMENTS': 'La reserva no tiene pagos.',
     'bookings.cancel.reason.NO_POLICY': 'La reserva no tiene política de cancelación.',
     'bookings.cancel.reason.OUTSIDE_POLICY_WINDOW': 'Fuera del plazo de reembolso de la política.',
+    'bookings.cancel.reason.NO_CUSTOMER_REFUNDS': 'Sin reembolsos por decisión del cliente.',
     'bookings.cancel.quote.paid': 'Cobrado hasta ahora',
     'bookings.cancel.quote.refund': 'Se reembolsará',
     'bookings.cancel.quote.tier':
-      'Tramo de la política: cancelación con {hours} h o más de anticipación',
+      'Tramo de la política anterior de esta reserva: cancelación con {hours} h o más de anticipación',
     'bookings.cancel.quote.error':
       'No se pudo calcular el reembolso; el API lo calculará al confirmar.',
     'bookings.cancel.confirm': 'Cancelar reserva',
@@ -247,20 +250,23 @@ export const bookings = defineMessages({
     'bookings.cancel.title': 'Cancel booking {reference}',
     'bookings.cancel.reason': 'Reason',
     'bookings.cancel.refund': 'Refund',
-    'bookings.cancel.refund.POLICY': 'According to the cancellation policy in force when booked',
-    'bookings.cancel.refund.FULL': 'Full refund (exception)',
+    'bookings.cancel.refund.POLICY':
+      'According to the cancellation policy (no refunds when the customer cancels)',
+    'bookings.cancel.refund.FULL':
+      'Full refund (the tour cannot run: weather, authorities or operator)',
     'bookings.cancel.refund.NONE': 'No refund (exception)',
     'bookings.cancel.policyHint':
-      'The API computes the amount with the policy the customer accepted. Exceptions need a special permission.',
+      'If the customer cancels there is no refund; bookings made before this rule use the tiers they accepted. Use "Full refund" only when the tour cannot run. Exceptions need a special permission.',
     'bookings.cancel.reason.NONE_REQUESTED': 'Cancelling without a refund was chosen.',
     'bookings.cancel.reason.NOTHING_TO_REFUND': 'Nothing to refund.',
     'bookings.cancel.reason.NO_PAYMENTS': 'The booking has no payments.',
     'bookings.cancel.reason.NO_POLICY': 'The booking has no cancellation policy.',
     'bookings.cancel.reason.OUTSIDE_POLICY_WINDOW': 'Outside the policy refund window.',
+    'bookings.cancel.reason.NO_CUSTOMER_REFUNDS': 'No refunds when the customer cancels.',
     'bookings.cancel.quote.paid': 'Collected so far',
     'bookings.cancel.quote.refund': 'Will be refunded',
     'bookings.cancel.quote.tier':
-      'Policy tier: {percent}% if cancelled {hours} h or more in advance',
+      'Earlier policy of this booking: {percent}% if cancelled {hours} h or more in advance',
     'bookings.cancel.quote.error':
       'The refund could not be calculated; the API will compute it on confirm.',
     'bookings.cancel.confirm': 'Cancel booking',

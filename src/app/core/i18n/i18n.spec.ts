@@ -11,6 +11,15 @@ describe('i18n', () => {
     }
   });
 
+  it('labels every reason the API gives for a zero refund', () => {
+    expect(es['bookings.cancel.reason.NO_CUSTOMER_REFUNDS']).toBe(
+      'Sin reembolsos por decisión del cliente.',
+    );
+    expect(en['bookings.cancel.reason.NO_CUSTOMER_REFUNDS']).toBe(
+      'No refunds when the customer cancels.',
+    );
+  });
+
   it('detects the language, Spanish by default', () => {
     expect(detectLang('en', 'es-PE')).toBe('en');
     expect(detectLang(null, 'en-GB')).toBe('en');
